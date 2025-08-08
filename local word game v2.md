@@ -1,19 +1,5 @@
 # Simplified Flutter Word Game Architecture
 
-## Issues with Previous Plan
-
-The previous architecture plan suffers from significant overengineering:
-
-### Major Overengineering Issues:
-- **Flame Game Engine**: Completely unnecessary for a word guessing game. Flame is for complex 2D games with physics, animations, and real-time interactions. A simple word game needs basic UI widgets.
-- **Complex BLoC Architecture**: Three separate BLoCs (GamePlay, Progress, Settings) when simple state management would suffice.
-- **Repository Pattern Overkill**: Abstract interfaces and multiple data sources for what should be local-only data.
-- **Overcomplicated Database**: 7+ tables for what could be 2-3 simple tables.
-- **Custom Audio Engine**: Building complex audio caching when Flutter's basic audio players are sufficient.
-- **Memory Management System**: Custom asset managers and LRU caches for a simple word game.
-- **Encryption**: Unnecessary security complexity for local game progress.
-- **Performance Monitoring**: Firebase Performance for a simple offline game is overkill.
-
 ## Simplified Architecture
 
 ### Core Principles
@@ -22,7 +8,7 @@ The previous architecture plan suffers from significant overengineering:
 - **Progressive complexity**: Start minimal, add features as needed
 - **Standard patterns**: Use well-established, simple patterns
 
-## System Architecture
+## System Architecture (Updated for BLoC)
 
 ```
 ┌─────────────────────────────────────────────┐
@@ -36,9 +22,10 @@ The previous architecture plan suffers from significant overengineering:
 ├─────────────────────────────────────────────┤
 │              State Management                │
 │  ┌─────────────────────────────────────────┐ │
-│  │          Provider/Riverpod             │ │
-│  │   - GameStateNotifier                 │ │
-│  │   - SettingsNotifier                  │ │
+│  │               BLoC Layer                │ │
+│  │   - GameBloc                           │ │
+│  │   - SettingsBloc                       │ │
+│  │   - StatsBloc                          │ │
 │  └─────────────────────────────────────────┘ │
 ├─────────────────────────────────────────────┤
 │                Data Layer                    │
@@ -46,94 +33,241 @@ The previous architecture plan suffers from significant overengineering:
 │  │Local Storage│  │      Services           ││
 │  │- SQLite     │  │- Word Service           ││
 │  │- SharedPrefs│  │- Audio Service          ││
+│  │             │  │- Stats Service          ││
 │  └─────────────┘  └─────────────────────────┘│
 └─────────────────────────────────────────────┘
 ```
 
 ## Implementation Details
 
-### 1. State Management - Simple Provider Pattern
+### 1. State Management - BLoC Pattern
 
+#### Game Events
 ```dart
-class GameState extends ChangeNotifier {
-  List<List<String>> _grid = List.generate(6, (_) => List.filled(5, ''));
-  List<List<TileState>> _tileStates = List.generate(6, (_) => List.filled(5, TileState.empty));
-  int _currentRow = 0;
-  int _currentCol = 0;
-  String _targetWord = '';
-  GameStatus _status = GameStatus.playing;
+abstract class GameEvent extends Equatable {
+  const GameEvent();
   
-  // Getters
-  List<List<String>> get grid => _grid;
-  List<List<TileState>> get tileStates => _tileStates;
-  int get currentRow => _currentRow;
-  GameStatus get status => _status;
+  @override
+  List<Object> get props => [];
+}
+
+class GameStarted extends GameEvent {}
+
+class LetterAdded extends GameEvent {
+  final String letter;
   
-  void startNewGame() {
-    _targetWord = WordService.getRandomWord();
-    _grid = List.generate(6, (_) => List.filled(5, ''));
-    _tileStates = List.generate(6, (_) => List.filled(5, TileState.empty));
-    _currentRow = 0;
-    _currentCol = 0;
-    _status = GameStatus.playing;
-    notifyListeners();
-  }
+  const LetterAdded(this.letter);
   
-  void addLetter(String letter) {
-    if (_currentCol < 5 && _status == GameStatus.playing) {
-      _grid[_currentRow][_currentCol] = letter;
-      _currentCol++;
-      notifyListeners();
-    }
-  }
+  @override
+  List<Object> get props => [letter];
+}
+
+class LetterRemoved extends GameEvent {}
+
+class GuessSubmitted extends GameEvent {}
+
+class NewGameRequested extends GameEvent {}
+```
+
+#### Game States
+```dart
+abstract class GameState extends Equatable {
+  const GameState();
   
-  void removeLetter() {
-    if (_currentCol > 0) {
-      _currentCol--;
-      _grid[_currentRow][_currentCol] = '';
-      notifyListeners();
-    }
-  }
+  @override
+  List<Object> get props => [];
+}
+
+class GameInitial extends GameState {}
+
+class GameInProgress extends GameState {
+  final List<List<String>> grid;
+  final List<List<TileState>> tileStates;
+  final int currentRow;
+  final int currentCol;
+  final String targetWord;
+  final GameStatus status;
+  final String? errorMessage;
   
-  void submitGuess() {
-    if (_currentCol == 5) {
-      String guess = _grid[_currentRow].join();
-      
-      // Check if valid word
-      if (!WordService.isValidWord(guess)) {
-        // Show error - invalid word
-        return;
-      }
-      
-      // Update tile states
-      for (int i = 0; i < 5; i++) {
-        if (guess[i] == _targetWord[i]) {
-          _tileStates[_currentRow][i] = TileState.correct;
-        } else if (_targetWord.contains(guess[i])) {
-          _tileStates[_currentRow][i] = TileState.wrongPosition;
-        } else {
-          _tileStates[_currentRow][i] = TileState.notInWord;
-        }
-      }
-      
-      // Check win/lose conditions
-      if (guess == _targetWord) {
-        _status = GameStatus.won;
-        StatsService.recordWin(_currentRow + 1);
-      } else if (_currentRow == 5) {
-        _status = GameStatus.lost;
-        StatsService.recordLoss();
-      }
-      
-      _currentRow++;
-      _currentCol = 0;
-      notifyListeners();
-    }
+  const GameInProgress({
+    required this.grid,
+    required this.tileStates,
+    required this.currentRow,
+    required this.currentCol,
+    required this.targetWord,
+    required this.status,
+    this.errorMessage,
+  });
+  
+  @override
+  List<Object> get props => [
+    grid,
+    tileStates,
+    currentRow,
+    currentCol,
+    targetWord,
+    status,
+    errorMessage ?? '',
+  ];
+  
+  GameInProgress copyWith({
+    List<List<String>>? grid,
+    List<List<TileState>>? tileStates,
+    int? currentRow,
+    int? currentCol,
+    String? targetWord,
+    GameStatus? status,
+    String? errorMessage,
+  }) {
+    return GameInProgress(
+      grid: grid ?? this.grid,
+      tileStates: tileStates ?? this.tileStates,
+      currentRow: currentRow ?? this.currentRow,
+      currentCol: currentCol ?? this.currentCol,
+      targetWord: targetWord ?? this.targetWord,
+      status: status ?? this.status,
+      errorMessage: errorMessage,
+    );
   }
 }
 
 enum TileState { empty, correct, wrongPosition, notInWord }
 enum GameStatus { playing, won, lost }
+```
+
+#### Game BLoC
+```dart
+class GameBloc extends Bloc<GameEvent, GameState> {
+  final WordService wordService;
+  final StatsService statsService;
+  final AudioService audioService;
+  
+  GameBloc({
+    required this.wordService,
+    required this.statsService,
+    required this.audioService,
+  }) : super(GameInitial()) {
+    on<GameStarted>(_onGameStarted);
+    on<LetterAdded>(_onLetterAdded);
+    on<LetterRemoved>(_onLetterRemoved);
+    on<GuessSubmitted>(_onGuessSubmitted);
+    on<NewGameRequested>(_onNewGameRequested);
+  }
+  
+  void _onGameStarted(GameStarted event, Emitter<GameState> emit) {
+    final targetWord = wordService.getRandomWord();
+    emit(GameInProgress(
+      grid: List.generate(6, (_) => List.filled(5, '')),
+      tileStates: List.generate(6, (_) => List.filled(5, TileState.empty)),
+      currentRow: 0,
+      currentCol: 0,
+      targetWord: targetWord,
+      status: GameStatus.playing,
+    ));
+  }
+  
+  void _onLetterAdded(LetterAdded event, Emitter<GameState> emit) {
+    if (state is GameInProgress) {
+      final currentState = state as GameInProgress;
+      
+      if (currentState.currentCol < 5 && currentState.status == GameStatus.playing) {
+        final newGrid = List<List<String>>.from(
+          currentState.grid.map((row) => List<String>.from(row))
+        );
+        
+        newGrid[currentState.currentRow][currentState.currentCol] = event.letter;
+        
+        audioService.playSound('key_tap');
+        
+        emit(currentState.copyWith(
+          grid: newGrid,
+          currentCol: currentState.currentCol + 1,
+          errorMessage: null,
+        ));
+      }
+    }
+  }
+  
+  void _onLetterRemoved(LetterRemoved event, Emitter<GameState> emit) {
+    if (state is GameInProgress) {
+      final currentState = state as GameInProgress;
+      
+      if (currentState.currentCol > 0) {
+        final newGrid = List<List<String>>.from(
+          currentState.grid.map((row) => List<String>.from(row))
+        );
+        
+        newGrid[currentState.currentRow][currentState.currentCol - 1] = '';
+        
+        audioService.playSound('key_tap');
+        
+        emit(currentState.copyWith(
+          grid: newGrid,
+          currentCol: currentState.currentCol - 1,
+          errorMessage: null,
+        ));
+      }
+    }
+  }
+  
+  void _onGuessSubmitted(GuessSubmitted event, Emitter<GameState> emit) {
+    if (state is GameInProgress) {
+      final currentState = state as GameInProgress;
+      
+      if (currentState.currentCol == 5) {
+        final guess = currentState.grid[currentState.currentRow].join();
+        
+        // Validate word
+        if (!wordService.isValidWord(guess)) {
+          audioService.playSound('error');
+          emit(currentState.copyWith(errorMessage: 'Invalid word'));
+          return;
+        }
+        
+        // Update tile states
+        final newTileStates = List<List<TileState>>.from(
+          currentState.tileStates.map((row) => List<TileState>.from(row))
+        );
+        
+        for (int i = 0; i < 5; i++) {
+          if (guess[i] == currentState.targetWord[i]) {
+            newTileStates[currentState.currentRow][i] = TileState.correct;
+          } else if (currentState.targetWord.contains(guess[i])) {
+            newTileStates[currentState.currentRow][i] = TileState.wrongPosition;
+          } else {
+            newTileStates[currentState.currentRow][i] = TileState.notInWord;
+          }
+        }
+        
+        // Check win/lose conditions
+        GameStatus newStatus = currentState.status;
+        if (guess == currentState.targetWord) {
+          newStatus = GameStatus.won;
+          statsService.recordWin(currentState.currentRow + 1);
+          audioService.playSound('win');
+        } else if (currentState.currentRow == 5) {
+          newStatus = GameStatus.lost;
+          statsService.recordLoss();
+          audioService.playSound('lose');
+        } else {
+          audioService.playSound('guess_submitted');
+        }
+        
+        emit(currentState.copyWith(
+          tileStates: newTileStates,
+          currentRow: currentState.currentRow + 1,
+          currentCol: 0,
+          status: newStatus,
+          errorMessage: null,
+        ));
+      }
+    }
+  }
+  
+  void _onNewGameRequested(NewGameRequested event, Emitter<GameState> emit) {
+    add(GameStarted());
+  }
+}
 ```
 
 ### 2. Simple Data Layer
@@ -197,90 +331,508 @@ class WordService {
 }
 ```
 
-### 3. UI Implementation - Standard Flutter Widgets
+### 3. App Styling & Theme System
+
+#### Theme Configuration
+```dart
+class AppTheme {
+  // Color Palette inspired by Zimbabwean culture
+  static const Color primaryGold = Color(0xFFFFD700);
+  static const Color secondaryRed = Color(0xFFDC2626);
+  static const Color accentGreen = Color(0xFF059669);
+  static const Color backgroundLight = Color(0xFFFAFAFA);
+  static const Color backgroundDark = Color(0xFF1F2937);
+  
+  // Game-specific colors
+  static const Color correctTile = Color(0xFF10B981); // Green
+  static const Color wrongPositionTile = Color(0xFFF59E0B); // Amber
+  static const Color notInWordTile = Color(0xFF6B7280); // Gray
+  static const Color emptyTile = Color(0xFFFFFFFF);
+  static const Color emptyTileBorder = Color(0xFFD1D5DB);
+  
+  static ThemeData lightTheme = ThemeData(
+    useMaterial3: true,
+    brightness: Brightness.light,
+    colorScheme: ColorScheme.fromSeed(
+      seedColor: primaryGold,
+      brightness: Brightness.light,
+    ),
+    appBarTheme: const AppBarTheme(
+      backgroundColor: primaryGold,
+      foregroundColor: Colors.black,
+      elevation: 0,
+      centerTitle: true,
+      titleTextStyle: TextStyle(
+        fontFamily: 'Roboto',
+        fontSize: 20,
+        fontWeight: FontWeight.w600,
+        color: Colors.black,
+      ),
+    ),
+    cardTheme: CardTheme(
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+    ),
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: primaryGold,
+        foregroundColor: Colors.black,
+        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+      ),
+    ),
+  );
+  
+  static ThemeData darkTheme = ThemeData(
+    useMaterial3: true,
+    brightness: Brightness.dark,
+    colorScheme: ColorScheme.fromSeed(
+      seedColor: primaryGold,
+      brightness: Brightness.dark,
+    ),
+    scaffoldBackgroundColor: backgroundDark,
+    appBarTheme: const AppBarTheme(
+      backgroundColor: backgroundDark,
+      foregroundColor: primaryGold,
+      elevation: 0,
+      centerTitle: true,
+    ),
+  );
+}
+
+// Custom typography for Shona and Ndebele text
+class AppTextStyles {
+  static const TextStyle heading1 = TextStyle(
+    fontSize: 32,
+    fontWeight: FontWeight.bold,
+    height: 1.2,
+  );
+  
+  static const TextStyle heading2 = TextStyle(
+    fontSize: 24,
+    fontWeight: FontWeight.w600,
+    height: 1.3,
+  );
+  
+  static const TextStyle body = TextStyle(
+    fontSize: 16,
+    fontWeight: FontWeight.w400,
+    height: 1.5,
+  );
+  
+  static const TextStyle tileLetter = TextStyle(
+    fontSize: 32,
+    fontWeight: FontWeight.bold,
+    height: 1.0,
+  );
+  
+  static const TextStyle keyboardKey = TextStyle(
+    fontSize: 18,
+    fontWeight: FontWeight.w600,
+    height: 1.0,
+  );
+}
+```
+
+#### Styled UI Components
 
 ```dart
 class GameScreen extends StatelessWidget {
+  const GameScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(context.read<SettingsState>().currentLanguage == 'shona' 
-          ? 'Mutambo weMazwi' : 'Umdlalo wamazwi'),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.settings),
-            onPressed: () => Navigator.push(context, 
-              MaterialPageRoute(builder: (_) => SettingsScreen())),
+    return BlocProvider(
+      create: (context) => GameBloc(
+        wordService: context.read<WordService>(),
+        statsService: context.read<StatsService>(),
+        audioService: context.read<AudioService>(),
+      )..add(GameStarted()),
+      child: Scaffold(
+        appBar: AppBar(
+          title: BlocBuilder<SettingsBloc, SettingsState>(
+            builder: (context, settingsState) {
+              return Text(
+                settingsState.currentLanguage == 'shona' 
+                  ? 'Mutambo weMazwi' 
+                  : 'Umdlalo wamazwi',
+              );
+            },
           ),
-        ],
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.bar_chart_rounded),
+              onPressed: () => _showStatsDialog(context),
+            ),
+            IconButton(
+              icon: const Icon(Icons.settings),
+              onPressed: () => Navigator.push(
+                context, 
+                MaterialPageRoute(builder: (_) => const SettingsScreen()),
+              ),
+            ),
+          ],
+        ),
+        body: BlocConsumer<GameBloc, GameState>(
+          listener: (context, state) {
+            if (state is GameInProgress && state.errorMessage != null) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.errorMessage!),
+                  backgroundColor: Colors.red,
+                  behavior: SnackBarBehavior.floating,
+                  duration: const Duration(seconds: 2),
+                ),
+              );
+            }
+          },
+          builder: (context, state) {
+            if (state is GameInitial) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            
+            if (state is GameInProgress) {
+              return Column(
+                children: [
+                  const SizedBox(height: 16),
+                  Expanded(
+                    flex: 3,
+                    child: GameGrid(gameState: state),
+                  ),
+                  const SizedBox(height: 16),
+                  if (state.status == GameStatus.playing)
+                    Expanded(
+                      flex: 2,
+                      child: VirtualKeyboard(gameState: state),
+                    )
+                  else
+                    GameResultsWidget(gameState: state),
+                  const SizedBox(height: 16),
+                ],
+              );
+            }
+            
+            return const Center(child: Text('Something went wrong'));
+          },
+        ),
       ),
-      body: Consumer<GameState>(
-        builder: (context, gameState, _) {
-          return Column(
-            children: [
-              Expanded(child: GameGrid()),
-              if (gameState.status == GameStatus.playing)
-                VirtualKeyboard(),
-              if (gameState.status != GameStatus.playing)
-                GameResultsWidget(),
-            ],
-          );
-        },
-      ),
+    );
+  }
+  
+  void _showStatsDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => const StatsDialog(),
     );
   }
 }
 
 class GameGrid extends StatelessWidget {
+  final GameInProgress gameState;
+  
+  const GameGrid({required this.gameState, super.key});
+
   @override
   Widget build(BuildContext context) {
-    return Consumer<GameState>(
-      builder: (context, gameState, _) {
-        return GridView.builder(
-          padding: EdgeInsets.all(16),
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 5,
-            mainAxisSpacing: 4,
-            crossAxisSpacing: 4,
-          ),
-          itemCount: 30, // 6 rows × 5 columns
-          itemBuilder: (context, index) {
-            final row = index ~/ 5;
-            final col = index % 5;
-            
-            return LetterTile(
-              letter: gameState.grid[row][col],
-              state: gameState.tileStates[row][col],
-            );
-          },
-        );
-      },
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        children: List.generate(6, (rowIndex) {
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(5, (colIndex) {
+                return Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: LetterTile(
+                    letter: gameState.grid[rowIndex][colIndex],
+                    state: gameState.tileStates[rowIndex][colIndex],
+                    isCurrentRow: rowIndex == gameState.currentRow,
+                    isAnimated: rowIndex < gameState.currentRow ||
+                        (rowIndex == gameState.currentRow && 
+                         gameState.status != GameStatus.playing),
+                  ),
+                );
+              }),
+            ),
+          );
+        }),
+      ),
     );
   }
 }
 
-class LetterTile extends StatelessWidget {
+class LetterTile extends StatefulWidget {
   final String letter;
   final TileState state;
+  final bool isCurrentRow;
+  final bool isAnimated;
   
-  const LetterTile({required this.letter, required this.state});
+  const LetterTile({
+    required this.letter,
+    required this.state,
+    this.isCurrentRow = false,
+    this.isAnimated = false,
+    super.key,
+  });
+  
+  @override
+  State<LetterTile> createState() => _LetterTileState();
+}
+
+class _LetterTileState extends State<LetterTile>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+  late Animation<double> _flipAnimation;
+  
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 600),
+      vsync: this,
+    );
+    
+    _scaleAnimation = Tween<double>(
+      begin: 1.0,
+      end: 1.1,
+    ).animate(CurvedAnimation(
+      parent: _controller,
+      curve: const Interval(0.0, 0.3, curve: Curves.easeInOut),
+    ));
+    
+    _flipAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _controller,
+      curve: const Interval(0.3, 1.0, curve: Curves.easeInOut),
+    ));
+  }
+  
+  @override
+  void didUpdateWidget(LetterTile oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.isAnimated && !oldWidget.isAnimated) {
+      _controller.forward();
+    }
+  }
   
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey),
-        color: _getBackgroundColor(),
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: Center(
-        child: Text(
-          letter,
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: _getTextColor(),
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        return Transform.scale(
+          scale: _scaleAnimation.value,
+          child: Transform(
+            alignment: Alignment.center,
+            transform: Matrix4.identity()
+              ..setEntry(3, 2, 0.001)
+              ..rotateY(_flipAnimation.value * 3.14159),
+            child: Container(
+              width: 56,
+              height: 56,
+              decoration: BoxDecoration(
+                color: _getBackgroundColor(),
+                border: Border.all(
+                  color: _getBorderColor(),
+                  width: 2,
+                ),
+                borderRadius: BorderRadius.circular(4),
+                boxShadow: widget.isCurrentRow && widget.letter.isNotEmpty
+                    ? [
+                        BoxShadow(
+                          color: AppTheme.primaryGold.withOpacity(0.3),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ]
+                    : null,
+              ),
+              child: Center(
+                child: Text(
+                  widget.letter.toUpperCase(),
+                  style: AppTextStyles.tileLetter.copyWith(
+                    color: _getTextColor(),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+  
+  Color _getBackgroundColor() {
+    switch (widget.state) {
+      case TileState.correct:
+        return AppTheme.correctTile;
+      case TileState.wrongPosition:
+        return AppTheme.wrongPositionTile;
+      case TileState.notInWord:
+        return AppTheme.notInWordTile;
+      default:
+        return AppTheme.emptyTile;
+    }
+  }
+  
+  Color _getBorderColor() {
+    if (widget.state != TileState.empty) {
+      return _getBackgroundColor();
+    }
+    return widget.isCurrentRow && widget.letter.isNotEmpty
+        ? AppTheme.primaryGold
+        : AppTheme.emptyTileBorder;
+  }
+  
+  Color _getTextColor() {
+    return widget.state == TileState.empty 
+        ? Colors.black 
+        : Colors.white;
+  }
+  
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+}
+
+class VirtualKeyboard extends StatelessWidget {
+  final GameInProgress gameState;
+  
+  const VirtualKeyboard({required this.gameState, super.key});
+  
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<SettingsBloc, SettingsState>(
+      builder: (context, settingsState) {
+        final layout = _getKeyboardLayout(settingsState.currentLanguage);
+        
+        return Container(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: layout.map((row) {
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: row.map((key) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 2),
+                      child: KeyboardKey(
+                        letter: key,
+                        keyState: _getKeyState(key),
+                        onPressed: () => _handleKeyPress(context, key),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              );
+            }).toList(),
+          ),
+        );
+      },
+    );
+  }
+  
+  List<List<String>> _getKeyboardLayout(String language) {
+    if (language == 'shona') {
+      return [
+        ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
+        ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'],
+        ['⏎', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', '⌫'],
+      ];
+    } else {
+      return [
+        ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
+        ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'],
+        ['⏎', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', '⌫'],
+      ];
+    }
+  }
+  
+  KeyState _getKeyState(String key) {
+    if (key == '⏎' || key == '⌫') return KeyState.normal;
+    
+    // Check if key has been used in previous guesses
+    for (int row = 0; row < gameState.currentRow; row++) {
+      for (int col = 0; col < 5; col++) {
+        if (gameState.grid[row][col] == key) {
+          switch (gameState.tileStates[row][col]) {
+            case TileState.correct:
+              return KeyState.correct;
+            case TileState.wrongPosition:
+              return KeyState.wrongPosition;
+            case TileState.notInWord:
+              return KeyState.notInWord;
+            default:
+              break;
+          }
+        }
+      }
+    }
+    
+    return KeyState.normal;
+  }
+  
+  void _handleKeyPress(BuildContext context, String key) {
+    final gameBloc = context.read<GameBloc>();
+    
+    if (key == '⌫') {
+      gameBloc.add(LetterRemoved());
+    } else if (key == '⏎') {
+      gameBloc.add(GuessSubmitted());
+    } else {
+      gameBloc.add(LetterAdded(key));
+    }
+  }
+}
+
+class KeyboardKey extends StatelessWidget {
+  final String letter;
+  final KeyState keyState;
+  final VoidCallback onPressed;
+  
+  const KeyboardKey({
+    required this.letter,
+    required this.keyState,
+    required this.onPressed,
+    super.key,
+  });
+  
+  @override
+  Widget build(BuildContext context) {
+    final isSpecialKey = letter == '⏎' || letter == '⌫';
+    
+    return GestureDetector(
+      onTap: onPressed,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        width: isSpecialKey ? 64 : 40,
+        height: 56,
+        decoration: BoxDecoration(
+          color: _getBackgroundColor(),
+          borderRadius: BorderRadius.circular(4),
+          border: Border.all(
+            color: _getBorderColor(),
+            width: 1,
+          ),
+        ),
+        child: Center(
+          child: Text(
+            letter,
+            style: AppTextStyles.keyboardKey.copyWith(
+              color: _getTextColor(),
+            ),
           ),
         ),
       ),
@@ -288,18 +840,32 @@ class LetterTile extends StatelessWidget {
   }
   
   Color _getBackgroundColor() {
-    switch (state) {
-      case TileState.correct: return Colors.green;
-      case TileState.wrongPosition: return Colors.orange;
-      case TileState.notInWord: return Colors.grey;
-      default: return Colors.white;
+    switch (keyState) {
+      case KeyState.correct:
+        return AppTheme.correctTile;
+      case KeyState.wrongPosition:
+        return AppTheme.wrongPositionTile;
+      case KeyState.notInWord:
+        return AppTheme.notInWordTile;
+      default:
+        return Colors.grey.shade200;
     }
   }
   
+  Color _getBorderColor() {
+    return keyState == KeyState.normal 
+        ? Colors.grey.shade400 
+        : _getBackgroundColor();
+  }
+  
   Color _getTextColor() {
-    return state == TileState.empty ? Colors.black : Colors.white;
+    return keyState == KeyState.normal 
+        ? Colors.black 
+        : Colors.white;
   }
 }
+
+enum KeyState { normal, correct, wrongPosition
 ```
 
 ### 4. Simple Audio Service
@@ -369,30 +935,590 @@ class SettingsState extends ChangeNotifier {
 }
 ```
 
-## Project Structure
-
-```
 lib/
 ├── main.dart
-├── models/
-│   ├── game_state.dart
-│   └── word.dart
-├── screens/
-│   ├── game_screen.dart
-│   ├── settings_screen.dart
-│   └── stats_screen.dart
-├── widgets/
-│   ├── game_grid.dart
-│   ├── letter_tile.dart
-│   ├── virtual_keyboard.dart
-│   └── results_widget.dart
-├── services/
-│   ├── word_service.dart
-│   ├── audio_service.dart
-│   └── stats_service.dart
-└── providers/
-    ├── game_provider.dart
-    └── settings_provider.dart
+├── app/
+│   ├── app.dart                    # Main app widget with theme
+│   └── themes/
+│       ├── app_theme.dart         # Theme configurations
+│       └── app_text_styles.dart   # Typography styles
+├── features/
+│   ├── game/
+│   │   ├── bloc/
+│   │   │   ├── game_bloc.dart
+│   │   │   ├── game_event.dart
+│   │   │   └── game_state.dart
+│   │   ├── screens/
+│   │   │   └── game_screen.dart
+│   │   └── widgets/
+│   │       ├── game_grid.dart
+│   │       ├── letter_tile.dart
+│   │       ├── virtual_keyboard.dart
+│   │       └── game_results.dart
+│   ├── settings/
+│   │   ├── bloc/
+│   │   │   ├── settings_bloc.dart
+│   │   │   ├── settings_event.dart
+│   │   │   └── settings_state.dart
+│   │   ├── screens/
+│   │   │   └── settings_screen.dart
+│   │   └── widgets/
+│   │       └── settings_card.dart
+│   └── stats/
+│       ├── bloc/
+│       │   ├── stats_bloc.dart
+│       │   ├── stats_event.dart
+│       │   └── stats_state.dart
+│       └── widgets/
+│           └── stats_dialog.dart
+├── shared/
+│   ├── models/
+│   │   ├── word.dart
+│   │   └── game_models.dart
+│   ├── services/
+│   │   ├── word_service.dart
+│   │   ├── audio_service.dart
+│   │   └── stats_service.dart
+│   ├── widgets/
+│   │   └── common_widgets.dart
+│   └── utils/
+│       ├── constants.dart
+│       └── extensions.dart
+└── assets/
+    ├── audio/
+    │   ├── sounds/
+    │   └── pronunciations/
+    ├── images/
+    └── fonts/
+```
+
+## App Entry Point
+
+```dart
+// main.dart
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'app/app.dart';
+import 'shared/services/word_service.dart';
+import 'shared/services/audio_service.dart';
+import 'shared/services/stats_service.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  // Initialize services
+  await WordService.initialize();
+  await AudioService.initialize();
+  await StatsService.initialize();
+  
+  runApp(const WordGameApp());
+}
+
+// app/app.dart
+class WordGameApp extends StatelessWidget {
+  const WordGameApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MultiRepositoryProvider(
+      providers: [
+        RepositoryProvider<WordService>(
+          create: (context) => WordService(),
+        ),
+        RepositoryProvider<AudioService>(
+          create: (context) => AudioService(),
+        ),
+        RepositoryProvider<StatsService>(
+          create: (context) => StatsService(),
+        ),
+      ],
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider<SettingsBloc>(
+            create: (context) => SettingsBloc()..add(SettingsLoaded()),
+          ),
+          BlocProvider<StatsBloc>(
+            create: (context) => StatsBloc(
+              statsService: context.read<StatsService>(),
+            )..add(StatsLoaded()),
+          ),
+        ],
+        child: BlocBuilder<SettingsBloc, SettingsState>(
+          builder: (context, state) {
+            return MaterialApp(
+              title: 'Shona & Ndebele Word Game',
+              theme: AppTheme.lightTheme,
+              darkTheme: AppTheme.darkTheme,
+              themeMode: state.isDarkMode ? ThemeMode.dark : ThemeMode.light,
+              home: const GameScreen(),
+              debugShowCheckedModeBanner: false,
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+```
+
+## Additional UI Components & Animations
+
+```dart
+// Animated splash screen widget
+class SplashScreen extends StatefulWidget {
+  const SplashScreen({super.key});
+  
+  @override
+  State<SplashScreen> createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _fadeAnimation;
+  late Animation<double> _scaleAnimation;
+  
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(seconds: 2),
+      vsync: this,
+    );
+    
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeIn,
+    ));
+    
+    _scaleAnimation = Tween<double>(
+      begin: 0.5,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _controller,
+      curve: Curves.elasticOut,
+    ));
+    
+    _controller.forward().then((_) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const GameScreen()),
+      );
+    });
+  }
+  
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppTheme.primaryGold,
+      body: Center(
+        child: AnimatedBuilder(
+          animation: _controller,
+          builder: (context, child) {
+            return FadeTransition(
+              opacity: _fadeAnimation,
+              child: ScaleTransition(
+                scale: _scaleAnimation,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: 120,
+                      height: 120,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.2),
+                            blurRadius: 20,
+                            offset: const Offset(0, 10),
+                          ),
+                        ],
+                      ),
+                      child: const Icon(
+                        Icons.school,
+                        size: 60,
+                        color: AppTheme.primaryGold,
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    Text(
+                      'Mutambo weMazwi',
+                      style: AppTextStyles.heading1.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Shona & Ndebele Word Game',
+                      style: AppTextStyles.body.copyWith(
+                        color: Colors.white70,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+  
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+}
+
+// Custom loading widget
+class GameLoadingWidget extends StatelessWidget {
+  const GameLoadingWidget({super.key});
+  
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(
+              AppTheme.primaryGold,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'Tichigadzira mutambo...',
+            style: AppTextStyles.body.copyWith(
+              color: Colors.grey.shade600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+```
+
+class GameResultsWidget extends StatelessWidget {
+  final GameInProgress gameState;
+  
+  const GameResultsWidget({required this.gameState, super.key});
+  
+  @override
+  Widget build(BuildContext context) {
+    final isWon = gameState.status == GameStatus.won;
+    
+    return Container(
+      padding: const EdgeInsets.all(24),
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      decoration: BoxDecoration(
+        color: isWon ? AppTheme.correctTile : AppTheme.notInWordTile,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            isWon ? '🎉 Makorokoto!' : '😔 Kana Ngomuso',
+            style: AppTextStyles.heading2.copyWith(color: Colors.white),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            'Shoko raiva: ${gameState.targetWord}',
+            style: AppTextStyles.body.copyWith(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          if (isWon) ...[
+            const SizedBox(height: 8),
+            Text(
+              'Makwidza mu${gameState.currentRow} attempts',
+              style: AppTextStyles.body.copyWith(color: Colors.white),
+            ),
+          ],
+          const SizedBox(height: 20),
+          ElevatedButton(
+            onPressed: () {
+              context.read<GameBloc>().add(NewGameRequested());
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.white,
+              foregroundColor: isWon ? AppTheme.correctTile : AppTheme.notInWordTile,
+            ),
+            child: const Text('Mutambo Mutsva'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class StatsDialog extends StatelessWidget {
+  const StatsDialog({super.key});
+  
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<StatsBloc, StatsState>(
+      builder: (context, state) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Zvibvumirano',
+                  style: AppTextStyles.heading2,
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    _StatItem(
+                      label: 'Mitambo',
+                      value: state.gamesPlayed.toString(),
+                    ),
+                    _StatItem(
+                      label: 'Kukunda %',
+                      value: state.winPercentage.toStringAsFixed(0),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    _StatItem(
+                      label: 'Streak Yazvino',
+                      value: state.currentStreak.toString(),
+                    ),
+                    _StatItem(
+                      label: 'Streak Yakakura',
+                      value: state.bestStreak.toString(),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 24),
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('Vhara'),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _StatItem extends StatelessWidget {
+  final String label;
+  final String value;
+  
+  const _StatItem({required this.label, required this.value});
+  
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text(
+          value,
+          style: AppTextStyles.heading1.copyWith(
+            color: AppTheme.primaryGold,
+          ),
+        ),
+        Text(
+          label,
+          style: AppTextStyles.body.copyWith(
+            color: Colors.grey.shade600,
+          ),
+        ),
+      ],
+    );
+  }
+}
+```
+
+#### Settings BLoC
+```dart
+class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
+  SettingsBloc() : super(const SettingsState()) {
+    on<SettingsLoaded>(_onSettingsLoaded);
+    on<LanguageChanged>(_onLanguageChanged);
+    on<SoundToggled>(_onSoundToggled);
+    on<ThemeChanged>(_onThemeChanged);
+  }
+  
+  void _onSettingsLoaded(SettingsLoaded event, Emitter<SettingsState> emit) async {
+    final prefs = await SharedPreferences.getInstance();
+    emit(state.copyWith(
+      currentLanguage: prefs.getString('language') ?? 'shona',
+      soundEnabled: prefs.getBool('sound_enabled') ?? true,
+      isDarkMode: prefs.getBool('dark_mode') ?? false,
+    ));
+  }
+  
+  void _onLanguageChanged(LanguageChanged event, Emitter<SettingsState> emit) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('language', event.language);
+    emit(state.copyWith(currentLanguage: event.language));
+  }
+  
+  void _onSoundToggled(SoundToggled event, Emitter<SettingsState> emit) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('sound_enabled', !state.soundEnabled);
+    emit(state.copyWith(soundEnabled: !state.soundEnabled));
+  }
+  
+  void _onThemeChanged(ThemeChanged event, Emitter<SettingsState> emit) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('dark_mode', event.isDark);
+    emit(state.copyWith(isDarkMode: event.isDark));
+  }
+}
+
+class SettingsState extends Equatable {
+  final String currentLanguage;
+  final bool soundEnabled;
+  final bool isDarkMode;
+  
+  const SettingsState({
+    this.currentLanguage = 'shona',
+    this.soundEnabled = true,
+    this.isDarkMode = false,
+  });
+  
+  SettingsState copyWith({
+    String? currentLanguage,
+    bool? soundEnabled,
+    bool? isDarkMode,
+  }) {
+    return SettingsState(
+      currentLanguage: currentLanguage ?? this.currentLanguage,
+      soundEnabled: soundEnabled ?? this.soundEnabled,
+      isDarkMode: isDarkMode ?? this.isDarkMode,
+    );
+  }
+  
+  @override
+  List<Object> get props => [currentLanguage, soundEnabled, isDarkMode];
+}
+
+class SettingsScreen extends StatelessWidget {
+  const SettingsScreen({super.key});
+  
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Magadzirirwo'),
+      ),
+      body: BlocBuilder<SettingsBloc, SettingsState>(
+        builder: (context, state) {
+          return ListView(
+            padding: const EdgeInsets.all(16),
+            children: [
+              _SettingsCard(
+                title: 'Mutauro',
+                children: [
+                  RadioListTile<String>(
+                    title: const Text('ChiShona'),
+                    value: 'shona',
+                    groupValue: state.currentLanguage,
+                    onChanged: (value) {
+                      if (value != null) {
+                        context.read<SettingsBloc>().add(LanguageChanged(value));
+                      }
+                    },
+                  ),
+                  RadioListTile<String>(
+                    title: const Text('IsiNdebele'),
+                    value: 'ndebele',
+                    groupValue: state.currentLanguage,
+                    onChanged: (value) {
+                      if (value != null) {
+                        context.read<SettingsBloc>().add(LanguageChanged(value));
+                      }
+                    },
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              _SettingsCard(
+                title: 'Mazwi',
+                children: [
+                  SwitchListTile(
+                    title: const Text('Ruzha'),
+                    subtitle: const Text('Batidza mazwi nemisindo'),
+                    value: state.soundEnabled,
+                    onChanged: (_) {
+                      context.read<SettingsBloc>().add(SoundToggled());
+                    },
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              _SettingsCard(
+                title: 'Chitarisiko',
+                children: [
+                  SwitchListTile(
+                    title: const Text('Dark Mode'),
+                    subtitle: const Text('Shandisa ruvara rwakasviba'),
+                    value: state.isDarkMode,
+                    onChanged: (value) {
+                      context.read<SettingsBloc>().add(ThemeChanged(value));
+                    },
+                  ),
+                ],
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _SettingsCard extends StatelessWidget {
+  final String title;
+  final List<Widget> children;
+  
+  const _SettingsCard({required this.title, required this.children});
+  
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Text(
+                title,
+                style: AppTextStyles.heading2,
+              ),
+            ),
+            ...children,
+          ],
+        ),
+      ),
+    );
+  }
+}
 ```
 
 ## Dependencies
@@ -401,28 +1527,146 @@ lib/
 dependencies:
   flutter:
     sdk: flutter
-  provider: ^6.0.5          # Simple state management
-  sqflite: ^2.3.0          # Local database
-  shared_preferences: ^2.2.0 # Simple settings storage
-  audioplayers: ^5.0.0     # Basic audio playback
+  # State Management
+  flutter_bloc: ^8.1.3
+  equatable: ^2.0.5
+  
+  # Data Storage
+  sqflite: ^2.3.0
+  shared_preferences: ^2.2.0
+  
+  # Audio
+  audioplayers: ^5.0.0
+  
+  # UI Enhancements
+  lottie: ^2.6.0            # For animations
   
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^3.0.0
+  bloc_test: ^9.1.4         # For testing BLoCs
 ```
 
-## Key Improvements Over Previous Plan
+## Key Improvements Over Previous Plan (Updated)
 
-1. **Removed Flame Engine**: Using standard Flutter widgets - no need for game engine
-2. **Simplified State Management**: Single Provider instead of multiple BLoCs
-3. **Minimal Database**: 2 tables instead of 7+ complex tables
-4. **Standard Audio**: Basic AudioPlayer instead of complex audio management
-5. **No Repository Pattern**: Direct service classes - much simpler
-6. **No Complex Security**: SharedPreferences for settings, no encryption needed
-7. **No Performance Monitoring**: Standard Flutter performance is sufficient
-8. **Removed Memory Management**: Flutter handles widget lifecycle automatically
-9. **Simplified Localization**: Basic string switching instead of complex i18n system
+1. **Removed Flame Engine**: Using standard Flutter widgets with beautiful animations - no need for game engine
+2. **Simplified BLoC Architecture**: Three focused BLoCs (Game, Settings, Stats) instead of complex layered architecture
+3. **Cultural Design Elements**: Zimbabwean-inspired color palette (gold, red, green) with thoughtful typography
+4. **Minimal Database**: 2 tables instead of 7+ complex tables
+5. **Standard Audio**: Basic AudioPlayer with smart caching instead of complex audio management
+6. **Beautiful Animations**: Tile flips, keyboard feedback, and smooth transitions using Flutter's animation system
+7. **No Repository Pattern**: Direct service classes - much simpler
+8. **Responsive Design**: Proper spacing, touch targets, and visual hierarchy
+9. **Cultural Localization**: Proper Shona/Ndebele text and culturally appropriate messaging
+10. **Progressive Enhancement**: Clean architecture that allows for easy feature additions
+
+## Responsive Design Considerations
+
+```dart
+// Responsive breakpoints
+class Breakpoints {
+  static const double mobile = 600;
+  static const double tablet = 900;
+  static const double desktop = 1200;
+}
+
+// Responsive helper widget
+class ResponsiveBuilder extends StatelessWidget {
+  final Widget mobile;
+  final Widget? tablet;
+  final Widget? desktop;
+  
+  const ResponsiveBuilder({
+    super.key,
+    required this.mobile,
+    this.tablet,
+    this.desktop,
+  });
+  
+  @override
+  Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    
+    if (screenWidth >= Breakpoints.desktop) {
+      return desktop ?? tablet ?? mobile;
+    } else if (screenWidth >= Breakpoints.tablet) {
+      return tablet ?? mobile;
+    } else {
+      return mobile;
+    }
+  }
+}
+
+// Adaptive game grid that works on different screen sizes
+class AdaptiveGameGrid extends StatelessWidget {
+  final GameInProgress gameState;
+  
+  const AdaptiveGameGrid({required this.gameState, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ResponsiveBuilder(
+      mobile: _buildMobileGrid(),
+      tablet: _buildTabletGrid(),
+      desktop: _buildDesktopGrid(),
+    );
+  }
+  
+  Widget _buildMobileGrid() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: _buildGrid(tileSize: 56),
+    );
+  }
+  
+  Widget _buildTabletGrid() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 64),
+      child: _buildGrid(tileSize: 72),
+    );
+  }
+  
+  Widget _buildDesktopGrid() {
+    return Center(
+      child: SizedBox(
+        width: 500,
+        child: _buildGrid(tileSize: 80),
+      ),
+    );
+  }
+  
+  Widget _buildGrid({required double tileSize}) {
+    return Column(
+      children: List.generate(6, (rowIndex) {
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: List.generate(5, (colIndex) {
+              return Padding(
+                padding: const EdgeInsets.only(right: 8),
+                child: SizedBox(
+                  width: tileSize,
+                  height: tileSize,
+                  child: LetterTile(
+                    letter: gameState.grid[rowIndex][colIndex],
+                    state: gameState.tileStates[rowIndex][colIndex],
+                    isCurrentRow: rowIndex == gameState.currentRow,
+                    isAnimated: rowIndex < gameState.currentRow ||
+                        (rowIndex == gameState.currentRow && 
+                         gameState.status != GameStatus.playing),
+                  ),
+                ),
+              );
+            }),
+          ),
+        );
+      }),
+    );
+  }
+}
+```
 
 ## Development Phases
 
@@ -444,5 +1688,3 @@ dev_dependencies:
 - Word definitions
 - Achievement system
 - Audio pronunciations
-
-This simplified architecture will be much faster to implement, easier to maintain, and perfectly adequate for a word guessing game. The previous plan was solving problems that don't exist for this type of application.
