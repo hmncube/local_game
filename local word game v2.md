@@ -1,6 +1,9 @@
 # Simplified Flutter Word Game Architecture
 
 ## Simplified Architecture
+#  Flutter Word Game Architecture
+
+## Architecture
 
 ### Core Principles
 - **Keep it simple**: Use Flutter's built-in widgets and state management
@@ -335,107 +338,9 @@ class WordService {
 
 #### Theme Configuration
 ```dart
-class AppTheme {
-  // Color Palette inspired by Zimbabwean culture
-  static const Color primaryGold = Color(0xFFFFD700);
-  static const Color secondaryRed = Color(0xFFDC2626);
-  static const Color accentGreen = Color(0xFF059669);
-  static const Color backgroundLight = Color(0xFFFAFAFA);
-  static const Color backgroundDark = Color(0xFF1F2937);
-  
-  // Game-specific colors
-  static const Color correctTile = Color(0xFF10B981); // Green
-  static const Color wrongPositionTile = Color(0xFFF59E0B); // Amber
-  static const Color notInWordTile = Color(0xFF6B7280); // Gray
-  static const Color emptyTile = Color(0xFFFFFFFF);
-  static const Color emptyTileBorder = Color(0xFFD1D5DB);
-  
-  static ThemeData lightTheme = ThemeData(
-    useMaterial3: true,
-    brightness: Brightness.light,
-    colorScheme: ColorScheme.fromSeed(
-      seedColor: primaryGold,
-      brightness: Brightness.light,
-    ),
-    appBarTheme: const AppBarTheme(
-      backgroundColor: primaryGold,
-      foregroundColor: Colors.black,
-      elevation: 0,
-      centerTitle: true,
-      titleTextStyle: TextStyle(
-        fontFamily: 'Roboto',
-        fontSize: 20,
-        fontWeight: FontWeight.w600,
-        color: Colors.black,
-      ),
-    ),
-    cardTheme: CardTheme(
-      elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-    ),
-    elevatedButtonTheme: ElevatedButtonThemeData(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: primaryGold,
-        foregroundColor: Colors.black,
-        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-      ),
-    ),
-  );
-  
-  static ThemeData darkTheme = ThemeData(
-    useMaterial3: true,
-    brightness: Brightness.dark,
-    colorScheme: ColorScheme.fromSeed(
-      seedColor: primaryGold,
-      brightness: Brightness.dark,
-    ),
-    scaffoldBackgroundColor: backgroundDark,
-    appBarTheme: const AppBarTheme(
-      backgroundColor: backgroundDark,
-      foregroundColor: primaryGold,
-      elevation: 0,
-      centerTitle: true,
-    ),
-  );
-}
 
 // Custom typography for Shona and Ndebele text
-class AppTextStyles {
-  static const TextStyle heading1 = TextStyle(
-    fontSize: 32,
-    fontWeight: FontWeight.bold,
-    height: 1.2,
-  );
-  
-  static const TextStyle heading2 = TextStyle(
-    fontSize: 24,
-    fontWeight: FontWeight.w600,
-    height: 1.3,
-  );
-  
-  static const TextStyle body = TextStyle(
-    fontSize: 16,
-    fontWeight: FontWeight.w400,
-    height: 1.5,
-  );
-  
-  static const TextStyle tileLetter = TextStyle(
-    fontSize: 32,
-    fontWeight: FontWeight.bold,
-    height: 1.0,
-  );
-  
-  static const TextStyle keyboardKey = TextStyle(
-    fontSize: 18,
-    fontWeight: FontWeight.w600,
-    height: 1.0,
-  );
-}
+
 ```
 
 #### Styled UI Components
@@ -1015,50 +920,7 @@ void main() async {
 }
 
 // app/app.dart
-class WordGameApp extends StatelessWidget {
-  const WordGameApp({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    return MultiRepositoryProvider(
-      providers: [
-        RepositoryProvider<WordService>(
-          create: (context) => WordService(),
-        ),
-        RepositoryProvider<AudioService>(
-          create: (context) => AudioService(),
-        ),
-        RepositoryProvider<StatsService>(
-          create: (context) => StatsService(),
-        ),
-      ],
-      child: MultiBlocProvider(
-        providers: [
-          BlocProvider<SettingsBloc>(
-            create: (context) => SettingsBloc()..add(SettingsLoaded()),
-          ),
-          BlocProvider<StatsBloc>(
-            create: (context) => StatsBloc(
-              statsService: context.read<StatsService>(),
-            )..add(StatsLoaded()),
-          ),
-        ],
-        child: BlocBuilder<SettingsBloc, SettingsState>(
-          builder: (context, state) {
-            return MaterialApp(
-              title: 'Shona & Ndebele Word Game',
-              theme: AppTheme.lightTheme,
-              darkTheme: AppTheme.darkTheme,
-              themeMode: state.isDarkMode ? ThemeMode.dark : ThemeMode.light,
-              home: const GameScreen(),
-              debugShowCheckedModeBanner: false,
-            );
-          },
-        ),
-      ),
-    );
-  }
-}
 ```
 
 ## Additional UI Components & Animations
