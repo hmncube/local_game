@@ -1,17 +1,27 @@
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:injectable/injectable.dart';
+import 'package:local_game/core/base/cubit/base_cubit_wrapper.dart';
 import 'package:local_game/presentation/splash/splash_state.dart';
 
+import '../../core/base/cubit/cubit_status.dart';
 import '../../data/local_provider.dart';
 
-class SplashCubit extends Cubit<SplashState> {
+@injectable
+class SplashCubit extends BaseCubitWrapper<SplashState> {
   final LocalProvider _localProvider;
 
-  SplashCubit(this._localProvider) : super(const SplashState(isUserOnboarded: false)) {
+  SplashCubit(this._localProvider)
+    : super(SplashState(cubitState: CubitInitial())) {
     _checkOnboardingStatus();
   }
 
   Future<void> _checkOnboardingStatus() async {
     final isUserOnboarded = await _localProvider.getIsUserOnboarded();
-    emit(state.copyWith(isUserOnboarded: isUserOnboarded));
+    emit(state.copyWith(isOnboarded: isUserOnboarded));
   }
+
+  @override
+  void dispose() {}
+
+  @override
+  void initialize() {}
 }

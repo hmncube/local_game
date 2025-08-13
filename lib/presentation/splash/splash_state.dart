@@ -1,10 +1,19 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:equatable/equatable.dart';
+import 'package:local_game/core/base/cubit/cubit_status.dart';
 
-part 'splash_state.freezed.dart';
+class SplashState extends Equatable {
+  final BaseCubitState cubitState;
+  final bool isOnboarded;
 
-@freezed
-class SplashState with _$SplashState {
-  const factory SplashState({
-    required bool isUserOnboarded,
-  }) = _SplashState;
+  const SplashState({required this.cubitState, this.isOnboarded = false});
+
+  SplashState copyWith({BaseCubitState? cubitState, bool? isOnboarded}) {
+    return SplashState(
+      cubitState: cubitState ?? this.cubitState,
+      isOnboarded: isOnboarded ?? this.isOnboarded,
+    );
+  }
+
+  @override
+  List<Object?> get props => [cubitState, isOnboarded];
 }
