@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:local_game/core/routes.dart';
+import 'package:local_game/presentation/map/map_screen.dart';
 import 'package:local_game/presentation/splash/splash_screen.dart';
 
 class AppRoutes {
@@ -8,11 +9,11 @@ class AppRoutes {
   <GoRoute>[
     GoRoute(path: '/',
     name: Routes.splashScreen.toNamed,
-      builder: (context, state) => const SplashScreen(),
+      builder: (context, state) => const MapScreen(),
       pageBuilder: (context, state) => buildPageWithDefaultTransition (
         context: context,
         state: state,
-        child: const SplashScreen()
+        child: const MapScreen()
       )
     )
   ]);
