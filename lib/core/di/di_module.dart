@@ -4,9 +4,9 @@ import 'package:sqflite/sqflite.dart';
 
 @module
 abstract class AppModule {
-  @lazySingleton
-  DatabaseProvider get databaseProvider => DatabaseProvider.instance;
-
   @preResolve
-  Future<Database> get database => databaseProvider.database;
+  Future<Database> get database async {
+    final databaseProvider = DatabaseProvider();
+    return await databaseProvider.database;
+  }
 }

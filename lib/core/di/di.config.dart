@@ -18,6 +18,7 @@ import '../../data/local_provider.dart' as _i1063;
 import '../../presentation/map/map_cubit.dart' as _i621;
 import '../../presentation/splash/splash_cubit.dart' as _i447;
 import 'di_module.dart' as _i211;
+import 'register_module.dart' as _i291;
 
 // initializes the registration of main-scope dependencies inside of GetIt
 Future<_i174.GetIt> init(
@@ -27,17 +28,25 @@ Future<_i174.GetIt> init(
 }) async {
   final gh = _i526.GetItHelper(getIt, environment, environmentFilter);
   final appModule = _$AppModule();
+  final registerModule = _$RegisterModule();
   await gh.factoryAsync<_i779.Database>(
     () => appModule.database,
     preResolve: true,
   );
   gh.factory<_i621.MapCubit>(() => _i621.MapCubit());
-  gh.lazySingleton<_i90.DatabaseProvider>(() => appModule.databaseProvider);
+  gh.lazySingleton<_i90.DatabaseProvider>(
+    () => registerModule.databaseProvider,
+  );
   gh.lazySingleton<_i1063.LocalProvider>(() => _i1063.LocalProvider());
   gh.factory<_i447.SplashCubit>(
-    () => _i447.SplashCubit(gh<_i1063.LocalProvider>()),
+    () => _i447.SplashCubit(
+      gh<_i1063.LocalProvider>(),
+      gh<_i90.DatabaseProvider>(),
+    ),
   );
   return getIt;
 }
 
 class _$AppModule extends _i211.AppModule {}
+
+class _$RegisterModule extends _i291.RegisterModule {}
