@@ -11,20 +11,33 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
+import 'package:sqflite/sqflite.dart' as _i779;
 
+import '../../data/database_provider.dart' as _i90;
 import '../../data/local_provider.dart' as _i1063;
+import '../../presentation/map/map_cubit.dart' as _i621;
 import '../../presentation/splash/splash_cubit.dart' as _i447;
+import 'di_module.dart' as _i211;
 
 // initializes the registration of main-scope dependencies inside of GetIt
-_i174.GetIt init(
+Future<_i174.GetIt> init(
   _i174.GetIt getIt, {
   String? environment,
   _i526.EnvironmentFilter? environmentFilter,
-}) {
+}) async {
   final gh = _i526.GetItHelper(getIt, environment, environmentFilter);
+  final appModule = _$AppModule();
+  await gh.factoryAsync<_i779.Database>(
+    () => appModule.database,
+    preResolve: true,
+  );
+  gh.factory<_i621.MapCubit>(() => _i621.MapCubit());
+  gh.lazySingleton<_i90.DatabaseProvider>(() => appModule.databaseProvider);
   gh.lazySingleton<_i1063.LocalProvider>(() => _i1063.LocalProvider());
   gh.factory<_i447.SplashCubit>(
     () => _i447.SplashCubit(gh<_i1063.LocalProvider>()),
   );
   return getIt;
 }
+
+class _$AppModule extends _i211.AppModule {}
