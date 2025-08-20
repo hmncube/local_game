@@ -19,7 +19,7 @@ class SplashCubit extends BaseCubitWrapper<SplashState> {
   Future<void> _init() async {
     await _databaseProvider.database;
     final isUserOnboarded = await _localProvider.getIsUserOnboarded();
-    emit(state.copyWith(isOnboarded: isUserOnboarded));
+    emit(state.copyWith(isOnboarded: true));
   }
 
   @override

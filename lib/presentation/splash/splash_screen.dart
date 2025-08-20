@@ -22,7 +22,7 @@ class _SplashScreenState extends State<SplashScreen> {
       create: (context) => getIt<SplashCubit>(),
       child: BlocListener<SplashCubit, SplashState>(
         listener: (context, state) {
-          if (state.isOnboarded != null) {
+          if (state.isOnboarded) {
             context.go(Routes.mapScreen.toPath);
           }
         },

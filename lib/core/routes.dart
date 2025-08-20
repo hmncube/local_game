@@ -1,6 +1,7 @@
 enum Routes {
   splashScreen,
   mapScreen,
+  gameScreen,
 }
 
 extension RoutesExt on Routes {

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:local_game/core/base/cubit/cubit_status.dart';
 import 'package:local_game/core/di/di.dart';
+import 'package:local_game/core/routes.dart';
 import 'package:local_game/presentation/map/map_cubit.dart';
 import 'package:local_game/presentation/map/map_state.dart';
 
@@ -56,10 +58,15 @@ late final MapCubit _cubit;
                 itemCount: state.levels.length,
                 itemBuilder: (context, index) {
                   final level = state.levels[index];
-                  return ListTile(
-                    title: Text('Level ${level.id}'),
-                    subtitle: Text('Difficulty: ${level.difficulty}'),
-                    trailing: Text('Points: ${level.points}'),
+                  return InkWell(
+                    onTap: () {
+                      context.go(Routes.gameScreen.toPath, extra: level.id);
+                    },
+                    child: ListTile(
+                      title: Text('Level ${level.id}'),
+                      //subtitle: Text('Difficulty: ${level.difficulty}'),
+                      trailing: Text('Points: ${level.points}'),
+                    ),
                   );
                 },
               );
