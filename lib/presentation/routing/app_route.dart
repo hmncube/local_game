@@ -9,11 +9,11 @@ class AppRoutes {
   <GoRoute>[
     GoRoute(path: '/',
     name: Routes.splashScreen.toNamed,
-      builder: (context, state) => const MapScreen(),
+      builder: (context, state) => const SplashScreen(),
       pageBuilder: (context, state) => buildPageWithDefaultTransition (
         context: context,
         state: state,
-        child: const MapScreen()
+        child: const SplashScreen()
       )
     )
   ]);
