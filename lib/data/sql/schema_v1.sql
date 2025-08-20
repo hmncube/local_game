@@ -58,20 +58,29 @@ CREATE TABLE daily_challenges (
 -- 5. Levels Table
 CREATE TABLE levels (
     id INTEGER PRIMARY KEY,
-    user_id TEXT NOT NULL,
     status INTEGER DEFAULT 0, -- 0: not done, 1: done
     points INTEGER DEFAULT 0,
+    difficulty INTEGER DEFAULT 0,
     finished_at INTEGER,
-    started_at INTEGER,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    started_at INTEGER
 );
+
+-- Initial Levels
+INSERT INTO levels (id, difficulty) VALUES (1, 1); -- Easy 1
+INSERT INTO levels (id, difficulty) VALUES (2, 1); -- Easy 2
+INSERT INTO levels (id, difficulty) VALUES (3, 1); -- Easy 3
+INSERT INTO levels (id, difficulty) VALUES (4, 2); -- Moderate 1
+INSERT INTO levels (id, difficulty) VALUES (5, 2); -- Moderate 2
+INSERT INTO levels (id, difficulty) VALUES (6, 2); -- Moderate 3
+INSERT INTO levels (id, difficulty) VALUES (7, 3); -- Hard 1
+INSERT INTO levels (id, difficulty) VALUES (8, 3); -- Hard 2
+INSERT INTO levels (id, difficulty) VALUES (9, 3); -- Hard 3
 
 -- Essential Indexes
 CREATE INDEX idx_words_language_active ON words(language, is_active);
 CREATE INDEX idx_words_length_difficulty ON words(word_length, difficulty);
 CREATE INDEX idx_sessions_user_date ON game_sessions(user_id, played_at DESC);
 CREATE INDEX idx_daily_date ON daily_challenges(challenge_date DESC);
-CREATE INDEX idx_levels_user_id ON levels(user_id);
 
 -- Simple Triggers for Data Consistency
 CREATE TRIGGER update_user_stats AFTER INSERT ON game_sessions 

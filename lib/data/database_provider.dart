@@ -27,10 +27,33 @@ class DatabaseProvider {
 
   Future _onCreate(Database db, int version) async {
     final sql = await rootBundle.loadString('lib/data/sql/schema_v1.sql');
-    final List<String> queries = sql.split(';');
-    for (String query in queries) {
-      if (query.trim().isNotEmpty) {
-        await db.execute(query);
+
+    // Remove comments from the SQL script
+    final cleanedSql = sql.split('\n').where((line) => !line.trim().startsWith('--')).join('\n');
+
+    final triggerKeyword = 'CREATE TRIGGER';
+    final triggerStartIndex = cleanedSql.toUpperCase().indexOf(triggerKeyword);
+
+    if (triggerStartIndex == -1) {
+      final List<String> queries = cleanedSql.split(';');
+      for (final query in queries) {
+        if (query.trim().isNotEmpty) {
+          await db.execute(query);
+        }
+      }
+    } else {
+      final statementsBeforeTrigger = cleanedSql.substring(0, triggerStartIndex);
+      final triggerStatement = cleanedSql.substring(triggerStartIndex);
+
+      final List<String> queries = statementsBeforeTrigger.split(';');
+      for (final query in queries) {
+        if (query.trim().isNotEmpty) {
+          await db.execute(query);
+        }
+      }
+
+      if (triggerStatement.trim().isNotEmpty) {
+        await db.execute(triggerStatement);
       }
     }
   }
