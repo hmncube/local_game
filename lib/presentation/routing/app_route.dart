@@ -5,17 +5,19 @@ import 'package:local_game/presentation/map/map_screen.dart';
 import 'package:local_game/presentation/splash/splash_screen.dart';
 
 class AppRoutes {
-  static final GoRouter _router = GoRouter(routes:
-  <GoRoute>[
-    GoRoute(path: '/',
-    name: Routes.splashScreen.toNamed,
-      builder: (context, state) => const MapScreen(),
-      pageBuilder: (context, state) => buildPageWithDefaultTransition (
-        context: context,
-        state: state,
-        child: const MapScreen()
-      )
-    )
+  static final GoRouter _router = GoRouter(routes: <GoRoute>[
+    GoRoute(
+        path: '/',
+        name: Routes.splashScreen.toNamed,
+        builder: (context, state) => const SplashScreen(),
+        pageBuilder: (context, state) => buildPageWithDefaultTransition(
+            context: context, state: state, child: const SplashScreen())),
+    GoRoute(
+        path: Routes.mapScreen.toPath,
+        name: Routes.mapScreen.toNamed,
+        builder: (context, state) => const MapScreen(),
+        pageBuilder: (context, state) => buildPageWithDefaultTransition(
+            context: context, state: state, child: const MapScreen()))
   ]);
 
   static GoRouter get router => _router;

@@ -13,6 +13,7 @@ import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
 import 'package:sqflite/sqflite.dart' as _i779;
 
+import '../../data/dao/level_dao.dart' as _i0;
 import '../../data/database_provider.dart' as _i90;
 import '../../data/local_provider.dart' as _i1063;
 import '../../presentation/map/map_cubit.dart' as _i621;
@@ -33,7 +34,6 @@ Future<_i174.GetIt> init(
     () => appModule.database,
     preResolve: true,
   );
-  gh.factory<_i621.MapCubit>(() => _i621.MapCubit());
   gh.lazySingleton<_i90.DatabaseProvider>(
     () => registerModule.databaseProvider,
   );
@@ -44,6 +44,8 @@ Future<_i174.GetIt> init(
       gh<_i90.DatabaseProvider>(),
     ),
   );
+  gh.factory<_i0.LevelDao>(() => _i0.LevelDao(gh<_i90.DatabaseProvider>()));
+  gh.factory<_i621.MapCubit>(() => _i621.MapCubit(gh<_i0.LevelDao>()));
   return getIt;
 }
 
