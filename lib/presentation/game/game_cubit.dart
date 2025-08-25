@@ -15,13 +15,18 @@ class GameCubit extends BaseCubitWrapper<GameState> {
   void dispose() {}
 
   @override
-  Future<void> initialize() async {
+  Future<void> initialize() async {}
+
+  Future<void> init({int? level}) async {
     emit(state.copyWith(cubitState: CubitLoading()));
-    try {
-      
-      emit(state.copyWith(cubitState: CubitSuccess(),));
-    } catch (e) {
-      emit(state.copyWith(cubitState: CubitError(message: e.toString())));
-    }
+    await Future.delayed(Duration.zero);
+    final words = ['MABHUKU', 'BHUKU', 'HUKU', 'UKU'];
+    emit(
+      state.copyWith(
+        cubitState: CubitSuccess(),
+        words: words,
+        letters: words.expand((word) => word.split('')).toSet().toList(),
+      ),
+    );
   }
 }

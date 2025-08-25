@@ -33,7 +33,6 @@ class AppRoutes {
       GoRoute(
         path: Routes.gameScreen.toPath,
         name: Routes.gameScreen.toNamed,
-        builder: (context, state) => GameScreen(level: (state.extra as int)),
         pageBuilder:
             (context, state) => buildPageWithDefaultTransition(
               context: context,
