@@ -73,4 +73,8 @@ class GameCubit extends BaseCubitWrapper<GameState> {
     if (words.isEmpty) return 0;
     return words.reduce((a, b) => a.length >= b.length ? a : b).length;
   }
+
+  void resetIsWordCorrect(bool bool) {
+    emit(state.copyWith(isWordCorrect: bool));
+  }
 }
