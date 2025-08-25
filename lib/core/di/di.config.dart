@@ -16,6 +16,7 @@ import 'package:sqflite/sqflite.dart' as _i779;
 import '../../data/dao/level_dao.dart' as _i0;
 import '../../data/database_provider.dart' as _i90;
 import '../../data/local_provider.dart' as _i1063;
+import '../../presentation/game/game_cubit.dart' as _i874;
 import '../../presentation/map/map_cubit.dart' as _i621;
 import '../../presentation/splash/splash_cubit.dart' as _i447;
 import 'di_module.dart' as _i211;
@@ -45,6 +46,7 @@ Future<_i174.GetIt> init(
     ),
   );
   gh.factory<_i0.LevelDao>(() => _i0.LevelDao(gh<_i90.DatabaseProvider>()));
+  gh.factory<_i874.GameCubit>(() => _i874.GameCubit(gh<_i0.LevelDao>()));
   gh.factory<_i621.MapCubit>(() => _i621.MapCubit(gh<_i0.LevelDao>()));
   return getIt;
 }

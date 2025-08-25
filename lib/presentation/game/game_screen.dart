@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:local_game/app/themes/app_text_styles.dart';
 import 'package:local_game/app/themes/app_theme.dart';
-import 'package:local_game/presentation/game/widgets/app_keyboard.dart';
 import 'package:local_game/presentation/game/widgets/letter_container.dart';
+import 'package:local_game/presentation/game/widgets/letters_keyboard.dart';
 import 'package:local_game/presentation/widget/life_widget.dart';
 import 'package:local_game/presentation/widget/money_widget.dart';
 
@@ -88,7 +88,12 @@ class _GameScreenState extends State<GameScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-              AppKeyboard(letters: ['F', 'I', 'T']),
+              LettersKeyboard(
+                enabledLetters: ['F', 'I', 'T'],
+                onKeyPressed: (letter) {
+                  // Handle key press
+                },
+              ),
               const SizedBox(height: 32),
             ],
           ),
