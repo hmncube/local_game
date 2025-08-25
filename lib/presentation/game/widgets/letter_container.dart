@@ -13,7 +13,7 @@ class _LetterContainerState extends State<LetterContainer> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 60,
+      width: 50,
       height: 60,
       decoration: BoxDecoration(
         border: Border.all(color: Colors.white, width: 1),

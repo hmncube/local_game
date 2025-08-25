@@ -20,13 +20,57 @@ class GameCubit extends BaseCubitWrapper<GameState> {
   Future<void> init({int? level}) async {
     emit(state.copyWith(cubitState: CubitLoading()));
     await Future.delayed(Duration.zero);
-    final words = ['MABHUKU', 'BHUKU', 'HUKU', 'UKU'];
+    final words = ['UKU', 'HUKU', 'BHUKU', 'MABHUKU'];
+
     emit(
       state.copyWith(
         cubitState: CubitSuccess(),
         words: words,
+        filledWords: dashWords(words),
         letters: words.expand((word) => word.split('')).toSet().toList(),
       ),
     );
+  }
+
+  List<String> dashWords(List<String> words) {
+    String mask(String w) => List.filled(w.runes.length, '-').join();
+    return words.map(mask).toList();
+  }
+
+  void updateCurrentWord(String letter) {
+    final word = state.currentWord;
+    List<String> newWord = word + [letter];
+    final nw = newWord.join('');
+
+    if (state.words.contains(nw)) {
+      List<String> newFilledWords = state.filledWords;
+      final filledWords = state.filledWords;
+      final filledWordIndex = filledWords.indexWhere(
+        (word) => word.length == nw.length,
+      );
+      filledWords[filledWordIndex] = nw;
+      newFilledWords = filledWords;
+      newWord = [];
+      emit(
+        state.copyWith(
+          currentWord: newWord,
+          filledWords: newFilledWords,
+          isWordCorrect: true,
+        ),
+      );
+    } else {
+      final size = findLongestWord(state.words);
+      bool isWordWrong = false;
+      if (newWord.length == size) {
+        newWord = [];
+        isWordWrong = true;
+      }
+      emit(state.copyWith(currentWord: newWord, isWordWrong: isWordWrong));
+    }
+  }
+
+  int findLongestWord(List<String> words) {
+    if (words.isEmpty) return 0;
+    return words.reduce((a, b) => a.length >= b.length ? a : b).length;
   }
 }
