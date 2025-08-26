@@ -9,6 +9,7 @@ import 'package:local_game/presentation/game/game_cubit.dart';
 import 'package:local_game/presentation/game/game_state.dart';
 import 'package:local_game/presentation/game/widgets/letters_keyboard.dart';
 import 'package:local_game/presentation/game/widgets/text_display.dart';
+import 'package:local_game/presentation/widget/app_button.dart';
 import 'package:local_game/presentation/widget/life_widget.dart';
 import 'package:local_game/presentation/widget/loading_screen.dart';
 import 'package:local_game/presentation/widget/money_widget.dart';
@@ -62,13 +63,25 @@ class _GameScreenState extends State<GameScreen>
     _controller.forward(from: 0);
   }
 
+  bool _showAlreadyEntered = false;
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<GameCubit, GameState>(
       bloc: _cubit,
       listener: (context, state) {
-        if (state.isWordCorrect) {
+        if (state.isLevelComplete) {
           _showCorrectOverlay();
+        }
+
+        if (state.wasWordEnteredBefore) {
+          setState(() => _showAlreadyEntered = true);
+
+          Future.delayed(const Duration(seconds: 3), () {
+            if (mounted) {
+              _cubit.resetWasWordEnteredBefore();
+              setState(() => _showAlreadyEntered = false);
+            }
+          });
         }
       },
       builder: (context, state) {
@@ -89,6 +102,18 @@ class _GameScreenState extends State<GameScreen>
                       Row(children: [LifeWidget(), Spacer(), MoneyWidget()]),
                       const SizedBox(height: 60),
                       TextDisplay(words: state.filledWords),
+                      Spacer(),
+                      AnimatedOpacity(
+                        opacity: _showAlreadyEntered ? 1.0 : 0.0,
+                        duration: const Duration(milliseconds: 800),
+                        child: Text(
+                          'Shoko iri watopinda kare',
+                          style: AppTextStyles.heading1.copyWith(
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+
                       Spacer(),
                       Container(
                         width: double.infinity,
@@ -118,11 +143,7 @@ class _GameScreenState extends State<GameScreen>
                   ),
                 ),
               ),
-              // Centered overlay for correct answer
-              if (state.isWordCorrect)
-                Center(
-                  child: _buildCorrectWidget(),
-                ),
+              if (state.isLevelComplete) Center(child: _buildCorrectWidget()),
             ],
           ),
         );
@@ -134,9 +155,11 @@ class _GameScreenState extends State<GameScreen>
     return FadeTransition(
       opacity: _fadeAnimation,
       child: Container(
+        height: double.infinity,
+        width: double.infinity,
         padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
         decoration: BoxDecoration(
-          color: Colors.green,
+          color: Colors.black.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
@@ -146,20 +169,30 @@ class _GameScreenState extends State<GameScreen>
             ),
           ],
         ),
-        child: SlideTransition(
-          position: _slideAnimation,
-          child: Lottie.asset(
-            AppAssets.correctAnimation,
-            width: 150,
-            height: 150,
-            fit: BoxFit.cover,
-            repeat: false,
-            onLoaded: (composition) {
-              Future.delayed(composition.duration, () {
-                _cubit.resetIsWordCorrect(false);
-              });
-            },
-          ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Spacer(),
+            Image.asset(AppAssets.wagona),
+            Spacer(),
+            SlideTransition(
+              position: _slideAnimation,
+              child: Lottie.asset(
+                AppAssets.correctAnimation,
+                width: 150,
+                height: 150,
+                fit: BoxFit.cover,
+                repeat: false,
+                onLoaded: (composition) {
+                  Future.delayed(composition.duration, () {
+                    _cubit.resetIsWordCorrect();
+                  });
+                },
+              ),
+            ),
+            Spacer(),
+            AppButton(title: 'Pfuurira Mberi', onClick: () {}),
+          ],
         ),
       ),
     );

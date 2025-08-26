@@ -6,6 +6,8 @@ class GameState extends Equatable {
   final int level;
   final bool isWordWrong;
   final bool isWordCorrect;
+  final bool isLevelComplete;
+  final bool wasWordEnteredBefore;
   final List<String> letters;
   final List<String> words;
   final List<String> filledWords;
@@ -14,6 +16,8 @@ class GameState extends Equatable {
   const GameState({
     required this.cubitState,
     this.level = 0,
+    this.wasWordEnteredBefore = false,
+    this.isLevelComplete = false,
     this.letters = const [],
     this.words = const [],
     this.filledWords = const [],
@@ -25,12 +29,14 @@ class GameState extends Equatable {
   GameState copyWith({
     BaseCubitState? cubitState,
     int? level,
+    bool? isLevelComplete,
     List<String>? letters,
     List<String>? words,
     List<String>? currentWord,
     List<String>? filledWords,
     bool? isWordWrong,
     bool? isWordCorrect,
+    bool? wasWordEnteredBefore,
   }) {
     return GameState(
       cubitState: cubitState ?? this.cubitState,
@@ -41,6 +47,8 @@ class GameState extends Equatable {
       filledWords: filledWords ?? this.filledWords,
       isWordCorrect: isWordCorrect ?? this.isWordCorrect,
       isWordWrong: isWordWrong ?? this.isWordWrong,
+      isLevelComplete: isLevelComplete ?? this.isLevelComplete,
+      wasWordEnteredBefore: wasWordEnteredBefore ?? this.wasWordEnteredBefore,
     );
   }
 
@@ -54,5 +62,7 @@ class GameState extends Equatable {
     filledWords,
     isWordCorrect,
     isWordWrong,
+    isLevelComplete,
+    wasWordEnteredBefore,
   ];
 }

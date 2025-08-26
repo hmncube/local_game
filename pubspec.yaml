@@ -78,6 +78,7 @@ flutter:
     - lib/data/sql/schema_v1.sql
     - assets/animations/
     - assets/sounds/
+    - assets/images/
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
 

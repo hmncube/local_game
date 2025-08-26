@@ -12,7 +12,7 @@ class GameCubit extends BaseCubitWrapper<GameState> {
   final SoundManager _soundManager;
 
   GameCubit(this._levelDao, this._soundManager)
-      : super(GameState(cubitState: CubitInitial()));
+    : super(GameState(cubitState: CubitInitial()));
 
   @override
   void dispose() {}
@@ -45,6 +45,12 @@ class GameCubit extends BaseCubitWrapper<GameState> {
     List<String> newWord = word + [letter];
     final nw = newWord.join('');
 
+    if (state.filledWords.contains(nw)) {
+      _soundManager.playWrongAnswerSound();
+      emit(state.copyWith(currentWord: [], wasWordEnteredBefore: true));
+      return;
+    }
+
     if (state.words.contains(nw)) {
       _soundManager.playCorrectAnswerSound();
       List<String> newFilledWords = state.filledWords;
@@ -55,11 +61,17 @@ class GameCubit extends BaseCubitWrapper<GameState> {
       filledWords[filledWordIndex] = nw;
       newFilledWords = filledWords;
       newWord = [];
+
+      bool isLevelComplete = newFilledWords.every(
+        (word) => !word.contains('-'),
+      );
+
       emit(
         state.copyWith(
           currentWord: newWord,
           filledWords: newFilledWords,
           isWordCorrect: true,
+          isLevelComplete: isLevelComplete,
         ),
       );
     } else {
@@ -79,7 +91,11 @@ class GameCubit extends BaseCubitWrapper<GameState> {
     return words.reduce((a, b) => a.length >= b.length ? a : b).length;
   }
 
-  void resetIsWordCorrect(bool bool) {
-    emit(state.copyWith(isWordCorrect: bool));
+  void resetIsWordCorrect() {
+    emit(state.copyWith(isWordCorrect: false));
+  }
+
+  void resetWasWordEnteredBefore() {
+    emit(state.copyWith(wasWordEnteredBefore: false));
   }
 }
