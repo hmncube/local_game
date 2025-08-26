@@ -1,5 +1,6 @@
 import 'package:injectable/injectable.dart';
 import 'package:local_game/core/base/cubit/base_cubit_wrapper.dart';
+import 'package:local_game/core/sound/sound_manager.dart';
 import 'package:local_game/data/dao/level_dao.dart';
 import 'package:local_game/presentation/game/game_state.dart';
 
@@ -8,8 +9,10 @@ import '../../core/base/cubit/cubit_status.dart';
 @injectable
 class GameCubit extends BaseCubitWrapper<GameState> {
   final LevelDao _levelDao;
+  final SoundManager _soundManager;
 
-  GameCubit(this._levelDao) : super(GameState(cubitState: CubitInitial()));
+  GameCubit(this._levelDao, this._soundManager)
+      : super(GameState(cubitState: CubitInitial()));
 
   @override
   void dispose() {}
@@ -43,6 +46,7 @@ class GameCubit extends BaseCubitWrapper<GameState> {
     final nw = newWord.join('');
 
     if (state.words.contains(nw)) {
+      _soundManager.playCorrectAnswerSound();
       List<String> newFilledWords = state.filledWords;
       final filledWords = state.filledWords;
       final filledWordIndex = filledWords.indexWhere(
@@ -62,6 +66,7 @@ class GameCubit extends BaseCubitWrapper<GameState> {
       final size = findLongestWord(state.words);
       bool isWordWrong = false;
       if (newWord.length == size) {
+        _soundManager.playWrongAnswerSound();
         newWord = [];
         isWordWrong = true;
       }
