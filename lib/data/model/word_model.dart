@@ -1,4 +1,6 @@
-class WordModel {
+import 'package:equatable/equatable.dart';
+
+class WordModel extends Equatable {
   final int? id;
   final String word;
   final String language;
@@ -9,7 +11,7 @@ class WordModel {
   final bool isActive;
   final int createdAt;
 
-  WordModel({
+  const WordModel({
     this.id,
     required this.word,
     required this.language,
@@ -48,4 +50,17 @@ class WordModel {
       'created_at': createdAt,
     };
   }
+
+  @override
+  List<Object?> get props => [
+        id,
+        word,
+        language,
+        wordLength,
+        difficulty,
+        englishTranslation,
+        definition,
+        isActive,
+        createdAt,
+      ];
 }

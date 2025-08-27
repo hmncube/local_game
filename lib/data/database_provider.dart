@@ -1,3 +1,4 @@
+import 'dart:convert';
 
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
@@ -56,5 +57,46 @@ class DatabaseProvider {
         await db.execute(triggerStatement);
       }
     }
+    await _seedDatabase(db);
+  }
+
+  Future<void> _seedDatabase(Database db) async {
+    // Load words into a map for efficient lookup
+    final List<Map<String, dynamic>> wordMaps = await db.query('words', columns: ['id', 'word']);
+    final Map<String, int> wordIdMap = {
+      for (var map in wordMaps) map['word'] as String: map['id'] as int
+    };
+
+    final String content = await rootBundle.loadString('assets/resources/proccessed_word_groups.json');
+    final List<dynamic> levels = json.decode(content);
+
+    await db.transaction((txn) async {
+      for (final levelData in levels) {
+        final List<dynamic> words = levelData;
+        final String mainWord = words[0];
+        
+        int difficulty = 1;
+        if (mainWord.length > 7) {
+          difficulty = 2;
+        }
+        if (mainWord.length > 11) {
+          difficulty = 3;
+        }
+
+        final levelId = await txn.insert('levels', {'difficulty': difficulty});
+
+        for (var j = 0; j < words.length; j++) {
+          final word = words[j] as String;
+          final wordId = wordIdMap[word];
+          if (wordId != null) {
+            await txn.insert('level_words', {
+              'level_id': levelId,
+              'word_id': wordId,
+              'display_order': j,
+            });
+          }
+        }
+      }
+    });
   }
 }
