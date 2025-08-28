@@ -194,15 +194,16 @@ class _GameScreenState extends State<GameScreen>
                 height: 150,
                 fit: BoxFit.cover,
                 repeat: false,
-                onLoaded: (composition) {
-                  Future.delayed(composition.duration, () {
-                    _cubit.resetIsWordCorrect();
-                  });
-                },
               ),
             ),
             Spacer(),
-            AppButton(title: 'Pfuurira Mberi', onClick: () {}),
+            AppButton(
+              title: 'Pfuurira Mberi',
+              onClick: () {
+                _cubit.resetIsLevelCorrect();
+                _cubit.loadNextLevel();
+              },
+            ),
           ],
         ),
       ),

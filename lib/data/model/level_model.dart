@@ -27,8 +27,8 @@ class LevelModel extends Equatable {
       status: map['status'],
       points: map['points'],
       difficulty: map['difficulty'],
-      finishedAt: map['finishedAt'],
-      startedAt: map['startedAt'],
+      finishedAt: map['finished_at'],
+      startedAt: map['started_at'],
     );
   }
 
@@ -38,8 +38,8 @@ class LevelModel extends Equatable {
       'status': status,
       'points': points,
       'difficulty': difficulty,
-      'finishedAt': finishedAt,
-      'startedAt': startedAt,
+      'finished_at': finishedAt,
+      'started_at': startedAt,
     };
   }
 

@@ -23,6 +23,7 @@ class GameCubit extends BaseCubitWrapper<GameState> {
   Future<void> initialize() async {}
 
   Future<void> init({int? level}) async {
+    print('pundez level $level');
     emit(state.copyWith(cubitState: CubitLoading()));
 
     final levelId = level ?? 1;
@@ -35,6 +36,7 @@ class GameCubit extends BaseCubitWrapper<GameState> {
         emit(
           state.copyWith(
             cubitState: CubitSuccess(),
+            level: levelId,
             words: words,
             hints: user?.hints,
             points: user?.totalScore,
@@ -83,7 +85,7 @@ class GameCubit extends BaseCubitWrapper<GameState> {
       List<String> newFilledWords = state.filledWords;
       final filledWords = state.filledWords;
       final filledWordIndex = filledWords.indexWhere(
-        (word) => word.length == nw.length,
+        (word) => (word.length == nw.length) && word.contains('-'),
       );
       filledWords[filledWordIndex] = nw;
       newFilledWords = filledWords;
@@ -93,9 +95,9 @@ class GameCubit extends BaseCubitWrapper<GameState> {
         (word) => !word.contains('-'),
       );
 
+        final points = _calculatePoints();
       if (isLevelComplete) {
         final level = state.levelModel;
-        final points =_calculatePoints(); 
         _levelDao.updateLevel(
           level?.copyWith(
             status: 1,
@@ -124,6 +126,7 @@ class GameCubit extends BaseCubitWrapper<GameState> {
           currentWord: newWord,
           filledWords: newFilledWords,
           isWordCorrect: true,
+          points: isLevelComplete ? points : state.points,
           isLevelComplete: isLevelComplete,
         ),
       );
@@ -148,12 +151,20 @@ class GameCubit extends BaseCubitWrapper<GameState> {
     emit(state.copyWith(isWordCorrect: false));
   }
 
+  void resetIsLevelCorrect() {
+    emit(state.copyWith(isLevelComplete: false));
+  }
+
   void resetWasWordEnteredBefore() {
     emit(state.copyWith(wasWordEnteredBefore: false));
   }
-  
+
   int _calculatePoints() {
     final words = state.words;
     return words.fold(0, (total, word) => total + word.length);
+  }
+
+  void loadNextLevel() {
+    init(level: state.level + 1);
   }
 }
