@@ -6,7 +6,7 @@ mixin AppAssets {
   static const wrongAnimation = 'assets/animations/wrong.json';
   static const coinsChest = 'assets/animations/coins_chest.json';
   static const fallingCoins = 'assets/animations/falling_coins.json';
-
+  static const loadingAnimation = 'assets/animations/loading.json';
   static const backgroundSound = 'sounds/background.mp3';
   static const correctSfx = 'sounds/correct.wav';
   static const wrongSfx = 'sounds/wrong.wav';

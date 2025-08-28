@@ -193,7 +193,7 @@ class _GameScreenState extends State<GameScreen>
                 width: 150,
                 height: 150,
                 fit: BoxFit.cover,
-                repeat: false,
+                repeat: true,
               ),
             ),
             const SizedBox(height: 32,),
