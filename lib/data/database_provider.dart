@@ -67,7 +67,7 @@ class DatabaseProvider {
       for (var map in wordMaps) map['word'] as String: map['id'] as int
     };
 
-    final String content = await rootBundle.loadString('assets/resources/proccessed_word_groups.json');
+    final String content = await rootBundle.loadString('assets/resources/word_groups.json');
     print('pundez db');
     print(content);
     final List<dynamic> levels = json.decode(content);
