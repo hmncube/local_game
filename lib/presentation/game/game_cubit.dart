@@ -3,7 +3,6 @@ import 'package:local_game/core/base/cubit/base_cubit_wrapper.dart';
 import 'package:local_game/core/sound/sound_manager.dart';
 import 'package:local_game/data/dao/level_dao.dart';
 import 'package:local_game/data/dao/user_dao.dart';
-import 'package:local_game/data/dao/word_dao.dart';
 import 'package:local_game/presentation/game/game_state.dart';
 
 import '../../core/base/cubit/cubit_status.dart';
@@ -39,6 +38,7 @@ class GameCubit extends BaseCubitWrapper<GameState> {
             words: words,
             hints: user?.hints,
             points: user?.totalScore,
+            levelModel: levelModel,
             filledWords: dashWords(words),
             letters: words.expand((word) => word.split('')).toSet().toList(),
           ),
@@ -93,6 +93,32 @@ class GameCubit extends BaseCubitWrapper<GameState> {
         (word) => !word.contains('-'),
       );
 
+      if (isLevelComplete) {
+        final level = state.levelModel;
+        final points =_calculatePoints(); 
+        _levelDao.updateLevel(
+          level?.copyWith(
+            status: 1,
+            points: points,
+            finishedAt: DateTime.now().millisecondsSinceEpoch,
+          ),
+        );
+        _userDao.getUser().then((user) {
+          if (user != null) {
+            _userDao.update(
+              user.copyWith(
+                totalScore: user.totalScore + points,
+                // currentStreak: user.currentStreak + 1,
+                // longestStreak: user.currentStreak + 1 > user.longestStreak
+                //     ? user.currentStreak + 1
+                //     : user.longestStreak,
+                lastPlayed: DateTime.now().millisecondsSinceEpoch,
+              ),
+            );
+          }
+        });
+      }
+
       emit(
         state.copyWith(
           currentWord: newWord,
@@ -124,5 +150,10 @@ class GameCubit extends BaseCubitWrapper<GameState> {
 
   void resetWasWordEnteredBefore() {
     emit(state.copyWith(wasWordEnteredBefore: false));
+  }
+  
+  int _calculatePoints() {
+    final words = state.words;
+    return words.fold(0, (total, word) => total + word.length);
   }
 }

@@ -46,4 +46,15 @@ class LevelDao {
     }
     return null;
   }
+
+  Future<void> updateLevel(LevelModel? level) async {
+    if (level == null) return;
+    final db = await _dbProvider.database;
+    await db.update(
+      'levels',
+      level.toMap(),
+      where: 'id = ?',
+      whereArgs: [level.id],
+    );
+  }
 }

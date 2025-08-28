@@ -49,7 +49,8 @@ class UserDao {
     return null;
   }
 
-  Future<int> update(UserModel user) async {
+  Future<int> update(UserModel? user) async {
+    if(user == null) return 0;
     final db = await _dbProvider.database;
     return await db.update(
       'users',

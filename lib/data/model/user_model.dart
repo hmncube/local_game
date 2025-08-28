@@ -54,4 +54,30 @@ class UserModel {
       'last_played': lastPlayed,
     };
   }
+
+  UserModel copyWith({
+    String? id,
+    String? username,
+    String? preferredLanguage,
+    int? currentStreak,
+    int? longestStreak,
+    int? totalScore,
+    int? hints,
+    Map<String, dynamic>? settings,
+    int? createdAt,
+    int? lastPlayed,
+  }) {
+    return UserModel(
+      id: id ?? this.id,
+      username: username ?? this.username,
+      preferredLanguage: preferredLanguage ?? this.preferredLanguage,
+      currentStreak: currentStreak ?? this.currentStreak,
+      longestStreak: longestStreak ?? this.longestStreak,
+      totalScore: totalScore ?? this.totalScore,
+      hints: hints ?? this.hints,
+      settings: settings ?? this.settings,
+      createdAt: createdAt ?? this.createdAt,
+      lastPlayed: lastPlayed ?? this.lastPlayed,
+    );
+  }
 }
