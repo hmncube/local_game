@@ -68,13 +68,13 @@ class GameCubit extends BaseCubitWrapper<GameState> {
     List<String> newWord = word + [letter];
     final nw = newWord.join('');
 
-    if (state.filledWords.contains(nw)) {
+    if (state.filledWords.contains(nw.toLowerCase())) {
       _soundManager.playWrongAnswerSound();
       emit(state.copyWith(currentWord: [], wasWordEnteredBefore: true));
       return;
     }
 
-    if (state.words.contains(nw)) {
+    if (state.words.contains(nw.toLowerCase())) {
       _soundManager.playCorrectAnswerSound();
       List<String> newFilledWords = state.filledWords;
       final filledWords = state.filledWords;
