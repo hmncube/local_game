@@ -10,7 +10,7 @@ import 'package:local_game/presentation/game/game_state.dart';
 import 'package:local_game/presentation/game/widgets/letters_keyboard.dart';
 import 'package:local_game/presentation/game/widgets/text_display.dart';
 import 'package:local_game/presentation/widget/app_button.dart';
-import 'package:local_game/presentation/widget/life_widget.dart';
+import 'package:local_game/presentation/widget/app_animated_icon.dart';
 import 'package:local_game/presentation/widget/loading_screen.dart';
 import 'package:local_game/presentation/widget/money_widget.dart';
 
@@ -98,7 +98,19 @@ class _GameScreenState extends State<GameScreen>
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
                     children: [
-                      Row(children: [LifeWidget(), Spacer(), MoneyWidget()]),
+                      Row(
+                        children: [
+                          Row(
+                            spacing: 16,
+                            children: [
+                              AppAnimatedIcon(icon: Icons.home),
+                              AppAnimatedIcon(icon: Icons.settings),
+                            ],
+                          ),
+                          Spacer(),
+                          MoneyWidget(),
+                        ],
+                      ),
                       const SizedBox(height: 60),
                       TextDisplay(words: state.filledWords),
                       Spacer(),
