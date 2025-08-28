@@ -1,8 +1,9 @@
-
+import 'package:injectable/injectable.dart';
 import 'package:local_game/data/database_provider.dart';
 import 'package:local_game/data/model/user_model.dart';
 import 'package:sqflite/sqflite.dart';
 
+@injectable
 class UserDao {
   final DatabaseProvider _dbProvider;
 
@@ -10,7 +11,20 @@ class UserDao {
 
   Future<int> insert(UserModel user) async {
     final db = await _dbProvider.database;
-    return await db.insert('users', user.toMap(), conflictAlgorithm: ConflictAlgorithm.replace);
+    return await db.insert(
+      'users',
+      user.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  Future<UserModel?> getUser() async {
+    final db = await _dbProvider.database;
+    final maps = await db.query('users');
+    if (maps.isNotEmpty) {
+      return UserModel.fromMap(maps.first);
+    }
+    return null;
   }
 
   Future<UserModel?> find(String id) async {
@@ -24,7 +38,11 @@ class UserDao {
 
   Future<UserModel?> findByUsername(String username) async {
     final db = await _dbProvider.database;
-    final maps = await db.query('users', where: 'username = ?', whereArgs: [username]);
+    final maps = await db.query(
+      'users',
+      where: 'username = ?',
+      whereArgs: [username],
+    );
     if (maps.isNotEmpty) {
       return UserModel.fromMap(maps.first);
     }
@@ -33,6 +51,11 @@ class UserDao {
 
   Future<int> update(UserModel user) async {
     final db = await _dbProvider.database;
-    return await db.update('users', user.toMap(), where: 'id = ?', whereArgs: [user.id]);
+    return await db.update(
+      'users',
+      user.toMap(),
+      where: 'id = ?',
+      whereArgs: [user.id],
+    );
   }
 }

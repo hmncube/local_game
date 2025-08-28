@@ -12,7 +12,7 @@ import 'package:local_game/presentation/game/widgets/text_display.dart';
 import 'package:local_game/presentation/widget/app_button.dart';
 import 'package:local_game/presentation/widget/app_animated_icon.dart';
 import 'package:local_game/presentation/widget/loading_screen.dart';
-import 'package:local_game/presentation/widget/money_widget.dart';
+import 'package:local_game/presentation/widget/points_widget.dart';
 
 import 'package:lottie/lottie.dart';
 
@@ -108,7 +108,7 @@ class _GameScreenState extends State<GameScreen>
                             ],
                           ),
                           Spacer(),
-                          MoneyWidget(),
+                          PointsWidget(points: state.points),
                         ],
                       ),
                       const SizedBox(height: 60),

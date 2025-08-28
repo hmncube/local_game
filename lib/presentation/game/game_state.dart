@@ -4,6 +4,8 @@ import 'package:local_game/core/base/cubit/cubit_status.dart';
 class GameState extends Equatable {
   final BaseCubitState cubitState;
   final int level;
+  final int points;
+  final int hints;
   final bool isWordWrong;
   final bool isWordCorrect;
   final bool isLevelComplete;
@@ -16,6 +18,8 @@ class GameState extends Equatable {
   const GameState({
     required this.cubitState,
     this.level = 0,
+    this.hints = 0,
+    this.points = 0,
     this.wasWordEnteredBefore = false,
     this.isLevelComplete = false,
     this.letters = const [],
@@ -29,6 +33,8 @@ class GameState extends Equatable {
   GameState copyWith({
     BaseCubitState? cubitState,
     int? level,
+    int? hints,
+    int? points,
     bool? isLevelComplete,
     List<String>? letters,
     List<String>? words,
@@ -43,6 +49,8 @@ class GameState extends Equatable {
       level: level ?? this.level,
       letters: letters ?? this.letters,
       words: words ?? this.words,
+      hints: hints ?? this.hints,
+      points: points ?? this.points,
       currentWord: currentWord ?? this.currentWord,
       filledWords: filledWords ?? this.filledWords,
       isWordCorrect: isWordCorrect ?? this.isWordCorrect,
@@ -58,6 +66,8 @@ class GameState extends Equatable {
     level,
     letters,
     words,
+    points,
+    hints,
     currentWord,
     filledWords,
     isWordCorrect,

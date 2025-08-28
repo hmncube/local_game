@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:local_game/app/themes/app_text_styles.dart';
 import 'package:local_game/app/themes/app_theme.dart';
 
-class MoneyWidget extends StatelessWidget {
-  const MoneyWidget({super.key});
+class PointsWidget extends StatelessWidget {
+  final int points;
+  const PointsWidget({super.key, required this.points});
 
   @override
   Widget build(BuildContext context) {
@@ -21,27 +22,24 @@ class MoneyWidget extends StatelessWidget {
                 bottomRight: Radius.circular(15),
               ),
             ),
-          child: Align(
-          alignment: Alignment.center,
-          child: Text('24', style: AppTextStyles.body.copyWith(
-            fontWeight: FontWeight.bold,
-          ),),
-        ),
+            child: Align(
+              alignment: Alignment.center,
+              child: Text(
+                points.toString(),
+                style: AppTextStyles.body.copyWith(fontWeight: FontWeight.bold),
+              ),
+            ),
           ),
-
         ),
         Container(
           decoration: BoxDecoration(
             color: AppTheme.primaryGold,
-            borderRadius: BorderRadius.circular(20)
+            borderRadius: BorderRadius.circular(20),
           ),
           height: 40,
           width: 40,
-          child: Center(
-            child: Icon(Icons.money,),
-          ),
+          child: Center(child: Icon(Icons.money)),
         ),
-        
       ],
     );
   }

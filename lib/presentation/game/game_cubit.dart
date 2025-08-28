@@ -2,6 +2,7 @@ import 'package:injectable/injectable.dart';
 import 'package:local_game/core/base/cubit/base_cubit_wrapper.dart';
 import 'package:local_game/core/sound/sound_manager.dart';
 import 'package:local_game/data/dao/level_dao.dart';
+import 'package:local_game/data/dao/user_dao.dart';
 import 'package:local_game/data/dao/word_dao.dart';
 import 'package:local_game/presentation/game/game_state.dart';
 
@@ -10,10 +11,10 @@ import '../../core/base/cubit/cubit_status.dart';
 @injectable
 class GameCubit extends BaseCubitWrapper<GameState> {
   final LevelDao _levelDao;
-  final WordDao _wordDao;
+  final UserDao _userDao;
   final SoundManager _soundManager;
 
-  GameCubit(this._levelDao, this._wordDao, this._soundManager)
+  GameCubit(this._levelDao, this._userDao, this._soundManager)
     : super(GameState(cubitState: CubitInitial()));
 
   @override
@@ -28,6 +29,7 @@ class GameCubit extends BaseCubitWrapper<GameState> {
     final levelId = level ?? 1;
     final levelModel = await _levelDao.getLevelById(levelId);
 
+    final user = await _userDao.getUser();
     if (levelModel != null) {
       final words = levelModel.words.map((m) => m.word).toList();
       if (words.isNotEmpty) {
@@ -35,6 +37,8 @@ class GameCubit extends BaseCubitWrapper<GameState> {
           state.copyWith(
             cubitState: CubitSuccess(),
             words: words,
+            hints: user?.hints,
+            points: user?.totalScore,
             filledWords: dashWords(words),
             letters: words.expand((word) => word.split('')).toSet().toList(),
           ),
