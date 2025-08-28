@@ -4,7 +4,8 @@ mixin AppAssets {
 
   static const correctAnimation = 'assets/animations/correct.json';
   static const wrongAnimation = 'assets/animations/wrong.json';
-
+  static const coinsChest = 'assets/animations/coins_chest.json';
+  static const fallingCoins = 'assets/animations/falling_coins.json';
 
   static const backgroundSound = 'sounds/background.mp3';
   static const correctSfx = 'sounds/correct.wav';

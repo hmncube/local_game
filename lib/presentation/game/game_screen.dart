@@ -154,7 +154,7 @@ class _GameScreenState extends State<GameScreen>
                   ),
                 ),
               ),
-              if (state.isLevelComplete) Center(child: _buildCorrectWidget()),
+              if (state.isLevelComplete) Center(child: _buildLevelComplete()),
             ],
           ),
         );
@@ -162,7 +162,7 @@ class _GameScreenState extends State<GameScreen>
     );
   }
 
-  Widget _buildCorrectWidget() {
+  Widget _buildLevelComplete() {
     return FadeTransition(
       opacity: _fadeAnimation,
       child: Container(
@@ -189,13 +189,21 @@ class _GameScreenState extends State<GameScreen>
             SlideTransition(
               position: _slideAnimation,
               child: Lottie.asset(
-                AppAssets.correctAnimation,
+                AppAssets.fallingCoins,
                 width: 150,
                 height: 150,
                 fit: BoxFit.cover,
                 repeat: false,
               ),
             ),
+            const SizedBox(height: 32,),
+            Lottie.asset(
+                AppAssets.coinsChest,
+                width: 150,
+                height: 150,
+                fit: BoxFit.cover,
+                repeat: false,
+              ),
             Spacer(),
             AppButton(
               title: 'Pfuurira Mberi',
