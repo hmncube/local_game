@@ -42,8 +42,6 @@ class LevelDao {
       }
 
       final level = LevelModel.fromMap(maps.first);
-      print('pundez dao');
-      print(words);
       return level.copyWith(words: words);
     }
     return null;

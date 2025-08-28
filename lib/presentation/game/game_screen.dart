@@ -59,7 +59,6 @@ class _GameScreenState extends State<GameScreen>
   }
 
   void _showCorrectOverlay() {
-    print('pundez word is correct');
     _controller.forward(from: 0);
   }
 

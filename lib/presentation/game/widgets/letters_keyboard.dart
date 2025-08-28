@@ -31,8 +31,6 @@ class LettersKeyboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print('pundez keyboard');
-    print(enabledLetters);
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
