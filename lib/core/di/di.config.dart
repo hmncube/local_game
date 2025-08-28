@@ -14,6 +14,7 @@ import 'package:injectable/injectable.dart' as _i526;
 import 'package:sqflite/sqflite.dart' as _i779;
 
 import '../../data/dao/level_dao.dart' as _i0;
+import '../../data/dao/word_dao.dart' as _i861;
 import '../../data/database_provider.dart' as _i90;
 import '../../data/local_provider.dart' as _i1063;
 import '../../presentation/game/game_cubit.dart' as _i874;
@@ -47,11 +48,18 @@ Future<_i174.GetIt> init(
       gh<_i90.DatabaseProvider>(),
     ),
   );
-  gh.factory<_i0.LevelDao>(() => _i0.LevelDao(gh<_i90.DatabaseProvider>()));
-  gh.factory<_i874.GameCubit>(
-    () => _i874.GameCubit(gh<_i0.LevelDao>(), gh<_i64.SoundManager>()),
+  gh.factory<_i861.WordDao>(() => _i861.WordDao(gh<_i90.DatabaseProvider>()));
+  gh.factory<_i0.LevelDao>(
+    () => _i0.LevelDao(gh<_i90.DatabaseProvider>(), gh<_i861.WordDao>()),
   );
   gh.factory<_i621.MapCubit>(() => _i621.MapCubit(gh<_i0.LevelDao>()));
+  gh.factory<_i874.GameCubit>(
+    () => _i874.GameCubit(
+      gh<_i0.LevelDao>(),
+      gh<_i861.WordDao>(),
+      gh<_i64.SoundManager>(),
+    ),
+  );
   return getIt;
 }
 

@@ -1,8 +1,10 @@
 
+import 'package:injectable/injectable.dart';
 import 'package:local_game/data/database_provider.dart';
 import 'package:local_game/data/model/word_model.dart';
 import 'package:sqflite/sqflite.dart';
 
+@injectable
 class WordDao {
   final DatabaseProvider _dbProvider;
 
@@ -45,5 +47,20 @@ class WordDao {
   Future<int> delete(int id) async {
     final db = await _dbProvider.database;
     return await db.delete('words', where: 'id = ?', whereArgs: [id]);
+  }
+
+  Future<List<WordModel>> getRandomWords(String language, int difficulty, int count) async {
+    final db = await _dbProvider.database;
+    final maps = await db.query(
+      'words',
+      where: 'language = ? AND difficulty = ? AND is_active = 1',
+      whereArgs: [language, difficulty],
+      orderBy: 'RANDOM()',
+      limit: count,
+    );
+    if (maps.isNotEmpty) {
+      return maps.map((map) => WordModel.fromMap(map)).toList();
+    }
+    return [];
   }
 }

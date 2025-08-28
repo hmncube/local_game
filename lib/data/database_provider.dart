@@ -68,8 +68,10 @@ class DatabaseProvider {
     };
 
     final String content = await rootBundle.loadString('assets/resources/proccessed_word_groups.json');
+    print('pundez db');
+    print(content);
     final List<dynamic> levels = json.decode(content);
-
+print(levels);
     await db.transaction((txn) async {
       for (final levelData in levels) {
         final List<dynamic> words = levelData;

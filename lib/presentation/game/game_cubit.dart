@@ -2,6 +2,7 @@ import 'package:injectable/injectable.dart';
 import 'package:local_game/core/base/cubit/base_cubit_wrapper.dart';
 import 'package:local_game/core/sound/sound_manager.dart';
 import 'package:local_game/data/dao/level_dao.dart';
+import 'package:local_game/data/dao/word_dao.dart';
 import 'package:local_game/presentation/game/game_state.dart';
 
 import '../../core/base/cubit/cubit_status.dart';
@@ -9,9 +10,10 @@ import '../../core/base/cubit/cubit_status.dart';
 @injectable
 class GameCubit extends BaseCubitWrapper<GameState> {
   final LevelDao _levelDao;
+  final WordDao _wordDao;
   final SoundManager _soundManager;
 
-  GameCubit(this._levelDao, this._soundManager)
+  GameCubit(this._levelDao, this._wordDao, this._soundManager)
     : super(GameState(cubitState: CubitInitial()));
 
   @override
@@ -22,22 +24,43 @@ class GameCubit extends BaseCubitWrapper<GameState> {
 
   Future<void> init({int? level}) async {
     emit(state.copyWith(cubitState: CubitLoading()));
-    await Future.delayed(Duration.zero);
-    final words = ['UKU', 'HUKU', 'BHUKU', 'MABHUKU'];
 
-    emit(
-      state.copyWith(
-        cubitState: CubitSuccess(),
-        words: words,
-        filledWords: dashWords(words),
-        letters: words.expand((word) => word.split('')).toSet().toList(),
-      ),
-    );
+    final levelId = level ?? 1;
+    final levelModel = await _levelDao.getLevelById(levelId);
+
+    if (levelModel != null) {
+      final words = levelModel.words.map((m) => m.word).toList();
+      if (words.isNotEmpty) {
+        emit(
+          state.copyWith(
+            cubitState: CubitSuccess(),
+            words: words,
+            filledWords: dashWords(words),
+            letters: words.expand((word) => word.split('')).toSet().toList(),
+          ),
+        );
+      } else {
+        emit(
+          state.copyWith(
+            cubitState: CubitError(
+              message: 'No words found for level $levelId',
+            ),
+          ),
+        );
+      }
+    } else {
+      emit(
+        state.copyWith(
+          cubitState: CubitError(message: 'Level $levelId not found'),
+        ),
+      );
+    }
   }
 
   List<String> dashWords(List<String> words) {
     String mask(String w) => List.filled(w.runes.length, '-').join();
-    return words.map(mask).toList();
+    return words.map(mask).toList()
+      ..sort((a, b) => a.length.compareTo(b.length));
   }
 
   void updateCurrentWord(String letter) {

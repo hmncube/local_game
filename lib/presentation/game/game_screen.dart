@@ -107,7 +107,7 @@ class _GameScreenState extends State<GameScreen>
                         opacity: _showAlreadyEntered ? 1.0 : 0.0,
                         duration: const Duration(milliseconds: 800),
                         child: Text(
-                          'Shoko iri watopinda kare',
+                          'Shoko iri ratopinda kare',
                           style: AppTextStyles.heading1.copyWith(
                             color: Colors.white,
                           ),

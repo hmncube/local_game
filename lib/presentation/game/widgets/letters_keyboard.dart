@@ -31,6 +31,8 @@ class LettersKeyboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print('pundez keyboard');
+    print(enabledLetters);
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -56,8 +58,7 @@ class LettersKeyboard extends StatelessWidget {
   }
 
   Widget _buildKey(String letter) {
-    final bool isEnabled = enabledLetters.isEmpty || enabledLetters.contains(letter);
-    
+    final bool isEnabled = enabledLetters.isEmpty || enabledLetters.contains(letter.toLowerCase());
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: keySpacing / 2),
       child: Material(

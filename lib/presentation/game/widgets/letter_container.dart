@@ -3,7 +3,12 @@ import 'package:local_game/app/themes/app_text_styles.dart';
 
 class LetterContainer extends StatefulWidget {
   final String letter;
-  const LetterContainer({super.key, required this.letter});
+  final LetterContainerSize size;
+  const LetterContainer({
+    super.key,
+    required this.letter,
+    this.size = LetterContainerSize.large,
+  });
 
   @override
   State<LetterContainer> createState() => _LetterContainerState();
@@ -13,7 +18,7 @@ class _LetterContainerState extends State<LetterContainer> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 50,
+      width: widget.size == LetterContainerSize.small ? 50 : 50,
       height: 60,
       decoration: BoxDecoration(
         border: Border.all(color: Colors.white, width: 1),
@@ -23,3 +28,5 @@ class _LetterContainerState extends State<LetterContainer> {
     );
   }
 }
+
+enum LetterContainerSize { small, large }
