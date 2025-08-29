@@ -1,43 +1,49 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class AppTextStyles {
-  static TextStyle heading1 = GoogleFonts.handlee(
+  static const TextStyle heading1 = TextStyle(
+    fontFamily: 'Handlee',
     fontSize: 32,
     fontWeight: FontWeight.bold,
     height: 1.2,
   );
 
-  static TextStyle heading2 = GoogleFonts.handlee(
+  static const TextStyle heading2 = TextStyle(
+    fontFamily: 'Handlee',
     fontSize: 24,
     fontWeight: FontWeight.w600,
     height: 1.3,
   );
 
-  static TextStyle body = GoogleFonts.handlee(
+  static const TextStyle body = TextStyle(
+    fontFamily: 'Handlee',
     fontSize: 16,
     fontWeight: FontWeight.w400,
     height: 1.5,
   );
 
-  static TextStyle tileLetter = GoogleFonts.handlee(
+  static const TextStyle tileLetter = TextStyle(
+    fontFamily: 'Handlee',
     fontSize: 32,
     fontWeight: FontWeight.bold,
     height: 1.0,
   );
 
-  static TextStyle keyboardKey = GoogleFonts.handlee(
+  static const TextStyle keyboardKey = TextStyle(
+    fontFamily: 'Handlee',
     fontSize: 18,
     fontWeight: FontWeight.w600,
     height: 1.0,
   );
 
-  static TextStyle splashTitle = GoogleFonts.handlee(
+  static const TextStyle splashTitle = TextStyle(
+    fontFamily: 'Handlee',
     fontSize: 50.0,
     fontWeight: FontWeight.bold,
   );
 
-  static TextStyle splashSubtitle = GoogleFonts.handlee(
+  static const TextStyle splashSubtitle = TextStyle(
+    fontFamily: 'Handlee',
     fontSize: 30.0,
     fontWeight: FontWeight.bold,
   );
