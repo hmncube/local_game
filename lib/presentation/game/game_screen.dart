@@ -7,6 +7,7 @@ import 'package:local_game/core/constants/app_assets.dart';
 import 'package:local_game/core/di/di.dart';
 import 'package:local_game/presentation/game/game_cubit.dart';
 import 'package:local_game/presentation/game/game_state.dart';
+import 'package:local_game/presentation/game/widgets/hint_widget.dart';
 import 'package:local_game/presentation/game/widgets/letters_keyboard.dart';
 import 'package:local_game/presentation/game/widgets/text_display.dart';
 import 'package:local_game/presentation/widget/app_button.dart';
@@ -124,8 +125,12 @@ class _GameScreenState extends State<GameScreen>
                           ),
                         ),
                       ),
-
                       Spacer(),
+                      HintWidget(
+                        hints: state.hintsCount,
+                        showHint: () => _cubit.showHint(),
+                      ),
+                      const SizedBox(height: 16),
                       Container(
                         width: double.infinity,
                         decoration: BoxDecoration(
@@ -196,14 +201,14 @@ class _GameScreenState extends State<GameScreen>
                 repeat: true,
               ),
             ),
-            const SizedBox(height: 32,),
+            const SizedBox(height: 32),
             Lottie.asset(
-                AppAssets.coinsChest,
-                width: 150,
-                height: 150,
-                fit: BoxFit.cover,
-                repeat: false,
-              ),
+              AppAssets.coinsChest,
+              width: 150,
+              height: 150,
+              fit: BoxFit.cover,
+              repeat: false,
+            ),
             Spacer(),
             AppButton(
               title: 'Pfuurira Mberi',

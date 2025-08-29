@@ -36,8 +36,8 @@ class GameCubit extends BaseCubitWrapper<GameState> {
           state.copyWith(
             cubitState: CubitSuccess(),
             level: levelId,
-            words: words,
-            hints: user?.hints,
+            words: words..sort((a, b) => a.length.compareTo(b.length)),
+            hintsCount: user?.hints,
             points: user?.totalScore,
             levelModel: levelModel,
             filledWords: dashWords(words),
@@ -134,7 +134,7 @@ class GameCubit extends BaseCubitWrapper<GameState> {
       bool isWordWrong = false;
       if (newWord.length == size) {
         _soundManager.playWrongAnswerSound();
-        newWord = [];
+        newWord = [state.hint];
         isWordWrong = true;
       }
       emit(state.copyWith(currentWord: newWord, isWordWrong: isWordWrong));
@@ -165,5 +165,19 @@ class GameCubit extends BaseCubitWrapper<GameState> {
 
   void loadNextLevel() {
     init(level: state.level + 1);
+  }
+
+  void showHint() {
+    print(state.filledWords);
+    print(state.words);
+    final firstWordIndex = state.filledWords.indexWhere((w)=>w.startsWith('-'));
+    final hint = state.words[firstWordIndex].split('')[0].toUpperCase();
+    final filledWords = state.filledWords;
+    final hintedWord = filledWords[firstWordIndex].replaceFirst('-', hint);
+
+    emit(state.copyWith(hint: hint,
+    filledWords: filledWords..[firstWordIndex] = hintedWord,
+    currentWord: [hint]
+    ));
   }
 }

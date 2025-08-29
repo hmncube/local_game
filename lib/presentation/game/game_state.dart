@@ -6,12 +6,13 @@ class GameState extends Equatable {
   final BaseCubitState cubitState;
   final int level;
   final int points;
-  final int hints;
+  final int hintsCount;
   final bool isWordWrong;
   final bool isWordCorrect;
   final bool isLevelComplete;
   final bool wasWordEnteredBefore;
   final LevelModel? levelModel;
+  final String hint;
   final List<String> letters;
   final List<String> words;
   final List<String> filledWords;
@@ -20,11 +21,12 @@ class GameState extends Equatable {
   const GameState({
     required this.cubitState,
     this.level = 0,
-    this.hints = 0,
+    this.hintsCount = 0,
     this.points = 0,
     this.levelModel,
     this.wasWordEnteredBefore = false,
     this.isLevelComplete = false,
+    this.hint = '',
     this.letters = const [],
     this.words = const [],
     this.filledWords = const [],
@@ -36,10 +38,11 @@ class GameState extends Equatable {
   GameState copyWith({
     BaseCubitState? cubitState,
     int? level,
-    int? hints,
+    int? hintsCount,
     int? points,
     LevelModel? levelModel,
     bool? isLevelComplete,
+    String? hint,
     List<String>? letters,
     List<String>? words,
     List<String>? currentWord,
@@ -53,7 +56,7 @@ class GameState extends Equatable {
       level: level ?? this.level,
       letters: letters ?? this.letters,
       words: words ?? this.words,
-      hints: hints ?? this.hints,
+      hintsCount: hintsCount ?? this.hintsCount,
       points: points ?? this.points,
       levelModel: levelModel ?? this.levelModel,
       currentWord: currentWord ?? this.currentWord,
@@ -62,6 +65,7 @@ class GameState extends Equatable {
       isWordWrong: isWordWrong ?? this.isWordWrong,
       isLevelComplete: isLevelComplete ?? this.isLevelComplete,
       wasWordEnteredBefore: wasWordEnteredBefore ?? this.wasWordEnteredBefore,
+      hint: hint ?? this.hint,
     );
   }
 
@@ -72,7 +76,8 @@ class GameState extends Equatable {
     letters,
     words,
     points,
-    hints,
+    hintsCount,
+    hint,
     levelModel,
     currentWord,
     filledWords,
