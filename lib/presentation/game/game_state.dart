@@ -7,6 +7,7 @@ class GameState extends Equatable {
   final int level;
   final int points;
   final int hintsCount;
+  final int hintWordIndex;
   final bool isWordWrong;
   final bool isWordCorrect;
   final bool isLevelComplete;
@@ -23,6 +24,7 @@ class GameState extends Equatable {
     this.level = 0,
     this.hintsCount = 0,
     this.points = 0,
+    this.hintWordIndex = 0,
     this.levelModel,
     this.wasWordEnteredBefore = false,
     this.isLevelComplete = false,
@@ -40,6 +42,7 @@ class GameState extends Equatable {
     int? level,
     int? hintsCount,
     int? points,
+    int? hintWordIndex,
     LevelModel? levelModel,
     bool? isLevelComplete,
     String? hint,
@@ -66,6 +69,7 @@ class GameState extends Equatable {
       isLevelComplete: isLevelComplete ?? this.isLevelComplete,
       wasWordEnteredBefore: wasWordEnteredBefore ?? this.wasWordEnteredBefore,
       hint: hint ?? this.hint,
+      hintWordIndex: hintWordIndex ?? this.hintWordIndex,
     );
   }
 
@@ -78,6 +82,7 @@ class GameState extends Equatable {
     points,
     hintsCount,
     hint,
+    hintWordIndex,
     levelModel,
     currentWord,
     filledWords,

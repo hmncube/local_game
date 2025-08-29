@@ -90,43 +90,19 @@ class GameCubit extends BaseCubitWrapper<GameState> {
       newFilledWords = filledWords;
       newWord = [];
 
-      bool isLevelComplete = newFilledWords.every(
-        (word) => !word.contains('-'),
-      );
+      final points = _calculatePoints();
 
-        final points = _calculatePoints();
-      if (isLevelComplete) {
-        final level = state.levelModel;
-        _levelDao.updateLevel(
-          level?.copyWith(
-            status: 1,
-            points: points,
-            finishedAt: DateTime.now().millisecondsSinceEpoch,
-          ),
-        );
-        _userDao.getUser().then((user) {
-          if (user != null) {
-            _userDao.update(
-              user.copyWith(
-                totalScore: user.totalScore + points,
-                // currentStreak: user.currentStreak + 1,
-                // longestStreak: user.currentStreak + 1 > user.longestStreak
-                //     ? user.currentStreak + 1
-                //     : user.longestStreak,
-                lastPlayed: DateTime.now().millisecondsSinceEpoch,
-              ),
-            );
-          }
-        });
-      }
+      bool isLevelComplete = handleCompleteLevel(newFilledWords, points);
 
       emit(
         state.copyWith(
           currentWord: newWord,
           filledWords: newFilledWords,
           isWordCorrect: true,
-          points: isLevelComplete ? points : state.points,
+          points: isLevelComplete ? points + state.points : state.points,
           isLevelComplete: isLevelComplete,
+          hint: '',
+          hintWordIndex: -1,
         ),
       );
     } else {
@@ -139,6 +115,36 @@ class GameCubit extends BaseCubitWrapper<GameState> {
       }
       emit(state.copyWith(currentWord: newWord, isWordWrong: isWordWrong));
     }
+  }
+
+  bool handleCompleteLevel(List<String> newFilledWords, int points) {
+    bool isLevelComplete = newFilledWords.every((word) => !word.contains('-'));
+
+    if (isLevelComplete) {
+      final level = state.levelModel;
+      _levelDao.updateLevel(
+        level?.copyWith(
+          status: 1,
+          points: points,
+          finishedAt: DateTime.now().millisecondsSinceEpoch,
+        ),
+      );
+      _userDao.getUser().then((user) {
+        if (user != null) {
+          _userDao.update(
+            user.copyWith(
+              totalScore: user.totalScore + points,
+              // currentStreak: user.currentStreak + 1,
+              // longestStreak: user.currentStreak + 1 > user.longestStreak
+              //     ? user.currentStreak + 1
+              //     : user.longestStreak,
+              lastPlayed: DateTime.now().millisecondsSinceEpoch,
+            ),
+          );
+        }
+      });
+    }
+    return isLevelComplete;
   }
 
   int findLongestWord(List<String> words) {
@@ -168,16 +174,34 @@ class GameCubit extends BaseCubitWrapper<GameState> {
   }
 
   void showHint() {
-    print(state.filledWords);
-    print(state.words);
-    final firstWordIndex = state.filledWords.indexWhere((w)=>w.startsWith('-'));
-    final hint = state.words[firstWordIndex].split('')[0].toUpperCase();
+    int firstWordIndex = 0;
+    if (state.hint.isEmpty) {
+      firstWordIndex = state.filledWords.indexWhere((w) => w.startsWith('-'));
+    } else {
+      firstWordIndex = state.hintWordIndex;
+    }
+    final hint =
+        state.words[firstWordIndex].split('')[state.hint.length].toUpperCase();
+    final newHint = '${state.hint}$hint'.trim();
     final filledWords = state.filledWords;
-    final hintedWord = filledWords[firstWordIndex].replaceFirst('-', hint);
+    final hintedWord = newHint.padRight(
+      filledWords[firstWordIndex].length,
+      '-',
+    );
+    final isWordComplete = !hintedWord.contains('-');
+    final points = _calculatePoints();
 
-    emit(state.copyWith(hint: hint,
-    filledWords: filledWords..[firstWordIndex] = hintedWord,
-    currentWord: [hint]
-    ));
+    final newFilledWords = filledWords..[firstWordIndex] = hintedWord;
+    bool isLevelComplete = handleCompleteLevel(newFilledWords, points);
+    emit(
+      state.copyWith(
+        hint: isWordComplete ? '' : newHint,
+        hintWordIndex: isWordComplete ? -1 : firstWordIndex,
+        filledWords: newFilledWords,
+        currentWord: isWordComplete ? [] : [newHint],
+        points: isLevelComplete ? points + state.points : state.points,
+        isLevelComplete: isLevelComplete,
+      ),
+    );
   }
 }
