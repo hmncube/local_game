@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:local_game/app/themes/app_text_styles.dart';
 
 class LettersKeyboard extends StatelessWidget {
   final Function(String) onKeyPressed;
@@ -74,7 +75,7 @@ class LettersKeyboard extends StatelessWidget {
             alignment: Alignment.center,
             child: Text(
               letter,
-              style: TextStyle(
+              style: AppTextStyles.body.copyWith(
                 fontSize: 18,
                 fontWeight: FontWeight.w500,
                 color: isEnabled 
