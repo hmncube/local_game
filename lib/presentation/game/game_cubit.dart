@@ -23,7 +23,6 @@ class GameCubit extends BaseCubitWrapper<GameState> {
   Future<void> initialize() async {}
 
   Future<void> init({int? level}) async {
-    print('pundez level $level');
     emit(state.copyWith(cubitState: CubitLoading()));
 
     final levelId = level ?? 1;
