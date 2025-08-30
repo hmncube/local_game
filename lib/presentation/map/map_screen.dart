@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:local_game/app/themes/app_text_styles.dart';
 import 'package:local_game/app/themes/app_theme.dart';
 import 'package:local_game/core/base/cubit/cubit_status.dart';
 import 'package:local_game/core/di/di.dart';
@@ -153,7 +154,7 @@ class LevelButton extends StatelessWidget {
             const SizedBox(height: 8.0),
             Text(
               'Level $levelId',
-              style: TextStyle(
+              style: AppTextStyles.body.copyWith(
                 fontSize: 18.0,
                 fontWeight: FontWeight.bold,
                 color:
@@ -164,7 +165,7 @@ class LevelButton extends StatelessWidget {
             ),
             const SizedBox(height: 4.0),
             Icon(
-              isCompleted ? Icons.check_circle : Icons.lock_open,
+              isCompleted ? Icons.check_circle : isUnLocked ? Icons.lock_open : Icons.lock,
               color: isCompleted ? Colors.white : AppTheme.notInWordTile,
             ),
           ],
