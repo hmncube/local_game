@@ -8,7 +8,7 @@ import 'package:local_game/core/di/di.dart';
 import 'package:local_game/presentation/game/game_cubit.dart';
 import 'package:local_game/presentation/game/game_state.dart';
 import 'package:local_game/presentation/game/widgets/hint_widget.dart';
-import 'package:local_game/presentation/game/widgets/letters_keyboard.dart';
+import 'package:local_game/presentation/game/widgets/swipe_keyboard.dart';
 import 'package:local_game/presentation/game/widgets/text_display.dart';
 import 'package:local_game/presentation/widget/app_button.dart';
 import 'package:local_game/presentation/widget/app_animated_icon.dart';
@@ -148,7 +148,7 @@ class _GameScreenState extends State<GameScreen>
                         ),
                       ),
                       const SizedBox(height: 16),
-                      LettersKeyboard(
+                      SwipeKeyboard(
                         enabledLetters: state.letters,
                         onKeyPressed: (letter) {
                           _cubit.updateCurrentWord(letter);
