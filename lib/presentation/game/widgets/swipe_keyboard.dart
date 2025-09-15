@@ -16,15 +16,62 @@ class SwipeKeyboard extends StatefulWidget {
   State<SwipeKeyboard> createState() => _SwipeKeyboardState();
 }
 
-class _SwipeKeyboardState extends State<SwipeKeyboard> {
+class _SwipeKeyboardState extends State<SwipeKeyboard>
+    with TickerProviderStateMixin {
   final Map<String, Rect> _letterPositions = {};
   final Set<String> _swipedLetters = {};
   final List<Offset> _swipePath = [];
+  List<String> _keyboardLetters = [];
+  
+  // Animation controllers
+  late AnimationController _rotationController;
+  late AnimationController _scaleController;
+  late Animation<double> _rotationAnimation;
+  late Animation<double> _scaleAnimation;
+  
+  bool _isAnimating = false;
 
   @override
   void initState() {
     super.initState();
+    _keyboardLetters = widget.enabledLetters;
+    
+    // Initialize animation controllers
+    _rotationController = AnimationController(
+      duration: const Duration(milliseconds: 800),
+      vsync: this,
+    );
+    
+    _scaleController = AnimationController(
+      duration: const Duration(milliseconds: 400),
+      vsync: this,
+    );
+    
+    // Setup animations
+    _rotationAnimation = Tween<double>(
+      begin: 0.0,
+      end: 2 * pi,
+    ).animate(CurvedAnimation(
+      parent: _rotationController,
+      curve: Curves.easeInOutCubic,
+    ));
+    
+    _scaleAnimation = Tween<double>(
+      begin: 1.0,
+      end: 0.3,
+    ).animate(CurvedAnimation(
+      parent: _scaleController,
+      curve: Curves.easeInOut,
+    ));
+    
     _generateLetterPositions();
+  }
+
+  @override
+  void dispose() {
+    _rotationController.dispose();
+    _scaleController.dispose();
+    super.dispose();
   }
 
   void _generateLetterPositions() {
@@ -33,14 +80,14 @@ class _SwipeKeyboardState extends State<SwipeKeyboard> {
     final centerX = 150.0;
     final centerY = 100.0;
     final radius = 80.0;
-    final count = widget.enabledLetters.length;
+    final count = _keyboardLetters.length;
 
     for (int i = 0; i < count; i++) {
       final angle = (2 * pi * i) / count;
       final dx = centerX + radius * cos(angle - pi / 2);
       final dy = centerY + radius * sin(angle - pi / 2);
 
-      _letterPositions[widget.enabledLetters[i]] = Rect.fromCenter(
+      _letterPositions[_keyboardLetters[i]] = Rect.fromCenter(
         center: Offset(dx, dy),
         width: 40,
         height: 40,
@@ -49,6 +96,8 @@ class _SwipeKeyboardState extends State<SwipeKeyboard> {
   }
 
   void _handleTouch(Offset position) {
+    if (_isAnimating) return; // Don't handle touch during animation
+    
     _swipePath.add(position);
 
     for (var entry in _letterPositions.entries) {
@@ -63,49 +112,114 @@ class _SwipeKeyboardState extends State<SwipeKeyboard> {
     setState(() {});
   }
 
+  void _randomiseLetters() async {
+    if (_isAnimating) return; // Prevent multiple animations
+    
+    setState(() {
+      _isAnimating = true;
+    });
+
+    // Start both animations
+    _scaleController.forward();
+    await _rotationController.forward();
+    
+    // Shuffle letters and regenerate positions
+    _keyboardLetters.shuffle();
+    _generateLetterPositions();
+    
+    // Reset animations
+    await _scaleController.reverse();
+    _rotationController.reset();
+    
+    setState(() {
+      _isAnimating = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onPanStart: (details) {
-        _swipedLetters.clear();
-        _swipePath.clear();
-        _handleTouch(details.localPosition);
-      },
-      onPanUpdate: (details) {
-        _handleTouch(details.localPosition);
-      },
-      onPanEnd: (details) {
-        _swipePath.clear();
-        _swipedLetters.clear();
-        setState(() {});
-      },
-      child: SizedBox(
-        height: 200,
-        width: 300,
-        child: CustomPaint(
-          painter: SwipeLinePainter(_swipePath),
-          child: Stack(
-            children:
-                _letterPositions.entries.map((entry) {
-                  return Positioned(
-                    left: entry.value.left,
-                    top: entry.value.top,
-                    child: Container(
-                      width: 40,
-                      height: 40,
-                      alignment: Alignment.center,
-                      child: Text(
-                        entry.key,
-                        style: AppTextStyles.tileLetter.copyWith(
-                          color: Colors.white,
-                        ),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        GestureDetector(
+          onPanStart: (details) {
+            if (_isAnimating) return;
+            _swipedLetters.clear();
+            _swipePath.clear();
+            _handleTouch(details.localPosition);
+          },
+          onPanUpdate: (details) {
+            if (_isAnimating) return;
+            _handleTouch(details.localPosition);
+          },
+          onPanEnd: (details) {
+            if (_isAnimating) return;
+            _swipePath.clear();
+            _swipedLetters.clear();
+            setState(() {});
+          },
+          child: SizedBox(
+            height: 200,
+            width: 300,
+            child: CustomPaint(
+              painter: SwipeLinePainter(_swipePath),
+              child: AnimatedBuilder(
+                animation: Listenable.merge([_rotationController, _scaleController]),
+                builder: (context, child) {
+                  return Transform.rotate(
+                    angle: _rotationAnimation.value,
+                    child: Transform.scale(
+                      scale: _scaleAnimation.value,
+                      child: Stack(
+                        children: _letterPositions.entries.map((entry) {
+                          return Positioned(
+                            left: entry.value.left,
+                            top: entry.value.top,
+                            child: AnimatedContainer(
+                              duration: Duration(milliseconds: _isAnimating ? 100 : 0),
+                              width: 40,
+                              height: 40,
+                              alignment: Alignment.center,
+                              decoration: _isAnimating
+                                  ? BoxDecoration(
+                                      color: Colors.white.withOpacity(0.1),
+                                      shape: BoxShape.circle,
+                                    )
+                                  : null,
+                              child: AnimatedOpacity(
+                                opacity: _isAnimating ? 0.7 : 1.0,
+                                duration: Duration(milliseconds: 200),
+                                child: Text(
+                                  entry.key,
+                                  style: AppTextStyles.tileLetter.copyWith(
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
+                        }).toList(),
                       ),
                     ),
                   );
-                }).toList(),
+                },
+              ),
+            ),
           ),
         ),
-      ),
+        GestureDetector(
+          onTap: _randomiseLetters,
+          child: AnimatedRotation(
+            turns: _isAnimating ? 1.0 : 0.0,
+            duration: Duration(milliseconds: 800),
+            child: Icon(
+              Icons.refresh,
+              color: _isAnimating ? Colors.grey : Colors.white,
+              size: 40,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -119,12 +233,11 @@ class SwipeLinePainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     if (points.isEmpty) return;
 
-    final paint =
-        Paint()
-          ..color = Colors.red
-          ..strokeWidth = 4
-          ..style = PaintingStyle.stroke
-          ..strokeCap = StrokeCap.round;
+    final paint = Paint()
+      ..color = Colors.red
+      ..strokeWidth = 4
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round;
 
     final path = Path()..moveTo(points.first.dx, points.first.dy);
     for (int i = 1; i < points.length; i++) {
