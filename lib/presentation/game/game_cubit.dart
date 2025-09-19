@@ -68,11 +68,9 @@ class GameCubit extends BaseCubitWrapper<GameState> {
       ..sort((a, b) => a.length.compareTo(b.length));
   }
 
-  void updateCurrentWord(String letter) {
+  void onCheckUserInput() {
     final word = state.currentWord;
-    List<String> newWord = word + [letter];
-    final nw = newWord.join('');
-
+    final nw = word.join('');
     if (state.filledWords.contains(nw.toLowerCase())) {
       _soundManager.playWrongAnswerSound();
       emit(state.copyWith(currentWord: [], wasWordEnteredBefore: true));
@@ -88,7 +86,6 @@ class GameCubit extends BaseCubitWrapper<GameState> {
       );
       filledWords[filledWordIndex] = nw;
       newFilledWords = filledWords;
-      newWord = [];
 
       final points = _calculatePoints();
 
@@ -96,7 +93,7 @@ class GameCubit extends BaseCubitWrapper<GameState> {
 
       emit(
         state.copyWith(
-          currentWord: newWord,
+          currentWord: [],
           filledWords: newFilledWords,
           isWordCorrect: true,
           points: isLevelComplete ? points + state.points : state.points,
@@ -106,15 +103,15 @@ class GameCubit extends BaseCubitWrapper<GameState> {
         ),
       );
     } else {
-      final size = findLongestWord(state.words);
-      bool isWordWrong = false;
-      if (newWord.length == size) {
         _soundManager.playWrongAnswerSound();
-        newWord = [state.hint];
-        isWordWrong = true;
-      }
-      emit(state.copyWith(currentWord: newWord, isWordWrong: isWordWrong));
+      emit(state.copyWith(currentWord: [state.hint], isWordWrong: true));
     }
+  }
+
+  void updateCurrentWord(String letter) {
+    final word = state.currentWord;
+    List<String> newWord = word + [letter];
+    emit(state.copyWith(currentWord: newWord));
   }
 
   bool handleCompleteLevel(List<String> newFilledWords, int points) {

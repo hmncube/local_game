@@ -4,6 +4,7 @@ import 'package:local_game/core/routes.dart';
 import 'package:local_game/presentation/game/game_screen.dart';
 import 'package:local_game/presentation/map/map_screen.dart';
 import 'package:local_game/presentation/splash/splash_screen.dart';
+import 'package:local_game/presentation/word_search/find_word_game_screen.dart';
 
 class AppRoutes {
   static final GoRouter _router = GoRouter(
@@ -38,6 +39,17 @@ class AppRoutes {
               context: context,
               state: state,
               child: GameScreen(level: (state.extra as int)),
+            ),
+      ),
+      GoRoute(
+        path: Routes.wordSearch.toPath,
+        name: Routes.wordSearch.toNamed,
+        builder: (context, state) => const FindWordGameScreen(),
+        pageBuilder:
+            (context, state) => buildPageWithDefaultTransition(
+              context: context,
+              state: state,
+              child: const FindWordGameScreen(),
             ),
       ),
     ],

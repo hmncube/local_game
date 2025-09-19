@@ -153,6 +153,9 @@ class _GameScreenState extends State<GameScreen>
                         onKeyPressed: (letter) {
                           _cubit.updateCurrentWord(letter);
                         },
+                        onCheckUserInput: (){
+                          _cubit.onCheckUserInput();
+                        },
                       ),
                       const SizedBox(height: 32),
                     ],
