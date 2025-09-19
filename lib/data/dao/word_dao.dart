@@ -2,7 +2,6 @@
 import 'package:injectable/injectable.dart';
 import 'package:local_game/data/database_provider.dart';
 import 'package:local_game/data/model/word_model.dart';
-import 'package:sqflite/sqflite.dart';
 
 @injectable
 class WordDao {
