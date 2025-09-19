@@ -342,32 +342,6 @@ class _FindWordGameScreenState extends State<FindWordGameScreen> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            // Game statistics
-            Container(
-              padding: const EdgeInsets.all(16),
-              margin: const EdgeInsets.only(bottom: 16),
-              decoration: BoxDecoration(
-                color: Colors.blue.shade50,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Text(
-                    'Found: ${foundWords.length}/${wordsToFind.length}',
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Text(
-                    'Grid: ${gridSize}x$gridSize',
-                    style: const TextStyle(fontSize: 14),
-                  ),
-                ],
-              ),
-            ),
-
             // Game grid
             Expanded(
               flex: 2,
@@ -475,11 +449,10 @@ class _FindWordGameScreenState extends State<FindWordGameScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'Words to Find:',
-                      style: TextStyle(
+                      style: AppTextStyles.tileLetter.copyWith(
                         fontSize: 18,
-                        fontWeight: FontWeight.bold,
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -512,7 +485,7 @@ class _FindWordGameScreenState extends State<FindWordGameScreen> {
                                 ),
                                 child: Text(
                                   word,
-                                  style: TextStyle(
+                                  style: AppTextStyles.keyboardKey.copyWith(
                                     decoration:
                                         isFound
                                             ? TextDecoration.lineThrough
