@@ -20,6 +20,8 @@ import '../../data/database_provider.dart' as _i90;
 import '../../data/local_provider.dart' as _i1063;
 import '../../presentation/game/game_cubit.dart' as _i874;
 import '../../presentation/map/map_cubit.dart' as _i621;
+import '../../presentation/similar_words/similar_words_game_cubit.dart'
+    as _i387;
 import '../../presentation/splash/splash_cubit.dart' as _i447;
 import '../../presentation/word_search/find_word_game_cubit.dart' as _i359;
 import '../sound/sound_manager.dart' as _i64;
@@ -48,6 +50,9 @@ Future<_i174.GetIt> init(
   gh.factory<_i861.WordDao>(() => _i861.WordDao(gh<_i90.DatabaseProvider>()));
   gh.factory<_i359.FindWordGameCubit>(
     () => _i359.FindWordGameCubit(gh<_i861.WordDao>()),
+  );
+  gh.factory<_i387.SimilarWordsGameCubit>(
+    () => _i387.SimilarWordsGameCubit(gh<_i861.WordDao>()),
   );
   gh.factory<_i0.LevelDao>(
     () => _i0.LevelDao(gh<_i90.DatabaseProvider>(), gh<_i861.WordDao>()),

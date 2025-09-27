@@ -75,7 +75,7 @@ class _MapScreenState extends State<MapScreen> {
                         !isUnLocked
                             ? null
                             : context.go(
-                              Routes.wordSearch.toPath,
+                              Routes.similarWords.toPath,
                               extra: level.id,
                             );
                       },
