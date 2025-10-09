@@ -34,22 +34,27 @@ class SimilarWordsGameCubit extends BaseCubitWrapper<SimilarWordsGameState> {
     }
     // Shuffle the available words
     availableWords.shuffle();
+
+    emit(state.copyWith(
+      availableWords: availableWords,
+      userAnswers: userAnswers,
+      questionAnswers: questionAnswers
+    ));
   }
 
-  void onWordDropped(String questionWord, String droppedWord) {
-    final userAnswers = state.userAnswers;
-    final usedWords = state.usedWords;
+void onWordDropped(String questionWord, String droppedWord) {
+  Map<String, String?> userAnswers = Map.from(state.userAnswers);
+  Set<String> usedWords = Set.from(state.usedWords);
 
-    if (userAnswers[questionWord] != null) {
-      usedWords.remove(state.userAnswers[questionWord]!);
-    }
-
-    // Set new answer
-    userAnswers[questionWord] = droppedWord;
-    usedWords.add(droppedWord);
-
-    emit(state.copyWith(usedWords: usedWords, userAnswers: userAnswers));
+  if (userAnswers[questionWord] != null) {
+    usedWords.remove(userAnswers[questionWord]!);
   }
+  
+  // Set new answer
+  userAnswers[questionWord] = droppedWord;
+  usedWords.add(droppedWord);
+  emit(state.copyWith(usedWords: usedWords, userAnswers: userAnswers));
+}
 
   bool isCorrectAnswer(String question, String? answer) {
     return state.questionAnswers[question] == answer;
