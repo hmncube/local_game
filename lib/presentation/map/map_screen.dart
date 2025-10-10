@@ -75,7 +75,7 @@ class _MapScreenState extends State<MapScreen> {
                         !isUnLocked
                             ? null
                             : context.go(
-                              Routes.similarWords.toPath,
+                              Routes.wordSearch.toPath,
                               extra: level.id,
                             );
                       },
@@ -165,7 +165,11 @@ class LevelButton extends StatelessWidget {
             ),
             const SizedBox(height: 4.0),
             Icon(
-              isCompleted ? Icons.check_circle : isUnLocked ? Icons.lock_open : Icons.lock,
+              isCompleted
+                  ? Icons.check_circle
+                  : isUnLocked
+                  ? Icons.lock_open
+                  : Icons.lock,
               color: isCompleted ? Colors.white : AppTheme.notInWordTile,
             ),
           ],

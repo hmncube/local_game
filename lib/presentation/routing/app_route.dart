@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:local_game/core/routes.dart';
+import 'package:local_game/presentation/crossword/crossword_screen.dart';
 import 'package:local_game/presentation/game/game_screen.dart';
 import 'package:local_game/presentation/map/map_screen.dart';
 import 'package:local_game/presentation/similar_words/similar_words_game_screen.dart';
@@ -62,6 +63,17 @@ class AppRoutes {
               context: context,
               state: state,
               child: const SimilarWordsGameScreen(),
+            ),
+      ),
+            GoRoute(
+        path: Routes.crosswordScreen.toPath,
+        name: Routes.crosswordScreen.toNamed,
+        builder: (context, state) => const CrosswordScreen(),
+        pageBuilder:
+            (context, state) => buildPageWithDefaultTransition(
+              context: context,
+              state: state,
+              child: const CrosswordScreen(),
             ),
       ),
     ],
