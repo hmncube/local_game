@@ -3,13 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:injectable/injectable.dart';
 import 'package:local_game/core/base/cubit/base_cubit_wrapper.dart';
 import 'package:local_game/core/base/cubit/cubit_status.dart';
+import 'package:local_game/core/game_system/points_management.dart';
+import 'package:local_game/data/dao/user_dao.dart';
 import 'package:local_game/data/dao/word_dao.dart';
 import 'package:local_game/presentation/word_search/find_word_game_state.dart';
 
 @injectable
 class FindWordGameCubit extends BaseCubitWrapper<FindWordGameState> {
   final WordDao _wordDao;
-  FindWordGameCubit(this._wordDao)
+  final UserDao _userDao;
+
+  FindWordGameCubit(this._wordDao, this._userDao)
     : super(FindWordGameState(cubitState: CubitInitial()));
 
   final List<Color> _availableColors = [
@@ -51,6 +55,8 @@ class FindWordGameCubit extends BaseCubitWrapper<FindWordGameState> {
     _placeWords(wordsToFind, grid, newGridSize, wordPositions);
     _fillEmptyCells(grid, newGridSize);
 
+    final user = await _userDao.getUser();
+
     emit(
       state.copyWith(
         cubitState: CubitSuccess(),
@@ -64,6 +70,9 @@ class FindWordGameCubit extends BaseCubitWrapper<FindWordGameState> {
         wordPositions: wordPositions,
         wordColors: {},
         newFoundWord: '',
+        points: user?.totalScore,
+        hints: user?.hints,
+        userId: user?.id,
       ),
     );
   }
@@ -194,7 +203,8 @@ class FindWordGameCubit extends BaseCubitWrapper<FindWordGameState> {
         newFoundWord = matchedWord;
       }
     }
-
+    final points = PointsManagement().calculatePoints(newFoundWord);
+    _updatePoints(points);
     emit(
       state.copyWith(
         selectedPositions: [],
@@ -203,6 +213,7 @@ class FindWordGameCubit extends BaseCubitWrapper<FindWordGameState> {
         foundWords: newFoundWords,
         wordColors: newWordColors,
         newFoundWord: newFoundWord,
+        points: state.points + points,
       ),
     );
   }
@@ -236,5 +247,33 @@ class FindWordGameCubit extends BaseCubitWrapper<FindWordGameState> {
 
   void clearNewFoundWord() {
     emit(state.copyWith(newFoundWord: ''));
+  }
+
+  void _updatePoints(int points) {
+    _userDao.updateTotalScore(state.userId, points + state.points);
+  }
+
+  void onHintClicked() {
+    if (state.hints == 0) {
+      emit(state.copyWith(hintError: 'You are out of hints!'));
+      return;
+    }
+    final remainingWords =
+        state.wordsToFind
+            .where((word) => !state.foundWords.contains(word))
+            .toList();
+
+    final wordPosition =
+        state.wordPositions.entries
+            .where((word) => remainingWords.contains(word.key))
+            .first;
+    final firstPosition = wordPosition.value.first;
+    final hints = state.hints - 1;
+    emit(state.copyWith(hintPosition: firstPosition, hints: hints));
+    updateHintDb(hints);
+  }
+
+  void updateHintDb(int hints) {
+    _userDao.updateHints(state.userId, hints);
   }
 }

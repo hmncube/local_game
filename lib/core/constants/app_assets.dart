@@ -10,4 +10,10 @@ mixin AppAssets {
   static const backgroundSound = 'sounds/background.mp3';
   static const correctSfx = 'sounds/correct.wav';
   static const wrongSfx = 'sounds/wrong.wav';
+
+  static const coinSvg = 'assets/svg/coin.svg';
+  static const homeSvg = 'assets/svg/home.svg';
+  static const hintSvg = 'assets/svg/hint.svg';
+  static const pauseSvg = 'assets/svg/pause.svg';
+  static const settingsSvg = 'assets/svg/settings.svg';
 }

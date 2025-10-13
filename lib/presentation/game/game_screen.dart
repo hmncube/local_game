@@ -13,7 +13,7 @@ import 'package:local_game/presentation/game/widgets/text_display.dart';
 import 'package:local_game/presentation/widget/app_button.dart';
 import 'package:local_game/presentation/widget/app_animated_icon.dart';
 import 'package:local_game/presentation/widget/loading_screen.dart';
-import 'package:local_game/presentation/widget/points_widget.dart';
+import 'package:local_game/presentation/widget/game_top_bar.dart';
 
 import 'package:lottie/lottie.dart';
 
@@ -109,7 +109,9 @@ class _GameScreenState extends State<GameScreen>
                             ],
                           ),
                           Spacer(),
-                          PointsWidget(points: state.points),
+                          GameTopBar(points: state.points, 
+                          hints: state.hintsCount,
+                          onHintClicked: (){},),
                         ],
                       ),
                       const SizedBox(height: 60),

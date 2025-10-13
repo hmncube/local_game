@@ -50,13 +50,33 @@ class UserDao {
   }
 
   Future<int> update(UserModel? user) async {
-    if(user == null) return 0;
+    if (user == null) return 0;
     final db = await _dbProvider.database;
     return await db.update(
       'users',
       user.toMap(),
       where: 'id = ?',
       whereArgs: [user.id],
+    );
+  }
+
+  Future<int> updateTotalScore(String userId, int totalScore) async {
+    final db = await _dbProvider.database;
+    return await db.update(
+      'users',
+      {'total_score': totalScore},
+      where: 'id = ?',
+      whereArgs: [userId],
+    );
+  }
+
+  Future<int> updateHints(String userId, int hint) async {
+    final db = await _dbProvider.database;
+    return await db.update(
+      'users',
+      {'hints': hint},
+      where: 'id = ?',
+      whereArgs: [userId],
     );
   }
 }

@@ -14,6 +14,11 @@ class FindWordGameState extends Equatable {
   final Map<String, List<Position>> wordPositions;
   final Map<String, Color> wordColors;
   final String newFoundWord;
+  final int points;
+  final int hints;
+  final String userId;
+  final String? hintError;
+  final Position? hintPosition;
 
   const FindWordGameState({
     required this.cubitState,
@@ -27,6 +32,11 @@ class FindWordGameState extends Equatable {
     this.wordPositions = const {},
     this.wordColors = const {},
     this.newFoundWord = '',
+    this.points = 0,
+    this.hints = 0,
+    this.userId = '',
+    this.hintError,
+    this.hintPosition,
   });
 
   FindWordGameState copyWith({
@@ -41,6 +51,11 @@ class FindWordGameState extends Equatable {
     Map<String, List<Position>>? wordPositions,
     Map<String, Color>? wordColors,
     String? newFoundWord,
+    int? points,
+    int? hints,
+    String? userId,
+    String? hintError,
+    Position? hintPosition,
   }) {
     return FindWordGameState(
       cubitState: cubitState ?? this.cubitState,
@@ -54,23 +69,32 @@ class FindWordGameState extends Equatable {
       wordPositions: wordPositions ?? this.wordPositions,
       wordColors: wordColors ?? this.wordColors,
       newFoundWord: newFoundWord ?? this.newFoundWord,
+      points: points ?? this.points,
+      userId: userId ?? this.userId,
+      hints: hints ?? this.hints,
+      hintError: hintError ?? this.hintError,
+      hintPosition: hintPosition ?? this.hintPosition,
     );
   }
 
   @override
   List<Object?> get props => [
-        cubitState,
-        gridSize,
-        grid,
-        wordsToFind,
-        foundWords,
-        selectedPositions,
-        startPosition,
-        isDragging,
-        wordPositions,
-        wordColors,
-        newFoundWord,
-      ];
+    cubitState,
+    gridSize,
+    grid,
+    wordsToFind,
+    foundWords,
+    selectedPositions,
+    startPosition,
+    isDragging,
+    wordPositions,
+    wordColors,
+    newFoundWord,
+    points,
+    userId,
+    hints,
+    hintPosition,
+  ];
 }
 
 class Position extends Equatable {
@@ -79,9 +103,7 @@ class Position extends Equatable {
 
   const Position(this.row, this.col);
 
-  const Position.invalid()
-      : row = -1,
-        col = -1;
+  const Position.invalid() : row = -1, col = -1;
 
   bool get isValid => row != -1 && col != -1;
 
