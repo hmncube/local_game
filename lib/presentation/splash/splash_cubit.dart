@@ -26,7 +26,7 @@ class SplashCubit extends BaseCubitWrapper<SplashState> {
       _userDao.insert(UserModel(id: '1', settings: {}, createdAt: DateTime.now().millisecondsSinceEpoch, lastPlayed: 0, totalScore: 0, hints: 3));
     }
     final isUserOnboarded = await _localProvider.getIsUserOnboarded();
-    emit(state.copyWith(isOnboarded: true));
+    emit(state.copyWith(isOnboarded: isUserOnboarded));
   }
 
   @override

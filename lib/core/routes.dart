@@ -1,4 +1,12 @@
-enum Routes { splashScreen, mapScreen, gameScreen, wordSearch, similarWords, crosswordScreen}
+enum Routes {
+  splashScreen,
+  onboarding,
+  mapScreen,
+  gameScreen,
+  wordSearch,
+  similarWords,
+  crosswordScreen,
+}
 
 extension RoutesExt on Routes {
   String get route => toString().split('.').last;

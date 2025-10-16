@@ -6,7 +6,10 @@ mixin AppAssets {
   static const wrongAnimation = 'assets/animations/wrong.json';
   static const coinsChest = 'assets/animations/coins_chest.json';
   static const fallingCoins = 'assets/animations/falling_coins.json';
+  static const fallingCoins2 = 'assets/animations/falling_coins2.json';
   static const loadingAnimation = 'assets/animations/loading.json';
+  static const celebrationsAnimation = 'assets/animations/celebrations.json';
+
   static const backgroundSound = 'sounds/background.mp3';
   static const correctSfx = 'sounds/correct.wav';
   static const wrongSfx = 'sounds/wrong.wav';
@@ -16,4 +19,9 @@ mixin AppAssets {
   static const hintSvg = 'assets/svg/hint.svg';
   static const pauseSvg = 'assets/svg/pause.svg';
   static const settingsSvg = 'assets/svg/settings.svg';
+  static const backgroundSvg = 'assets/svg/background.svg';
+  static const mavaraSvg = 'assets/svg/mavara.svg';
+  static const maskotSvg = 'assets/svg/mascot-learning.svg';
+  static const maskotCelebratingSvg = 'assets/svg/mascot-celebration.svg';
+  static const progressBarSvg = 'assets/svg/progrees-bar.svg';
 }

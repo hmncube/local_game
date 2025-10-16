@@ -3,7 +3,9 @@ import 'package:go_router/go_router.dart';
 import 'package:local_game/core/routes.dart';
 import 'package:local_game/presentation/crossword/crossword_screen.dart';
 import 'package:local_game/presentation/game/game_screen.dart';
+import 'package:local_game/presentation/level_complete/level_complete_screen.dart';
 import 'package:local_game/presentation/map/map_screen.dart';
+import 'package:local_game/presentation/onboarding/onboarding_screen.dart';
 import 'package:local_game/presentation/similar_words/similar_words_game_screen.dart';
 import 'package:local_game/presentation/splash/splash_screen.dart';
 import 'package:local_game/presentation/word_search/find_word_game_screen.dart';
@@ -25,12 +27,23 @@ class AppRoutes {
       GoRoute(
         path: Routes.mapScreen.toPath,
         name: Routes.mapScreen.toNamed,
-        builder: (context, state) => const MapScreen(),
+        builder: (context, state) => const SplashScreen(),
         pageBuilder:
             (context, state) => buildPageWithDefaultTransition(
               context: context,
               state: state,
-              child: const MapScreen(),
+              child: const SplashScreen(),
+            ),
+      ),
+      GoRoute(
+        path: Routes.onboarding.toPath,
+        name: Routes.onboarding.toNamed,
+        builder: (context, state) => const OnboardingScreen(),
+        pageBuilder:
+            (context, state) => buildPageWithDefaultTransition(
+              context: context,
+              state: state,
+              child: const OnboardingScreen(),
             ),
       ),
       GoRoute(
@@ -65,7 +78,7 @@ class AppRoutes {
               child: const SimilarWordsGameScreen(),
             ),
       ),
-            GoRoute(
+      GoRoute(
         path: Routes.crosswordScreen.toPath,
         name: Routes.crosswordScreen.toNamed,
         builder: (context, state) => const CrosswordScreen(),

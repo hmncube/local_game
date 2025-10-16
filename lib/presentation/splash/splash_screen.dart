@@ -103,6 +103,8 @@ class _SplashScreenState extends State<SplashScreen>
         listener: (context, state) {
           if (state.isOnboarded) {
             context.go(Routes.mapScreen.toPath);
+          }if (!state.isOnboarded) {
+            context.go(Routes.mapScreen.toPath);
           }
         },
         child: Scaffold(
