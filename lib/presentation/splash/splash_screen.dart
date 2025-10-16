@@ -8,6 +8,7 @@ import 'package:local_game/core/di/di.dart';
 import 'package:local_game/core/routes.dart';
 import 'package:local_game/presentation/splash/splash_cubit.dart';
 import 'package:local_game/presentation/splash/splash_state.dart';
+import 'package:local_game/presentation/widget/animated_progress_bar.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -20,14 +21,12 @@ class _SplashScreenState extends State<SplashScreen>
     with TickerProviderStateMixin {
   late AnimationController _mascotController;
   late AnimationController _mavaraController;
-  late AnimationController _progressController;
   late AnimationController _backgroundController;
 
   late Animation<double> _mascotBounce;
   late Animation<double> _mascotScale;
   late Animation<double> _mavaraFloat;
   late Animation<double> _mavaraRotate;
-  late Animation<double> _progressAnimation;
   late Animation<double> _backgroundPulse;
 
   @override
@@ -74,19 +73,6 @@ class _SplashScreenState extends State<SplashScreen>
       ),
     );
 
-    // Progress bar animation
-    _progressController = AnimationController(
-      duration: const Duration(milliseconds: 2500),
-      vsync: this,
-    )..repeat();
-
-    _progressAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _progressController,
-        curve: Curves.easeInOut,
-      ),
-    );
-
     // Background pulse animation
     _backgroundController = AnimationController(
       duration: const Duration(milliseconds: 3000),
@@ -105,7 +91,6 @@ class _SplashScreenState extends State<SplashScreen>
   void dispose() {
     _mascotController.dispose();
     _mavaraController.dispose();
-    _progressController.dispose();
     _backgroundController.dispose();
     super.dispose();
   }
@@ -178,41 +163,12 @@ class _SplashScreenState extends State<SplashScreen>
                 ),
               ),
 
-              // Animated progress bar with shimmer effect
-              Positioned(
+              // Animated progress bar
+              const Positioned(
                 bottom: 40,
                 left: 0,
                 right: 0,
-                child: AnimatedBuilder(
-                  animation: _progressAnimation,
-                  builder: (context, child) {
-                    return ShaderMask(
-                      shaderCallback: (bounds) {
-                        return LinearGradient(
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
-                          stops: [
-                            _progressAnimation.value - 0.3,
-                            _progressAnimation.value,
-                            _progressAnimation.value + 0.3,
-                          ],
-                          colors: const [
-                            Colors.transparent,
-                            Colors.white24,
-                            Colors.transparent,
-                          ],
-                        ).createShader(bounds);
-                      },
-                      blendMode: BlendMode.srcATop,
-                      child: SvgPicture.asset(
-                        height: 60,
-                        width: double.infinity,
-                        AppAssets.progressBarSvg,
-                        fit: BoxFit.fill,
-                      ),
-                    );
-                  },
-                ),
+                child: AnimatedProgressBar(),
               ),
             ],
           ),
