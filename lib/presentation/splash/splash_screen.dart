@@ -16,7 +16,100 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
+class _SplashScreenState extends State<SplashScreen>
+    with TickerProviderStateMixin {
+  late AnimationController _mascotController;
+  late AnimationController _mavaraController;
+  late AnimationController _progressController;
+  late AnimationController _backgroundController;
+
+  late Animation<double> _mascotBounce;
+  late Animation<double> _mascotScale;
+  late Animation<double> _mavaraFloat;
+  late Animation<double> _mavaraRotate;
+  late Animation<double> _progressAnimation;
+  late Animation<double> _backgroundPulse;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Mascot bounce animation
+    _mascotController = AnimationController(
+      duration: const Duration(milliseconds: 1500),
+      vsync: this,
+    )..repeat(reverse: true);
+
+    _mascotBounce = Tween<double>(begin: -10, end: 10).animate(
+      CurvedAnimation(
+        parent: _mascotController,
+        curve: Curves.easeInOut,
+      ),
+    );
+
+    _mascotScale = Tween<double>(begin: 0.95, end: 1.05).animate(
+      CurvedAnimation(
+        parent: _mascotController,
+        curve: Curves.easeInOut,
+      ),
+    );
+
+    // Mavara floating animation
+    _mavaraController = AnimationController(
+      duration: const Duration(milliseconds: 2000),
+      vsync: this,
+    )..repeat(reverse: true);
+
+    _mavaraFloat = Tween<double>(begin: -8, end: 8).animate(
+      CurvedAnimation(
+        parent: _mavaraController,
+        curve: Curves.easeInOut,
+      ),
+    );
+
+    _mavaraRotate = Tween<double>(begin: -0.02, end: 0.02).animate(
+      CurvedAnimation(
+        parent: _mavaraController,
+        curve: Curves.easeInOut,
+      ),
+    );
+
+    // Progress bar animation
+    _progressController = AnimationController(
+      duration: const Duration(milliseconds: 2500),
+      vsync: this,
+    )..repeat();
+
+    _progressAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _progressController,
+        curve: Curves.easeInOut,
+      ),
+    );
+
+    // Background pulse animation
+    _backgroundController = AnimationController(
+      duration: const Duration(milliseconds: 3000),
+      vsync: this,
+    )..repeat(reverse: true);
+
+    _backgroundPulse = Tween<double>(begin: 1.0, end: 1.05).animate(
+      CurvedAnimation(
+        parent: _backgroundController,
+        curve: Curves.easeInOut,
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _mascotController.dispose();
+    _mavaraController.dispose();
+    _progressController.dispose();
+    _backgroundController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
@@ -31,35 +124,96 @@ class _SplashScreenState extends State<SplashScreen> {
           backgroundColor: AppTheme.accentGreen,
           body: Stack(
             children: [
-              SizedBox(
-                width: double.infinity,
-                height: double.infinity,
-                child: SvgPicture.asset(
-                  fit: BoxFit.fill,
-                  AppAssets.backgroundSvg,
-                ),
+              // Animated background
+              AnimatedBuilder(
+                animation: _backgroundPulse,
+                builder: (context, child) {
+                  return Transform.scale(
+                    scale: _backgroundPulse.value,
+                    child: SizedBox(
+                      width: double.infinity,
+                      height: double.infinity,
+                      child: SvgPicture.asset(
+                        fit: BoxFit.fill,
+                        AppAssets.backgroundSvg,
+                      ),
+                    ),
+                  );
+                },
               ),
-              SvgPicture.asset(
-                  AppAssets.mavaraSvg,
-                ),
+
+              // Animated Mavara logo with floating and rotation
+              AnimatedBuilder(
+                animation: _mavaraController,
+                builder: (context, child) {
+                  return Transform.translate(
+                    offset: Offset(0, _mavaraFloat.value),
+                    child: Transform.rotate(
+                      angle: _mavaraRotate.value,
+                      child: SvgPicture.asset(
+                        AppAssets.mavaraSvg,
+                      ),
+                    ),
+                  );
+                },
+              ),
+
+              // Animated mascot with bounce and scale
               Center(
-                child: SvgPicture.asset(
-                  height: 400,
-                  width: 400,
-                    AppAssets.maskotSvg,
-                  ),
+                child: AnimatedBuilder(
+                  animation: _mascotController,
+                  builder: (context, child) {
+                    return Transform.translate(
+                      offset: Offset(0, _mascotBounce.value),
+                      child: Transform.scale(
+                        scale: _mascotScale.value,
+                        child: SvgPicture.asset(
+                          height: 400,
+                          width: 400,
+                          AppAssets.maskotSvg,
+                        ),
+                      ),
+                    );
+                  },
+                ),
               ),
+
+              // Animated progress bar with shimmer effect
               Positioned(
                 bottom: 40,
                 left: 0,
                 right: 0,
-                child: 
-              SvgPicture.asset(
-                 height: 60,
-                width: double.infinity,
-                    AppAssets.progressBarSvg,fit: BoxFit.fill,
-                  ),
-              )
+                child: AnimatedBuilder(
+                  animation: _progressAnimation,
+                  builder: (context, child) {
+                    return ShaderMask(
+                      shaderCallback: (bounds) {
+                        return LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          stops: [
+                            _progressAnimation.value - 0.3,
+                            _progressAnimation.value,
+                            _progressAnimation.value + 0.3,
+                          ],
+                          colors: const [
+                            Colors.transparent,
+                            Colors.white24,
+                            Colors.transparent,
+                          ],
+                        ).createShader(bounds);
+                      },
+                      blendMode: BlendMode.srcATop,
+                      child: SvgPicture.asset(
+                        height: 60,
+                        width: double.infinity,
+                        AppAssets.progressBarSvg,
+                        fit: BoxFit.fill,
+                      ),
+                    );
+                  },
+                ),
+              ),
             ],
           ),
         ),
@@ -67,13 +221,3 @@ class _SplashScreenState extends State<SplashScreen> {
     );
   }
 }
-
-/*
-Center(
-            child: Text(
-              'Learning Through Play,\nGrowing Through Games',
-              style: AppTextStyles.heading1.copyWith(color: Colors.white),
-              textAlign: TextAlign.center,
-            ),
-          ),
-*/
