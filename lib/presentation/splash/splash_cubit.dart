@@ -15,7 +15,7 @@ class SplashCubit extends BaseCubitWrapper<SplashState> {
   final UserDao _userDao;
 
   SplashCubit(this._localProvider, this._databaseProvider, this._userDao)
-      : super(SplashState(cubitState: CubitInitial())) {
+    : super(SplashState(cubitState: CubitInitial())) {
     _init();
   }
 
@@ -23,9 +23,19 @@ class SplashCubit extends BaseCubitWrapper<SplashState> {
     await _databaseProvider.database;
     final user = await _userDao.getUser();
     if (user == null) {
-      _userDao.insert(UserModel(id: '1', settings: {}, createdAt: DateTime.now().millisecondsSinceEpoch, lastPlayed: 0, totalScore: 0, hints: 3));
+      _userDao.insert(
+        UserModel(
+          id: '1',
+          settings: {},
+          createdAt: DateTime.now().millisecondsSinceEpoch,
+          lastPlayed: 0,
+          totalScore: 0,
+          hints: 3,
+        ),
+      );
     }
     final isUserOnboarded = await _localProvider.getIsUserOnboarded();
+    await Future.delayed(Duration(seconds: 2));
     emit(state.copyWith(isOnboarded: isUserOnboarded));
   }
 

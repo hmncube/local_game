@@ -27,12 +27,12 @@ class AppRoutes {
       GoRoute(
         path: Routes.mapScreen.toPath,
         name: Routes.mapScreen.toNamed,
-        builder: (context, state) => const SplashScreen(),
+        builder: (context, state) => const MapScreen(),
         pageBuilder:
             (context, state) => buildPageWithDefaultTransition(
               context: context,
               state: state,
-              child: const SplashScreen(),
+              child: const MapScreen(),
             ),
       ),
       GoRoute(

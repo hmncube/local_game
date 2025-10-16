@@ -40,17 +40,11 @@ class _SplashScreenState extends State<SplashScreen>
     )..repeat(reverse: true);
 
     _mascotBounce = Tween<double>(begin: -10, end: 10).animate(
-      CurvedAnimation(
-        parent: _mascotController,
-        curve: Curves.easeInOut,
-      ),
+      CurvedAnimation(parent: _mascotController, curve: Curves.easeInOut),
     );
 
     _mascotScale = Tween<double>(begin: 0.95, end: 1.05).animate(
-      CurvedAnimation(
-        parent: _mascotController,
-        curve: Curves.easeInOut,
-      ),
+      CurvedAnimation(parent: _mascotController, curve: Curves.easeInOut),
     );
 
     // Mavara floating animation
@@ -60,17 +54,11 @@ class _SplashScreenState extends State<SplashScreen>
     )..repeat(reverse: true);
 
     _mavaraFloat = Tween<double>(begin: -8, end: 8).animate(
-      CurvedAnimation(
-        parent: _mavaraController,
-        curve: Curves.easeInOut,
-      ),
+      CurvedAnimation(parent: _mavaraController, curve: Curves.easeInOut),
     );
 
     _mavaraRotate = Tween<double>(begin: -0.02, end: 0.02).animate(
-      CurvedAnimation(
-        parent: _mavaraController,
-        curve: Curves.easeInOut,
-      ),
+      CurvedAnimation(parent: _mavaraController, curve: Curves.easeInOut),
     );
 
     // Background pulse animation
@@ -80,10 +68,7 @@ class _SplashScreenState extends State<SplashScreen>
     )..repeat(reverse: true);
 
     _backgroundPulse = Tween<double>(begin: 1.0, end: 1.05).animate(
-      CurvedAnimation(
-        parent: _backgroundController,
-        curve: Curves.easeInOut,
-      ),
+      CurvedAnimation(parent: _backgroundController, curve: Curves.easeInOut),
     );
   }
 
@@ -103,8 +88,9 @@ class _SplashScreenState extends State<SplashScreen>
         listener: (context, state) {
           if (state.isOnboarded) {
             context.go(Routes.mapScreen.toPath);
-          }if (!state.isOnboarded) {
-            context.go(Routes.mapScreen.toPath);
+          }
+          if (!state.isOnboarded) {
+            context.go(Routes.onboarding.toPath);
           }
         },
         child: Scaffold(
@@ -137,9 +123,7 @@ class _SplashScreenState extends State<SplashScreen>
                     offset: Offset(0, _mavaraFloat.value),
                     child: Transform.rotate(
                       angle: _mavaraRotate.value,
-                      child: SvgPicture.asset(
-                        AppAssets.mavaraSvg,
-                      ),
+                      child: SvgPicture.asset(AppAssets.mavaraSvg),
                     ),
                   );
                 },
