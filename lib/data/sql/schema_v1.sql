@@ -48,6 +48,27 @@ CREATE TABLE level_words (
     FOREIGN KEY (word_id) REFERENCES words(id) ON DELETE CASCADE
 );
 
+-- 7. Player Icons Table
+CREATE TABLE player_icons (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name_en TEXT,
+    name_nd TEXT,
+    name_sn TEXT,
+    path TEXT,
+    facts_en TEXT,
+    facts_nd TEXT,
+    facts_sn TEXT
+);
+
+-- Initial Player Icons
+INSERT INTO player_icons (name_en, name_nd, name_sn, path, facts_en, facts_nd, facts_sn) VALUES
+('Buffalo', 'Imbuffalo', 'Nyati', 'buffalo', 'Buffalo are strong animals that live in large herds for protection.', 'Imbuffalo ziyizilwane ezinamandla ezihlala ngobunengi ukuze zivikelane.', 'Nyati inhoro ine simba inogara mumapoka kuti idzivirirwe.'),
+('Crocodile', 'Ingwenya', 'Ngwena', 'crocodile', 'Crocodiles can stay underwater for more than 30 minutes without breathing.', 'Ingwenya zingahlala ngaphansi kwamanzi imizuzu engaphezu kuka-30 zingaphefumuli.', 'Ngwena inogona kugara mumvura kwemaminitsi anopfuura makumi matatu isina kufema.'),
+('Giraffe', 'Indlulamithi', 'Tsvimborume', 'giraffe', 'Giraffes are the tallest land animals in the world.', 'Indlulamithi yisilwane eside kakhulu emhlabeni.', 'Tsvimborume ndiyo mhuka refu kupfuura dzese pasi pano.'),
+('Leopard', 'Ingwe', 'Shumba nyamuzihwa', 'leopard', 'Leopards are known for their beautiful spotted coats and climbing ability.', 'Ingwe yaziwa ngokuba lesikhumba esinemabala amahle futhi iyakhwela izihlahla.', 'Shumba nyamuzihwa inozivara zvine mavara akanaka uye inokwira miti.'),
+('Location', 'Indawo', 'Nzvimbo', 'location', 'Location means a place or area where something exists or happens.', 'Indawo itsho lapho okuthile okukhona khona kumbe okwenzakalayo.', 'Nzvimbo inoreva nzvimbo kana nzvimbo panowanikwa chinhu kana chiitiko.'),
+('Owl', 'Uqhokolo', 'Hukurubwi', 'owl', 'Owls can see clearly at night and turn their heads almost all the way around.', 'Uqhokolo lubona kahle ebusuku futhi luyakwazi ukujika ikhanda cishe ngokupheleleyo.', 'Hukurubwi hunoona zvakanaka usiku uye hunogona kutenderedza musoro kusvika kumashure.');
+
 -- Initial Shona Words
 INSERT INTO words (word, language, word_length, difficulty, english_translation, definition) VALUES
 ('abedinhego', 'shona', 10, 1, '', ''),
