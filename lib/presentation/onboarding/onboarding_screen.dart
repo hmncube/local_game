@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:local_game/app/themes/app_text_styles.dart';
 import 'package:local_game/core/base/cubit/cubit_status.dart';
 import 'package:local_game/core/constants/app_assets.dart';
 import 'package:local_game/core/di/di.dart';
+import 'package:local_game/core/routes.dart';
 import 'package:local_game/presentation/onboarding/onboarding_cubit.dart';
 import 'package:local_game/presentation/onboarding/onboarding_state.dart';
 import 'package:local_game/presentation/widget/app_btn.dart';
@@ -48,6 +50,11 @@ class _OnboardingScreenState extends State<OnboardingScreen>
     return BlocProvider(
       create: (context) => _cubit,
       child: BlocConsumer<OnboardingCubit, OnboardingState>(
+        listener: (context, state) {
+          if (state.navigateToMap) {
+            context.go(Routes.mapScreen.toPath);
+          }
+        },
         builder: (context, state) {
           return (state.cubitState is CubitLoading)
               ? LoadingScreen()
@@ -203,7 +210,9 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                         Padding(
                           padding: const EdgeInsets.all(20.0),
                           child: AppBtn(
-                            onClick: () {},
+                            onClick: () {
+                              _cubit.saveProfile();
+                            },
                             title: 'Save',
                             isEnabled: state.canProceed,
                           ),
@@ -214,7 +223,6 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                 ),
               );
         },
-        listener: (context, state) {},
       ),
     );
   }

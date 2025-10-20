@@ -10,6 +10,7 @@ class OnboardingState extends Equatable {
   final List<Language> langauges;
   final List<Language>? selectedLanguage;
   final bool canProceed;
+  final bool navigateToMap;
 
   const OnboardingState({
     required this.cubitState,
@@ -19,6 +20,7 @@ class OnboardingState extends Equatable {
     required this.langauges,
     this.selectedLanguage,
     this.canProceed = false,
+    this.navigateToMap = false,
   });
 
   OnboardingState copyWith({
@@ -29,6 +31,7 @@ class OnboardingState extends Equatable {
     List<Language>? selectedLanguage,
     String? nickname,
     bool? canProceed,
+    bool? navigateToMap,
   }) {
     return OnboardingState(
       cubitState: cubitState ?? this.cubitState,
@@ -38,6 +41,7 @@ class OnboardingState extends Equatable {
       selectedLanguage: selectedLanguage ?? this.selectedLanguage,
       nickname: nickname ?? this.nickname,
       canProceed: canProceed ?? this.canProceed,
+      navigateToMap: navigateToMap ?? this.navigateToMap,
     );
   }
 
@@ -50,6 +54,7 @@ class OnboardingState extends Equatable {
     selectedLanguage,
     nickname,
     canProceed,
+    navigateToMap,
   ];
 }
 

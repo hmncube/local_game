@@ -27,30 +27,30 @@ class OnboardingCubit extends BaseCubitWrapper<OnboardingState> {
   }
 
   Future<void> _init() async {
-    emit(state.copyWith(
-      cubitState: CubitLoading()
-    ));
+    emit(state.copyWith(cubitState: CubitLoading()));
     await _databaseProvider.database;
     final playerIcons = await _playerIconDao.getAllPlayerIcons();
     emit(
       state.copyWith(
         playerIcons: playerIcons,
         langauges: Language.getAllLanguages(),
-        cubitState: CubitSuccess()
+        cubitState: CubitSuccess(),
       ),
     );
   }
 
   Future<void> saveProfile() async {
+    emit(state.copyWith(cubitState: CubitLoading()));
     if (!_checkIfCanProceed()) {
       return;
     }
-  
+
     final user = UserModel(
       id: '1',
       username: state.nickname,
-      playerIconId: state.selectedPlayerIcon?.id??0,
-      preferredLanguage: state.selectedLanguage?.map((lan)=>lan.id).join(',') ?? '1',
+      playerIconId: state.selectedPlayerIcon?.id ?? 0,
+      preferredLanguage:
+          state.selectedLanguage?.map((lan) => lan.id).join(',') ?? '1',
       settings: {},
       createdAt: DateTime.now().millisecondsSinceEpoch,
       lastPlayed: 0,
@@ -58,6 +58,8 @@ class OnboardingCubit extends BaseCubitWrapper<OnboardingState> {
       hints: 3,
     );
     await _userDao.insert(user);
+
+    emit(state.copyWith(cubitState: CubitSuccess(), navigateToMap: true));
   }
 
   @override
@@ -67,7 +69,12 @@ class OnboardingCubit extends BaseCubitWrapper<OnboardingState> {
   void initialize() {}
 
   void onIconSelected(PlayerIconModel playerIcon) {
-    emit(state.copyWith(selectedPlayerIcon: playerIcon, canProceed: _checkIfCanProceed()));
+    emit(
+      state.copyWith(
+        selectedPlayerIcon: playerIcon,
+        canProceed: _checkIfCanProceed(),
+      ),
+    );
   }
 
   void onNicknameChanged(String text) {
@@ -75,16 +82,23 @@ class OnboardingCubit extends BaseCubitWrapper<OnboardingState> {
   }
 
   void onLanguageSelectedChanged(Language language) {
-    List<Language> currentLaguages = List.from(state.selectedLanguage??[]);
-    if(currentLaguages.contains(language)){
+    List<Language> currentLaguages = List.from(state.selectedLanguage ?? []);
+    if (currentLaguages.contains(language)) {
       currentLaguages.remove(language);
     } else {
       currentLaguages.add(language);
     }
-    emit(state.copyWith(selectedLanguage: currentLaguages, canProceed: _checkIfCanProceed()));
+    emit(
+      state.copyWith(
+        selectedLanguage: currentLaguages,
+        canProceed: _checkIfCanProceed(),
+      ),
+    );
   }
 
-  bool _checkIfCanProceed(){
-    return state.nickname.isNotEmpty && state.selectedPlayerIcon != null && state.langauges.isNotEmpty;
+  bool _checkIfCanProceed() {
+    return state.nickname.isNotEmpty &&
+        state.selectedPlayerIcon != null &&
+        state.langauges.isNotEmpty;
   }
 }
