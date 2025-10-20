@@ -3,9 +3,9 @@ import 'package:local_game/core/base/cubit/cubit_status.dart';
 
 class SplashState extends Equatable {
   final BaseCubitState cubitState;
-  final bool isOnboarded;
+  final bool? isOnboarded;
 
-  const SplashState({required this.cubitState, this.isOnboarded = false});
+  const SplashState({required this.cubitState, this.isOnboarded});
 
   SplashState copyWith({BaseCubitState? cubitState, bool? isOnboarded}) {
     return SplashState(
