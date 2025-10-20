@@ -20,9 +20,7 @@ mixin AppAssets {
   static const pauseSvg = 'assets/svg/pause.svg';
   static const settingsSvg = 'assets/svg/settings.svg';
   static const backgroundSvg = 'assets/svg/background.svg';
-  static const mavaraSvg = 'assets/svg/mavara.svg';
-  static const maskotSvg = 'assets/svg/mascot-learning.svg';
-  static const maskotCelebratingSvg = 'assets/svg/mascot-celebration.svg';
+
   static const progressBarSvg = 'assets/svg/progrees-bar.svg';
   static const inputSvg = 'assets/svg/input.svg';
   static const pencilSvg = 'assets/svg/pencil.svg';
@@ -32,4 +30,10 @@ mixin AppAssets {
   static const btnBlueSvg = 'assets/svg/btn_blue.svg';
   static const btnGreenSvg = 'assets/svg/btn_green.svg';
   static const btnPurpleSvg = 'assets/svg/btn_purple.svg';
+
+  //mascots
+  static const mavaraSvg = 'assets/svg/mavara.svg';
+  static const maskotSvg = 'assets/svg/mascot-learning.svg';
+  static const maskotCelebratingSvg = 'assets/svg/mascot-celebration.svg';
+  static const mascotSadSvg = 'assets/svg/mascot_sad.svg';
 }

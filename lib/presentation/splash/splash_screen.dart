@@ -8,7 +8,6 @@ import 'package:local_game/core/di/di.dart';
 import 'package:local_game/core/routes.dart';
 import 'package:local_game/presentation/splash/splash_cubit.dart';
 import 'package:local_game/presentation/splash/splash_state.dart';
-import 'package:local_game/presentation/widget/animated_progress_bar.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -33,7 +32,6 @@ class _SplashScreenState extends State<SplashScreen>
   void initState() {
     super.initState();
 
-    // Mascot bounce animation
     _mascotController = AnimationController(
       duration: const Duration(milliseconds: 1500),
       vsync: this,
@@ -47,7 +45,6 @@ class _SplashScreenState extends State<SplashScreen>
       CurvedAnimation(parent: _mascotController, curve: Curves.easeInOut),
     );
 
-    // Mavara floating animation
     _mavaraController = AnimationController(
       duration: const Duration(milliseconds: 2000),
       vsync: this,
@@ -61,7 +58,6 @@ class _SplashScreenState extends State<SplashScreen>
       CurvedAnimation(parent: _mavaraController, curve: Curves.easeInOut),
     );
 
-    // Background pulse animation
     _backgroundController = AnimationController(
       duration: const Duration(milliseconds: 3000),
       vsync: this,
@@ -97,7 +93,6 @@ class _SplashScreenState extends State<SplashScreen>
           backgroundColor: AppTheme.accentGreen,
           body: Stack(
             children: [
-              // Animated background
               AnimatedBuilder(
                 animation: _backgroundPulse,
                 builder: (context, child) {
@@ -115,7 +110,6 @@ class _SplashScreenState extends State<SplashScreen>
                 },
               ),
 
-              // Animated Mavara logo with floating and rotation
               AnimatedBuilder(
                 animation: _mavaraController,
                 builder: (context, child) {
@@ -129,7 +123,6 @@ class _SplashScreenState extends State<SplashScreen>
                 },
               ),
 
-              // Animated mascot with bounce and scale
               Center(
                 child: AnimatedBuilder(
                   animation: _mascotController,
@@ -149,13 +142,6 @@ class _SplashScreenState extends State<SplashScreen>
                 ),
               ),
 
-              // Animated progress bar
-              const Positioned(
-                bottom: 40,
-                left: 0,
-                right: 0,
-                child: AnimatedProgressBar(),
-              ),
             ],
           ),
         ),
