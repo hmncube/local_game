@@ -1,6 +1,8 @@
+import 'package:injectable/injectable.dart';
 import 'package:sqflite/sqflite.dart';
 import '../model/player_icon_model.dart';
 
+@injectable
 class PlayerIconDao {
   final Database _db;
 

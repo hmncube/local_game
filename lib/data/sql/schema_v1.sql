@@ -18,7 +18,8 @@ CREATE TABLE words (
 CREATE TABLE users (
     id TEXT PRIMARY KEY, -- UUID
     username TEXT UNIQUE,
-    preferred_language TEXT DEFAULT 'shona' CHECK(preferred_language IN ('shona', 'ndebele')),
+    player_icon_id INTEGER,
+    preferred_language TEXT,
     current_streak INTEGER DEFAULT 0,
     longest_streak INTEGER DEFAULT 0,
     total_score INTEGER DEFAULT 0,
@@ -65,8 +66,12 @@ INSERT INTO player_icons (name_en, name_nd, name_sn, path, facts_en, facts_nd, f
 ('Buffalo', 'Imbuffalo', 'Nyati', 'buffalo', 'Buffalo are strong animals that live in large herds for protection.', 'Imbuffalo ziyizilwane ezinamandla ezihlala ngobunengi ukuze zivikelane.', 'Nyati inhoro ine simba inogara mumapoka kuti idzivirirwe.'),
 ('Crocodile', 'Ingwenya', 'Ngwena', 'crocodile', 'Crocodiles can stay underwater for more than 30 minutes without breathing.', 'Ingwenya zingahlala ngaphansi kwamanzi imizuzu engaphezu kuka-30 zingaphefumuli.', 'Ngwena inogona kugara mumvura kwemaminitsi anopfuura makumi matatu isina kufema.'),
 ('Giraffe', 'Indlulamithi', 'Tsvimborume', 'giraffe', 'Giraffes are the tallest land animals in the world.', 'Indlulamithi yisilwane eside kakhulu emhlabeni.', 'Tsvimborume ndiyo mhuka refu kupfuura dzese pasi pano.'),
-('Leopard', 'Ingwe', 'Shumba nyamuzihwa', 'leopard', 'Leopards are known for their beautiful spotted coats and climbing ability.', 'Ingwe yaziwa ngokuba lesikhumba esinemabala amahle futhi iyakhwela izihlahla.', 'Shumba nyamuzihwa inozivara zvine mavara akanaka uye inokwira miti.'),
-('Location', 'Indawo', 'Nzvimbo', 'location', 'Location means a place or area where something exists or happens.', 'Indawo itsho lapho okuthile okukhona khona kumbe okwenzakalayo.', 'Nzvimbo inoreva nzvimbo kana nzvimbo panowanikwa chinhu kana chiitiko.'),
+('Leopard', 'Ingwe', 'Shumba', 'leopard', 'Leopards are known for their beautiful spotted coats and climbing ability.', 'Ingwe yaziwa ngokuba lesikhumba esinemabala amahle futhi iyakhwela izihlahla.', 'Shumba nyamuzihwa inozivara zvine mavara akanaka uye inokwira miti.'),
+('Lion', 'Ingonyama', 'Shumba', 'lion',
+'Lions live in groups called prides and are known as the kings of the jungle.',
+'Ingonyama ihlala ngemihlambi ebizwa ngokuthi ama-pride futhi yaziwa njengenkosi yehlathi.',
+'Shumba inogara mumapoka anonzi mapridhe uye inozivikanwa semambo wesango.'
+),
 ('Owl', 'Uqhokolo', 'Hukurubwi', 'owl', 'Owls can see clearly at night and turn their heads almost all the way around.', 'Uqhokolo lubona kahle ebusuku futhi luyakwazi ukujika ikhanda cishe ngokupheleleyo.', 'Hukurubwi hunoona zvakanaka usiku uye hunogona kutenderedza musoro kusvika kumashure.');
 
 -- Initial Shona Words

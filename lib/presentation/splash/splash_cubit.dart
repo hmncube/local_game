@@ -20,20 +20,6 @@ class SplashCubit extends BaseCubitWrapper<SplashState> {
   }
 
   Future<void> _init() async {
-    await _databaseProvider.database;
-    final user = await _userDao.getUser();
-    if (user == null) {
-      _userDao.insert(
-        UserModel(
-          id: '1',
-          settings: {},
-          createdAt: DateTime.now().millisecondsSinceEpoch,
-          lastPlayed: 0,
-          totalScore: 0,
-          hints: 3,
-        ),
-      );
-    }
     final isUserOnboarded = await _localProvider.getIsUserOnboarded();
     await Future.delayed(Duration(seconds: 2));
     emit(state.copyWith(isOnboarded: isUserOnboarded));

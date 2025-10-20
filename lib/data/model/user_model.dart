@@ -3,6 +3,7 @@ import 'dart:convert';
 class UserModel {
   final String id;
   final String? username;
+  final int playerIconId;
   final String preferredLanguage;
   final int currentStreak;
   final int longestStreak;
@@ -15,6 +16,7 @@ class UserModel {
   UserModel({
     required this.id,
     this.username,
+    this.playerIconId = 0,
     this.preferredLanguage = 'shona',
     this.currentStreak = 0,
     this.longestStreak = 0,
@@ -29,6 +31,7 @@ class UserModel {
     return UserModel(
       id: map['id'],
       username: map['username'],
+      playerIconId: map['player_icon_id'],
       preferredLanguage: map['preferred_language'],
       hints: map['hints'],
       currentStreak: map['current_streak'],
@@ -44,6 +47,7 @@ class UserModel {
     return {
       'id': id,
       'username': username,
+      'player_icon_id': playerIconId,
       'preferred_language': preferredLanguage,
       'hints': hints,
       'current_streak': currentStreak,
@@ -58,6 +62,7 @@ class UserModel {
   UserModel copyWith({
     String? id,
     String? username,
+    int? playerIconId,
     String? preferredLanguage,
     int? currentStreak,
     int? longestStreak,
@@ -70,6 +75,7 @@ class UserModel {
     return UserModel(
       id: id ?? this.id,
       username: username ?? this.username,
+      playerIconId: playerIconId ?? this.playerIconId,
       preferredLanguage: preferredLanguage ?? this.preferredLanguage,
       currentStreak: currentStreak ?? this.currentStreak,
       longestStreak: longestStreak ?? this.longestStreak,

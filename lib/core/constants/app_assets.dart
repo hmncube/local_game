@@ -1,5 +1,5 @@
 mixin AppAssets {
-  static const background = 'assets/images/background.jpg';
+  static const background = 'assets/images/background.png';
   static const wagona = 'assets/images/wagona_ribbon.png';
 
   static const correctAnimation = 'assets/animations/correct.json';
@@ -24,4 +24,12 @@ mixin AppAssets {
   static const maskotSvg = 'assets/svg/mascot-learning.svg';
   static const maskotCelebratingSvg = 'assets/svg/mascot-celebration.svg';
   static const progressBarSvg = 'assets/svg/progrees-bar.svg';
+  static const inputSvg = 'assets/svg/input.svg';
+  static const pencilSvg = 'assets/svg/pencil.svg';
+  static const langSvg = 'assets/svg/lang.svg';
+  static const circleSvg = 'assets/svg/circle.svg';
+  //buttons
+  static const btnBlueSvg = 'assets/svg/btn_blue.svg';
+  static const btnGreenSvg = 'assets/svg/btn_green.svg';
+  static const btnPurpleSvg = 'assets/svg/btn_purple.svg';
 }
