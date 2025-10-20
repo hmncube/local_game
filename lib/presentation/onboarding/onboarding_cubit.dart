@@ -2,6 +2,7 @@ import 'package:injectable/injectable.dart';
 import 'package:local_game/core/base/cubit/base_cubit_wrapper.dart';
 import 'package:local_game/data/dao/player_icon_dao.dart';
 import 'package:local_game/data/dao/user_dao.dart';
+import 'package:local_game/data/local_provider.dart';
 import 'package:local_game/data/model/player_icon_model.dart';
 import 'package:local_game/data/model/user_model.dart';
 import 'package:local_game/presentation/onboarding/onboarding_state.dart';
@@ -12,11 +13,16 @@ import '../../data/database_provider.dart';
 @injectable
 class OnboardingCubit extends BaseCubitWrapper<OnboardingState> {
   final DatabaseProvider _databaseProvider;
+  final LocalProvider _localProvider;
   final UserDao _userDao;
   final PlayerIconDao _playerIconDao;
 
-  OnboardingCubit(this._playerIconDao, this._databaseProvider, this._userDao)
-    : super(
+  OnboardingCubit(
+    this._playerIconDao,
+    this._databaseProvider,
+    this._userDao,
+    this._localProvider,
+  ) : super(
         OnboardingState(
           cubitState: CubitInitial(),
           playerIcons: const [],
@@ -58,7 +64,7 @@ class OnboardingCubit extends BaseCubitWrapper<OnboardingState> {
       hints: 3,
     );
     await _userDao.insert(user);
-
+    _localProvider.setIsUserOnboarded(true);
     emit(state.copyWith(cubitState: CubitSuccess(), navigateToMap: true));
   }
 

@@ -48,6 +48,9 @@ Future<_i174.GetIt> init(
   );
   gh.lazySingleton<_i64.SoundManager>(() => _i64.SoundManager());
   gh.lazySingleton<_i1063.LocalProvider>(() => _i1063.LocalProvider());
+  gh.factory<_i447.SplashCubit>(
+    () => _i447.SplashCubit(gh<_i1063.LocalProvider>()),
+  );
   gh.factory<_i959.PlayerIconDao>(
     () => _i959.PlayerIconDao(gh<_i779.Database>()),
   );
@@ -58,6 +61,14 @@ Future<_i174.GetIt> init(
   );
   gh.factory<_i387.SimilarWordsGameCubit>(
     () => _i387.SimilarWordsGameCubit(gh<_i861.WordDao>()),
+  );
+  gh.factory<_i69.OnboardingCubit>(
+    () => _i69.OnboardingCubit(
+      gh<_i959.PlayerIconDao>(),
+      gh<_i90.DatabaseProvider>(),
+      gh<_i390.UserDao>(),
+      gh<_i1063.LocalProvider>(),
+    ),
   );
   gh.factory<_i0.LevelDao>(
     () => _i0.LevelDao(gh<_i90.DatabaseProvider>(), gh<_i861.WordDao>()),
@@ -70,20 +81,6 @@ Future<_i174.GetIt> init(
     ),
   );
   gh.factory<_i621.MapCubit>(() => _i621.MapCubit(gh<_i0.LevelDao>()));
-  gh.factory<_i447.SplashCubit>(
-    () => _i447.SplashCubit(
-      gh<_i1063.LocalProvider>(),
-      gh<_i90.DatabaseProvider>(),
-      gh<_i390.UserDao>(),
-    ),
-  );
-  gh.factory<_i69.OnboardingCubit>(
-    () => _i69.OnboardingCubit(
-      gh<_i959.PlayerIconDao>(),
-      gh<_i90.DatabaseProvider>(),
-      gh<_i390.UserDao>(),
-    ),
-  );
   return getIt;
 }
 

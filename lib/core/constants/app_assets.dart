@@ -26,6 +26,12 @@ mixin AppAssets {
   static const pencilSvg = 'assets/svg/pencil.svg';
   static const langSvg = 'assets/svg/lang.svg';
   static const circleSvg = 'assets/svg/circle.svg';
+
+
+  static const starSvg = 'assets/svg/star.svg';
+  static const matchSvg = 'assets/svg/match.svg';
+  static const linkSvg = 'assets/svg/link.svg';
+  static const fnderSvg = 'assets/svg/finder.svg';
   //buttons
   static const btnBlueSvg = 'assets/svg/btn_blue.svg';
   static const btnGreenSvg = 'assets/svg/btn_green.svg';
