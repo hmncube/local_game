@@ -8,6 +8,7 @@ import 'package:local_game/core/di/di.dart';
 import 'package:local_game/core/routes.dart';
 import 'package:local_game/presentation/map/map_cubit.dart';
 import 'package:local_game/presentation/map/map_state.dart';
+import 'package:local_game/presentation/widget/game_top_bar.dart';
 import 'package:local_game/presentation/widget/loading_screen.dart';
 
 class MapScreen extends StatefulWidget {
@@ -54,35 +55,47 @@ class _MapScreenState extends State<MapScreen> {
               final unLocked = state.levels.firstWhere(
                 (level) => level.status == 0,
               );
-              return Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: GridView.builder(
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3,
-                    crossAxisSpacing: 16.0,
-                    mainAxisSpacing: 16.0,
-                    childAspectRatio: 1.0, // Make squares
-                  ),
-                  itemCount: state.levels.length,
-                  itemBuilder: (context, index) {
-                    final level = state.levels[index];
-                    final isCompleted = level.status == 1;
-                    final isUnLocked = unLocked.id == level.id;
-                    return LevelButton(
-                      levelId: level.id,
-                      isCompleted: isCompleted,
-                      onTap: () {
-                        !isUnLocked
-                            ? null
-                            : context.go(
-                              Routes.wordSearch.toPath,
-                              extra: level.id,
+              return Scaffold(
+                body: SafeArea(
+                  child: Column(
+                    children: [
+                      SizedBox(
+                        height: 60,
+                        child: GameTopBar(points: 100, hints: 3),
+                      ),
+                      Expanded(
+                        child: GridView.builder(
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 3,
+                                crossAxisSpacing: 16.0,
+                                mainAxisSpacing: 16.0,
+                                childAspectRatio: 1.0,
+                              ),
+                          itemCount: state.levels.length,
+                          itemBuilder: (context, index) {
+                            final level = state.levels[index];
+                            final isCompleted = level.status == 1;
+                            final isUnLocked = unLocked.id == level.id;
+                            return LevelButton(
+                              levelId: level.id,
+                              isCompleted: isCompleted,
+                              onTap: () {
+                                !isUnLocked
+                                    ? null
+                                    : context.go(
+                                      Routes.wordSearch.toPath,
+                                      extra: level.id,
+                                    );
+                              },
+                              difficulty: level.difficulty,
+                              isUnLocked: isUnLocked,
                             );
-                      },
-                      difficulty: level.difficulty,
-                      isUnLocked: isUnLocked,
-                    );
-                  },
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               );
             }
