@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:local_game/app/themes/app_text_styles.dart';
-import 'package:local_game/app/themes/app_theme.dart';
 import 'package:local_game/core/base/cubit/cubit_status.dart';
+import 'package:local_game/core/constants/app_assets.dart';
 import 'package:local_game/core/di/di.dart';
 import 'package:local_game/core/routes.dart';
 import 'package:local_game/presentation/map/map_cubit.dart';
@@ -57,42 +58,59 @@ class _MapScreenState extends State<MapScreen> {
               );
               return Scaffold(
                 body: SafeArea(
-                  child: Column(
+                  child: Stack(
                     children: [
                       SizedBox(
-                        height: 60,
-                        child: GameTopBar(points: 100, hints: 3),
-                      ),
-                      Expanded(
-                        child: GridView.builder(
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 3,
-                                crossAxisSpacing: 16.0,
-                                mainAxisSpacing: 16.0,
-                                childAspectRatio: 1.0,
-                              ),
-                          itemCount: state.levels.length,
-                          itemBuilder: (context, index) {
-                            final level = state.levels[index];
-                            final isCompleted = level.status == 1;
-                            final isUnLocked = unLocked.id == level.id;
-                            return LevelButton(
-                              levelId: level.id,
-                              isCompleted: isCompleted,
-                              onTap: () {
-                                !isUnLocked
-                                    ? null
-                                    : context.go(
-                                      Routes.wordSearch.toPath,
-                                      extra: level.id,
-                                    );
-                              },
-                              difficulty: level.difficulty,
-                              isUnLocked: isUnLocked,
-                            );
-                          },
+                        height: double.infinity,
+                        child: SvgPicture.asset(
+                          AppAssets.backgroundSvg,
+                          fit: BoxFit.fill,
                         ),
+                      ),
+                      Container(
+                        width: double.infinity,
+                        height: double.infinity,
+                        color: Colors.white54,
+                      ),
+                      Column(
+                        children: [
+                          SizedBox(
+                            height: 60,
+                            child: GameTopBar(points: 100, hints: 3),
+                          ),
+                          const SizedBox(height: 16),
+                          Expanded(
+                            child: GridView.builder(
+                              gridDelegate:
+                                  const SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 3,
+                                    crossAxisSpacing: 16.0,
+                                    mainAxisSpacing: 16.0,
+                                    childAspectRatio: 1.0,
+                                  ),
+                              itemCount: state.levels.length,
+                              itemBuilder: (context, index) {
+                                final level = state.levels[index];
+                                final isCompleted = level.status == 1;
+                                final isUnLocked = unLocked.id == level.id;
+                                return LevelButton(
+                                  levelId: level.id,
+                                  isCompleted: isCompleted,
+                                  onTap: () {
+                                    !isUnLocked
+                                        ? null
+                                        : context.go(
+                                          Routes.wordSearch.toPath,
+                                          extra: level.id,
+                                        );
+                                  },
+                                  difficulty: level.difficulty,
+                                  isUnLocked: isUnLocked,
+                                );
+                              },
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -123,70 +141,57 @@ class LevelButton extends StatelessWidget {
     required this.isUnLocked,
   });
 
-  // Helper function to determine difficulty color
-  Color _getDifficultyColor(int difficulty) {
-    switch (difficulty) {
-      case 1:
-        return AppTheme.accentGreen; // Easy
-      case 2:
-        return AppTheme.primaryGold; // Moderate
-      case 3:
-        return AppTheme.secondaryRed; // Hard
-      default:
-        return Colors.grey; // Default color
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    final difficultyColor = _getDifficultyColor(difficulty);
-
-    return InkWell(
+    return GestureDetector(
       onTap: onTap,
-      child: Container(
-        decoration: BoxDecoration(
-          color: isCompleted ? AppTheme.correctTile : AppTheme.backgroundLight,
-          borderRadius: BorderRadius.circular(12.0),
-          border: Border.all(
-            color: AppTheme.emptyTileBorder, // Add border
-            width: 1.0,
+      child: Column(
+        children: [
+          Stack(
+            children: [
+              SizedBox(
+                height: 100,
+                width: 100,
+                child: Stack(
+                  children: [
+                    SvgPicture.asset(AppAssets.matchSvg),
+                    Align(
+                      alignment: Alignment.center,
+                      child: Text(
+                        '$levelId',
+                        style: AppTextStyles.heading1.copyWith(
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Visibility(
+                visible: !isUnLocked,
+                child: Container(
+                  height: 100,
+                  width: 100,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(100),
+                    color: Colors.white54,
+                  ),
+                  child: Icon(Icons.lock),
+                ),
+              ),
+            ],
           ),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // Difficulty Indicator (colored dot)
-            Container(
-              width: 12.0,
-              height: 12.0,
-              decoration: BoxDecoration(
-                color: difficultyColor,
-                shape: BoxShape.circle,
-              ),
+          Center(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SvgPicture.asset(AppAssets.starSvg, height: 35, width: 35),
+                SvgPicture.asset(AppAssets.starSvg, height: 35, width: 35),
+                SvgPicture.asset(AppAssets.starSvg, height: 35, width: 35),
+              ],
             ),
-            const SizedBox(height: 8.0),
-            Text(
-              'Level $levelId',
-              style: AppTextStyles.body.copyWith(
-                fontSize: 18.0,
-                fontWeight: FontWeight.bold,
-                color:
-                    isCompleted
-                        ? Colors.white
-                        : Colors.black, // Adjust text color
-              ),
-            ),
-            const SizedBox(height: 4.0),
-            Icon(
-              isCompleted
-                  ? Icons.check_circle
-                  : isUnLocked
-                  ? Icons.lock_open
-                  : Icons.lock,
-              color: isCompleted ? Colors.white : AppTheme.notInWordTile,
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
