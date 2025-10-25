@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:local_game/app/themes/app_text_styles.dart';
+import 'package:local_game/core/constants/app_assets.dart';
 import 'package:local_game/presentation/word_search/find_word_game_state.dart';
 
 class WordsToFind extends StatefulWidget {
@@ -30,7 +32,7 @@ class _WordsToFindState extends State<WordsToFind> {
               'Words to Find:',
               style: AppTextStyles.tileLetter.copyWith(fontSize: 18),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 16),
             Expanded(
               child: Wrap(
                 spacing: 8,
@@ -40,33 +42,30 @@ class _WordsToFindState extends State<WordsToFind> {
                       bool isFound = widget.state.foundWords.contains(word);
                       Color wordColor =
                           widget.state.wordColors[word] ?? Colors.grey;
-                      return Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          color:
-                              isFound
-                                  ? wordColor.withOpacity(0.2)
-                                  : Colors.white,
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(
-                            color: isFound ? wordColor : Colors.grey.shade400,
+                      return Stack(
+                        children: [
+                          Positioned.fill(
+                            child: SvgPicture.asset(
+                              AppAssets.inputSvg,
+                              fit: BoxFit.fill,
+                            ),
                           ),
-                        ),
-                        child: Text(
-                          word,
-                          style: AppTextStyles.keyboardKey.copyWith(
-                            decoration:
-                                isFound ? TextDecoration.lineThrough : null,
-                            color:
-                                isFound
-                                    ? wordColor.withAlpha(100)
-                                    : Colors.black87,
-                            fontWeight: FontWeight.w500,
+                          Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Text(
+                              word,
+                              style: AppTextStyles.keyboardKey.copyWith(
+                                decoration:
+                                    isFound ? TextDecoration.lineThrough : null,
+                                color:
+                                    isFound
+                                        ? wordColor.withAlpha(100)
+                                        : Colors.black87,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
                           ),
-                        ),
+                        ],
                       );
                     }).toList(),
               ),
