@@ -45,19 +45,28 @@ class GameTopBar extends StatelessWidget {
               ),
             ),
           ),
-          Visibility(
-            visible: onHintClicked != null,
-            child: Align(
-              alignment: Alignment.center,
-              child: GestureDetector(
-                onTap: () {
-                  onHintClicked!();
-                },
-                child: SvgPicture.asset(
-                  AppAssets.hintSvg,
-                  height: 30,
-                  width: 30,
-                ),
+          Align(
+            alignment: Alignment.center,
+            child: GestureDetector(
+              onTap: () {
+                onHintClicked!();
+              },
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SvgPicture.asset(AppAssets.hintSvg, height: 30, width: 30),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 14.0),
+                    child: Text(
+                      hints.toString(),
+                      style: AppTextStyles.body.copyWith(
+                        color: AppTheme.accentGreen,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
