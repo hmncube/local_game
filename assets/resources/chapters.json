@@ -1,0 +1,182 @@
+[
+  {
+    "title": "At Home",
+    "title_sn": "Pamba",
+    "title_nd": "Ekhaya",
+    "theme": "Household objects and family life",
+    "theme_sn": "Zvinhu zviri mumba uye hupenyu hwemhuri",
+    "theme_nd": "Izinto ezisemzini lokuphila komndeni",
+    "difficulty": "easy"
+  },
+  {
+    "title": "My Family",
+    "title_sn": "Mhuri Yangu",
+    "title_nd": "Umndeni Wami",
+    "theme": "Family members and relationships",
+    "theme_sn": "Nhengo dzemhuri uye hukama",
+    "theme_nd": "Amalunga omndeni lobudlelwano",
+    "difficulty": "easy"
+  },
+  {
+    "title": "At School",
+    "title_sn": "Kuchikoro",
+    "title_nd": "Esikolo",
+    "theme": "School items and learning",
+    "theme_sn": "Zvinhu zvechikoro uye kudzidza",
+    "theme_nd": "Izinto zesikolo lokufunda",
+    "difficulty": "easy"
+  },
+  {
+    "title": "Fruits and Vegetables",
+    "title_sn": "Michero Nemiriwo",
+    "title_nd": "Izithelo Lezithombo",
+    "theme": "Common fruits and vegetables",
+    "theme_sn": "Michero nemiriwo inozivikanwa",
+    "theme_nd": "Izithelo lezithombo ezivamayo",
+    "difficulty": "easy"
+  },
+  {
+    "title": "Animals",
+    "title_sn": "Mhuka",
+    "title_nd": "Izilwane",
+    "theme": "Wild and domestic animals",
+    "theme_sn": "Mhuka dzesango nedzemumba",
+    "theme_nd": "Izilwane zasendle lezasekhaya",
+    "difficulty": "easy"
+  },
+  {
+    "title": "Body Parts",
+    "title_sn": "Zvikamu Zvemuviri",
+    "title_nd": "Izingxenye Zomzimba",
+    "theme": "Human body and health",
+    "theme_sn": "Muviri wemunhu uye hutano",
+    "theme_nd": "Umzimba womuntu lempilo",
+    "difficulty": "easy"
+  },
+  {
+    "title": "Colours and Shapes",
+    "title_sn": "Mavara Nechimiro",
+    "title_nd": "Imibala Lezimo",
+    "theme": "Describing colours and shapes",
+    "theme_sn": "Tsananguro yemavara nechimiro",
+    "theme_nd": "Incazelo yemibala lezimo",
+    "difficulty": "easy"
+  },
+  {
+    "title": "Numbers and Counting",
+    "title_sn": "Manhamba Nekuverenga",
+    "title_nd": "Amanani Lokubala",
+    "theme": "Learning numbers and counting",
+    "theme_sn": "Kudzidza manhamba nekuverenga",
+    "theme_nd": "Ukufunda amanani lokubala",
+    "difficulty": "easy"
+  },
+  {
+    "title": "Weather and Seasons",
+    "title_sn": "Mamiro Ekunze Nemwaka",
+    "title_nd": "Isimo Somoya Lamaxesha",
+    "theme": "Rain, sun, wind, and seasons",
+    "theme_sn": "Mvura, zuva, mhepo nemwaka",
+    "theme_nd": "Imvula, ilanga, umoya lamaxesha onyaka",
+    "difficulty": "medium"
+  },
+  {
+    "title": "Clothes and Attire",
+    "title_sn": "Zvipfeko",
+    "title_nd": "Izembatho",
+    "theme": "Everyday and traditional clothes",
+    "theme_sn": "Zvipfeko zvezuva nezuva nezvetsika",
+    "theme_nd": "Izembatho zansuku zonke lezemvelo",
+    "difficulty": "medium"
+  },
+  {
+    "title": "Food and Cooking",
+    "title_sn": "Chikafu Nekubika",
+    "title_nd": "Ukudla Lokupheka",
+    "theme": "Meals and kitchen items",
+    "theme_sn": "Zvekudya nezviri mukicheni",
+    "theme_nd": "Ukudla lezinto zasekhishini",
+    "difficulty": "medium"
+  },
+  {
+    "title": "Community Helpers",
+    "title_sn": "Vanobatsira Munharaunda",
+    "title_nd": "Abasizi Bomphakathi",
+    "theme": "Jobs and roles in the community",
+    "theme_sn": "Mabasa nevarairidzi venharaunda",
+    "theme_nd": "Imisebenzi labasizi emphakathini",
+    "difficulty": "medium"
+  },
+  {
+    "title": "Farm and Garden",
+    "title_sn": "Papurazi Nebindu",
+    "title_nd": "Epulazini Lebhindu",
+    "theme": "Crops, tools, and animals",
+    "theme_sn": "Zvirimwa, midziyo nemhuka",
+    "theme_nd": "Izitshalo, amathuluzi lezilwane",
+    "difficulty": "medium"
+  },
+  {
+    "title": "Transport",
+    "title_sn": "Zvekufambisa",
+    "title_nd": "Ezokuhamba",
+    "theme": "Ways of travel and transport",
+    "theme_sn": "Nzira dzekufamba nezvekufambisa",
+    "theme_nd": "Izindlela zokuhamba lezokuthutha",
+    "difficulty": "medium"
+  },
+  {
+    "title": "Places Around Us",
+    "title_sn": "Nzvimbo Dzakatikomberedza",
+    "title_nd": "Izindawo Eziseduze",
+    "theme": "Common community and natural places",
+    "theme_sn": "Nzvimbo dzinowanikwa munharaunda",
+    "theme_nd": "Izindawo ezivamileyo emphakathini",
+    "difficulty": "medium"
+  },
+  {
+    "title": "Traditional Life",
+    "title_sn": "Hupenyu Hwechivanhu",
+    "title_nd": "Impilo Yesintu",
+    "theme": "Culture, totems, and customs",
+    "theme_sn": "Tsika, madzitateguru netsika dzechivanhu",
+    "theme_nd": "Amasiko, iziduko lezindlela zesintu",
+    "difficulty": "hard"
+  },
+  {
+    "title": "Festivals and Celebrations",
+    "title_sn": "Mhemberero Nemitambo",
+    "title_nd": "Imikhosi Lemiklomelo",
+    "theme": "Cultural and joyful events",
+    "theme_sn": "Mitambo netsika dzekufara",
+    "theme_nd": "Imikhosi lamathuba okujabula",
+    "difficulty": "hard"
+  },
+  {
+    "title": "Health and Body Care",
+    "title_sn": "Utano Nekuchengeta Muviri",
+    "title_nd": "Impilo Lokunakekela Umzimba",
+    "theme": "Health, hygiene, and wellbeing",
+    "theme_sn": "Utano, hutsanana uye kugara zvakanaka",
+    "theme_nd": "Impilo, ukuhlanzeka lokuphila kahle",
+    "difficulty": "hard"
+  },
+  {
+    "title": "Time and Calendar",
+    "title_sn": "Nguva Nekarenda",
+    "title_nd": "Isikhathi Lekhalenda",
+    "theme": "Days, months, and time words",
+    "theme_sn": "Mazuva, mwedzi nenguva",
+    "theme_nd": "Izinsuku, izinyanga lesikhathi",
+    "difficulty": "hard"
+  },
+  {
+    "title": "Nature and Environment",
+    "title_sn": "Zvisikwa Nemamiriro Epasirese",
+    "title_nd": "Imvelo Lemvelo",
+    "theme": "Earth, plants, and environment care",
+    "theme_sn": "Pasi, miti, uye kuchengetedza zvakatipoteredza",
+    "theme_nd": "Umhlaba, izitshalo lokulondoloza imvelo",
+    "difficulty": "hard"
+  }
+]

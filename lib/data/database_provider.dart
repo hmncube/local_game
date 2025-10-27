@@ -61,20 +61,34 @@ class DatabaseProvider {
   }
 
   Future<void> _seedDatabase(Database db) async {
+    // Seed chapters
+    final String chaptersContent =
+        await rootBundle.loadString('assets/resources/chapters.json');
+    final List<dynamic> chapters = json.decode(chaptersContent);
+    await db.transaction((txn) async {
+      final batch = txn.batch();
+      for (final chapter in chapters) {
+        batch.insert('chapters', chapter as Map<String, dynamic>);
+      }
+      await batch.commit(noResult: true);
+    });
+
     // Load words into a map for efficient lookup
-    final List<Map<String, dynamic>> wordMaps = await db.query('words', columns: ['id', 'word']);
+    final List<Map<String, dynamic>> wordMaps =
+        await db.query('words', columns: ['id', 'word']);
     final Map<String, int> wordIdMap = {
       for (var map in wordMaps) map['word'] as String: map['id'] as int
     };
 
-    final String content = await rootBundle.loadString('assets/resources/word_groups.json');
+    final String content =
+        await rootBundle.loadString('assets/resources/word_groups.json');
     final List<dynamic> levels = json.decode(content);
 
     await db.transaction((txn) async {
       for (final levelData in levels) {
         final List<dynamic> words = levelData;
         final String mainWord = words[0];
-        
+
         int difficulty = 1;
         if (mainWord.length > 7) {
           difficulty = 2;
