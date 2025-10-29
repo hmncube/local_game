@@ -59,12 +59,14 @@ class AppRoutes {
       GoRoute(
         path: Routes.wordSearch.toPath,
         name: Routes.wordSearch.toNamed,
-        builder: (context, state) => const FindWordGameScreen(),
+        builder:
+            (context, state) =>
+                FindWordGameScreen(levelId: (state.extra as int)),
         pageBuilder:
             (context, state) => buildPageWithDefaultTransition(
               context: context,
               state: state,
-              child: const FindWordGameScreen(),
+              child: FindWordGameScreen(levelId: (state.extra as int)),
             ),
       ),
       GoRoute(
@@ -87,6 +89,17 @@ class AppRoutes {
               context: context,
               state: state,
               child: const CrosswordScreen(),
+            ),
+      ),
+       GoRoute(
+        path: Routes.levelCompleteScreen.toPath,
+        name: Routes.levelCompleteScreen.toNamed,
+        builder: (context, state) => const LevelCompleteScreen(),
+        pageBuilder:
+            (context, state) => buildPageWithDefaultTransition(
+              context: context,
+              state: state,
+              child: const LevelCompleteScreen(),
             ),
       ),
     ],

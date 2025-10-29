@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:local_game/app/themes/app_text_styles.dart';
 import 'package:local_game/core/base/cubit/cubit_status.dart';
 import 'package:local_game/core/constants/app_assets.dart';
+import 'package:local_game/core/constants/app_values.dart';
 import 'package:local_game/core/di/di.dart';
 import 'package:local_game/core/routes.dart';
 import 'package:local_game/presentation/map/map_cubit.dart';
@@ -92,15 +93,16 @@ class _MapScreenState extends State<MapScreen> {
                               itemBuilder: (context, index) {
                                 final level = state.levels[index];
                                 final isCompleted = level.status == 1;
-                                final isUnLocked = unLocked.id == level.id;
+                                final isUnLocked =  true;//unLocked.id == level.id;
                                 return LevelButton(
                                   levelId: level.id,
+                                  type: level.type,
                                   isCompleted: isCompleted,
                                   onTap: () {
                                     !isUnLocked
                                         ? null
                                         : context.go(
-                                          Routes.wordSearch.toPath,
+                                          _getTypeScreenLocation(level.type),
                                           extra: level.id,
                                         );
                                   },
@@ -123,6 +125,17 @@ class _MapScreenState extends State<MapScreen> {
       ),
     );
   }
+
+  String _getTypeScreenLocation(int type) {
+    switch (type) {
+      case AppValues.wordLink:
+        return Routes.gameScreen.toPath;
+      case AppValues.wordMatch:
+        return Routes.similarWords.toPath;
+      default:
+        return Routes.wordSearch.toPath;
+    }
+  }
 }
 
 class LevelButton extends StatelessWidget {
@@ -130,6 +143,7 @@ class LevelButton extends StatelessWidget {
   final bool isCompleted;
   final VoidCallback onTap;
   final int difficulty;
+  final int type;
   final bool isUnLocked;
 
   const LevelButton({
@@ -138,6 +152,7 @@ class LevelButton extends StatelessWidget {
     required this.isCompleted,
     required this.onTap,
     required this.difficulty,
+    required this.type,
     required this.isUnLocked,
   });
 
@@ -154,7 +169,7 @@ class LevelButton extends StatelessWidget {
                 width: 100,
                 child: Stack(
                   children: [
-                    SvgPicture.asset(AppAssets.matchSvg),
+                    SvgPicture.asset(_getTypeSvg(type)),
                     Align(
                       alignment: Alignment.center,
                       child: Text(
@@ -194,5 +209,16 @@ class LevelButton extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  String _getTypeSvg(int type) {
+    switch (type) {
+      case AppValues.wordLink:
+        return AppAssets.linkSvg;
+      case AppValues.wordMatch:
+        return AppAssets.matchSvg;
+      default:
+        return AppAssets.fnderSvg;
+    }
   }
 }

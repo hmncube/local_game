@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:local_game/core/constants/app_assets.dart';
 import 'package:local_game/core/di/di.dart';
+import 'package:local_game/core/routes.dart';
 import 'package:local_game/core/sound/sound_manager.dart';
+import 'package:local_game/presentation/widget/app_button.dart';
 import 'package:lottie/lottie.dart';
 
 class LevelCompleteScreen extends StatefulWidget {
@@ -100,6 +103,15 @@ class _LevelCompleteScreenState extends State<LevelCompleteScreen>
                           repeat: false,
                         ),
                         const SizedBox(height: 32),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: AppButton(
+                            title: 'Pfuurira Mberi',
+                            onClick: () {
+                              context.go(Routes.mapScreen.toPath);
+                            },
+                          ),
+                        ),
                       ],
                     ),
                   ),

@@ -4,6 +4,7 @@ import 'package:injectable/injectable.dart';
 import 'package:local_game/core/base/cubit/base_cubit_wrapper.dart';
 import 'package:local_game/core/base/cubit/cubit_status.dart';
 import 'package:local_game/core/game_system/points_management.dart';
+import 'package:local_game/data/dao/level_dao.dart';
 import 'package:local_game/data/dao/user_dao.dart';
 import 'package:local_game/data/dao/word_dao.dart';
 import 'package:local_game/presentation/word_search/find_word_game_state.dart';
@@ -12,8 +13,9 @@ import 'package:local_game/presentation/word_search/find_word_game_state.dart';
 class FindWordGameCubit extends BaseCubitWrapper<FindWordGameState> {
   final WordDao _wordDao;
   final UserDao _userDao;
+  final LevelDao _levelDao;
 
-  FindWordGameCubit(this._wordDao, this._userDao)
+  FindWordGameCubit(this._wordDao, this._userDao, this._levelDao)
     : super(FindWordGameState(cubitState: CubitInitial()));
 
   final List<Color> _availableColors = [
@@ -35,21 +37,18 @@ class FindWordGameCubit extends BaseCubitWrapper<FindWordGameState> {
   void dispose() {}
 
   @override
-  Future<void> initialize() async {
-    initializeGame();
-  }
+  Future<void> initialize() async {}
 
-  void initializeGame({int? gridSize}) async {
+  void initializeGame({required int level, int? gridSize}) async {
     emit(state.copyWith(cubitState: CubitLoading()));
 
     final newGridSize = gridSize ?? state.gridSize;
     var grid = List.generate(newGridSize, (_) => List.filled(newGridSize, ''));
     final wordsToFind =
-        (await _wordDao.getRandomWords(
-          'shona',
-          1,
-          6,
-        )).map((w) => w.word.toUpperCase()).toList();
+        (await _levelDao.getLevelById(
+          level,
+        ))?.wordsEn.map((w) => w.toUpperCase()).toList() ??
+        [];
     final wordPositions = <String, List<Position>>{};
 
     _placeWords(wordsToFind, grid, newGridSize, wordPositions);
@@ -211,6 +210,7 @@ class FindWordGameCubit extends BaseCubitWrapper<FindWordGameState> {
         startPosition: const Position.invalid(),
         isDragging: false,
         foundWords: newFoundWords,
+        isAllComplete: newFoundWords.length == state.wordsToFind.length,
         wordColors: newWordColors,
         newFoundWord: newFoundWord,
         points: state.points + points,

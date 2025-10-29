@@ -11,6 +11,7 @@ class FindWordGameState extends Equatable {
   final List<Position> selectedPositions;
   final Position startPosition;
   final bool isDragging;
+  final bool isAllComplete;
   final Map<String, List<Position>> wordPositions;
   final Map<String, Color> wordColors;
   final String newFoundWord;
@@ -29,6 +30,7 @@ class FindWordGameState extends Equatable {
     this.selectedPositions = const [],
     this.startPosition = const Position.invalid(),
     this.isDragging = false,
+    this.isAllComplete = false,
     this.wordPositions = const {},
     this.wordColors = const {},
     this.newFoundWord = '',
@@ -48,6 +50,7 @@ class FindWordGameState extends Equatable {
     List<Position>? selectedPositions,
     Position? startPosition,
     bool? isDragging,
+    bool? isAllComplete,
     Map<String, List<Position>>? wordPositions,
     Map<String, Color>? wordColors,
     String? newFoundWord,
@@ -71,6 +74,7 @@ class FindWordGameState extends Equatable {
       newFoundWord: newFoundWord ?? this.newFoundWord,
       points: points ?? this.points,
       userId: userId ?? this.userId,
+      isAllComplete: isAllComplete ?? this.isAllComplete,
       hints: hints ?? this.hints,
       hintError: hintError ?? this.hintError,
       hintPosition: hintPosition ?? this.hintPosition,
@@ -94,6 +98,7 @@ class FindWordGameState extends Equatable {
     userId,
     hints,
     hintPosition,
+    isAllComplete,
   ];
 }
 

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:local_game/core/di/di.dart';
+import 'package:local_game/core/routes.dart';
 import 'package:local_game/presentation/widget/game_top_bar.dart';
 import 'package:local_game/presentation/word_search/find_word_game_cubit.dart';
 import 'package:local_game/presentation/word_search/find_word_game_state.dart';
@@ -9,7 +11,8 @@ import 'package:local_game/presentation/word_search/widgets/game_grid.dart';
 import 'package:local_game/presentation/word_search/widgets/words_to_find.dart';
 
 class FindWordGameScreen extends StatefulWidget {
-  const FindWordGameScreen({super.key});
+  final int levelId;
+  const FindWordGameScreen({super.key, required this.levelId});
 
   @override
   State<FindWordGameScreen> createState() => _FindWordGameScreenState();
@@ -22,7 +25,7 @@ class _FindWordGameScreenState extends State<FindWordGameScreen> {
   void initState() {
     super.initState();
     _cubit = getIt<FindWordGameCubit>();
-    _cubit.initialize();
+    _cubit.initializeGame(level: widget.levelId);
   }
 
   @override
@@ -57,6 +60,10 @@ class _FindWordGameScreenState extends State<FindWordGameScreen> {
               ),
             );
           }
+
+          if (state.isAllComplete) {
+            context.go(Routes.levelCompleteScreen.toPath);
+          }
         },
         builder: (context, state) {
           return Scaffold(
@@ -65,11 +72,17 @@ class _FindWordGameScreenState extends State<FindWordGameScreen> {
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
                   children: [
-                    GameTopBar(points: state.points, 
-                    hints: state.hints,
-                    onHintClicked: ()=> _cubit.onHintClicked()),
+                    GameTopBar(
+                      points: state.points,
+                      hints: state.hints,
+                      onHintClicked: () => _cubit.onHintClicked(),
+                    ),
                     const SizedBox(height: 16),
-                    GameGrid(state: state, cubit: _cubit, hintPosition: state.hintPosition),
+                    GameGrid(
+                      state: state,
+                      cubit: _cubit,
+                      hintPosition: state.hintPosition,
+                    ),
                     const SizedBox(height: 16),
                     WordsToFind(state: state),
                   ],
