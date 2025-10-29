@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:local_game/data/model/level_model.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:flutter/services.dart';
@@ -30,7 +31,10 @@ class DatabaseProvider {
     final sql = await rootBundle.loadString('lib/data/sql/schema_v1.sql');
 
     // Remove comments from the SQL script
-    final cleanedSql = sql.split('\n').where((line) => !line.trim().startsWith('--')).join('\n');
+    final cleanedSql = sql
+        .split('\n')
+        .where((line) => !line.trim().startsWith('--'))
+        .join('\n');
 
     final triggerKeyword = 'CREATE TRIGGER';
     final triggerStartIndex = cleanedSql.toUpperCase().indexOf(triggerKeyword);
@@ -43,7 +47,10 @@ class DatabaseProvider {
         }
       }
     } else {
-      final statementsBeforeTrigger = cleanedSql.substring(0, triggerStartIndex);
+      final statementsBeforeTrigger = cleanedSql.substring(
+        0,
+        triggerStartIndex,
+      );
       final triggerStatement = cleanedSql.substring(triggerStartIndex);
 
       final List<String> queries = statementsBeforeTrigger.split(';');
@@ -60,10 +67,12 @@ class DatabaseProvider {
     await _seedDatabase(db);
   }
 
+  //todo run in compute??
   Future<void> _seedDatabase(Database db) async {
     // Seed chapters
-    final String chaptersContent =
-        await rootBundle.loadString('assets/resources/chapters.json');
+    final String chaptersContent = await rootBundle.loadString(
+      'assets/resources/chapters.json',
+    );
     final List<dynamic> chapters = json.decode(chaptersContent);
     await db.transaction((txn) async {
       final batch = txn.batch();
@@ -73,44 +82,45 @@ class DatabaseProvider {
       await batch.commit(noResult: true);
     });
 
-    // Load words into a map for efficient lookup
-    final List<Map<String, dynamic>> wordMaps =
-        await db.query('words', columns: ['id', 'word']);
-    final Map<String, int> wordIdMap = {
-      for (var map in wordMaps) map['word'] as String: map['id'] as int
-    };
-
-    final String content =
-        await rootBundle.loadString('assets/resources/word_groups.json');
+    final String content = await rootBundle.loadString(
+      'assets/resources/chapter1_level.json',
+    );
     final List<dynamic> levels = json.decode(content);
 
     await db.transaction((txn) async {
+      int id = 0;
       for (final levelData in levels) {
-        final List<dynamic> words = levelData;
-        final String mainWord = words[0];
+        final levelMap = levelData as Map<String, dynamic>;
 
-        int difficulty = 1;
-        if (mainWord.length > 7) {
-          difficulty = 2;
-        }
-        if (mainWord.length > 11) {
-          difficulty = 3;
-        }
+        List<String> wordsEn = safeFlatten(levelMap['words_en'] as List);
+        List<String> wordsSn = safeFlatten(levelMap['words_sn'] as List);
+        //(levelMap['words_sn'] as List).cast<String>();
+        List<String> wordsNd = safeFlatten(levelMap['words_nd'] as List);
+        // (levelMap['words_nd'] as List).cast<String>();
 
-        final levelId = await txn.insert('levels', {'difficulty': difficulty});
-
-        for (var j = 0; j < words.length; j++) {
-          final word = words[j] as String;
-          final wordId = wordIdMap[word];
-          if (wordId != null) {
-            await txn.insert('level_words', {
-              'level_id': levelId,
-              'word_id': wordId,
-              'display_order': j,
-            });
-          }
-        }
+        final level = LevelModel(
+          id: id,
+          difficulty: 0,
+          type: int.parse(levelMap['type']),
+          wordsEn: wordsEn,
+          wordsNd: wordsNd,
+          wordsSn: wordsSn,
+        );
+        id++;
+        final batch = txn.batch();
+        batch.insert('levels', level.toMap());
+        await batch.commit(noResult: true);
       }
     });
+  }
+
+  List<String> safeFlatten<String>(List<dynamic> list) {
+    if (list.isEmpty) return [];
+
+    if (list.first is List) {
+      return list.expand((item) => item as List).cast<String>().toList();
+    } else {
+      return list.cast<String>().toList();
+    }
   }
 }

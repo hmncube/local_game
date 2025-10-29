@@ -1,0 +1,344 @@
+[
+    {
+        "id": "1",
+        "type": "1",
+        "words_en": [
+            "bed",
+            "chair",
+            "table",
+            "door",
+            "window"
+        ],
+        "words_sn": [
+            "mubhedha",
+            "chigaro",
+            "tafura",
+            "gonhi",
+            "hwindo"
+        ],
+        "words_nd": [
+            "umbheda",
+            "isihlalo",
+            "itafula",
+            "umnyango",
+            "iwindi"
+        ]
+    },
+    {
+        "id": "1",
+        "type": "2",
+        "words_en": [
+            [
+                "bed",
+                "pillow"
+            ],
+            [
+                "radio",
+                "living room"
+            ],
+            [
+                "cup",
+                "spoon"
+            ],
+            [
+                "door",
+                "wall"
+            ]
+        ],
+        "words_sn": [
+            [
+                "mubhedha",
+                "blanketi"
+            ],
+            [
+                "chigaro",
+                "tafura"
+            ],
+            [
+                "sitovu",
+                "firiji"
+            ],
+            [
+                "sipo",
+                "tauro"
+            ],
+            [
+                "hwindo",
+                "keteni"
+            ],
+            [
+                "mutsvairo",
+                "bhakiti"
+            ]
+        ],
+        "words_nd": [
+            [
+                "umbheda",
+                "iphilo"
+            ],
+            [
+                "isihlalo",
+                "itafula"
+            ],
+            [
+                "isitofu",
+                "ifriji"
+            ],
+            [
+                "isipho",
+                "ithawulo"
+            ]
+        ]
+    },
+    {
+        "id": "1",
+        "type": "3",
+        "words_en": [
+            "door",
+            "floor",
+            "mirror",
+            "spoon"
+        ],
+        "words_sn": [
+            "yekugezera",
+            "yekubikira",
+            "yekugara",
+            "yekurara"
+        ],
+        "words_nd": [
+            "itafula",
+            "ifriji",
+            "ifeni",
+            "ilambu"
+        ]
+    },
+    {
+        "id": "1",
+        "type": "1",
+        "words_en": [
+            "cup",
+            "plate",
+            "spoon",
+            "broom",
+            "room"
+        ],
+        "words_sn": [
+            "kapu",
+            "ndirowa",
+            "chipunu",
+            "mutsvairo",
+            "imba"
+        ],
+        "words_nd": [
+            "ikomishi",
+            "ipulethi",
+            "isipunu",
+            "umthayi",
+            "indlu"
+        ]
+    },
+    {
+        "id": "1",
+        "type": "2",
+        "words_en": [
+            [
+                "blanket",
+                "bedroom"
+            ],
+            [
+                "chair",
+                "table"
+            ],
+            [
+                "stove",
+                "fridge"
+            ],
+            [
+                "soap",
+                "towel"
+            ],
+            [
+                "window",
+                "window curtain"
+            ],
+            [
+                "broom",
+                "bucket"
+            ]
+        ],
+        "words_sn": [
+            [
+                "piro",
+                "hozi"
+            ],
+            [
+                "terevhizheni",
+                "redhiyo"
+            ],
+            [
+                "kapu",
+                "chipunu"
+            ],
+            [
+                "gonhi",
+                "rusvingo"
+            ]
+        ],
+        "words_nd": [
+            [
+                "umbheda",
+                "ingubo"
+            ],
+            [
+                "umabonakude",
+                "irediyo"
+            ],
+            [
+                "umuganu",
+                "ikomishi"
+            ],
+            [
+                "ibhulashi lamazinyo",
+                "umuthi wamazinyo"
+            ],
+            [
+                "iwindi",
+                "iketeni"
+            ]
+        ]
+    },
+    {
+        "id": "1",
+        "type": "3",
+        "words_en": [
+            "chair",
+            "stair",
+            "soap",
+            "sink",
+            "stove"
+        ],
+        "words_sn": [
+            "gonhi",
+            "girazi",
+            "redhiyo",
+            "rambi",
+            "siniki"
+        ],
+        "words_nd": [
+            "ibhakede",
+            "ibhulashi",
+            "isitofu"
+        ]
+    },
+    {
+        "id": "1",
+        "type": "1",
+        "words_en": [
+            "lamp",
+            "mirror",
+            "blanket",
+            "pillow",
+            "floor"
+        ],
+        "words_sn": [
+            "rambi",
+            "girazi",
+            "blanketi",
+            "puro",
+            "pasi"
+        ],
+        "words_nd": [
+            "ilambi",
+            "isibuko",
+            "ingubo",
+            "iphilo",
+            "iphansi"
+        ]
+    },
+    {
+        "type": "2",
+        "words_en": [
+            [
+                "television",
+                "living room"
+            ],
+            [
+                "plate",
+                "kitchen"
+            ],
+            [
+                "toothbrush",
+                "toothpaste"
+            ],
+            [
+                "sink",
+                "bathroom"
+            ],
+            [
+                "roof",
+                "floor"
+            ],
+            [
+                "doorbell",
+                "door"
+            ]
+        ],
+        "words_sn": [
+            [
+                "nhanga",
+                "vasikana"
+            ],
+            [
+                "denga",
+                "pasi"
+            ],
+            [
+                "bhero",
+                "imba"
+            ],
+            [
+                "bhrashi yezino",
+                "sinki"
+            ]
+        ],
+        "words_nd": [
+            [
+                "izitepisi",
+                "indlu"
+            ],
+            [
+                "isinki",
+                "indlu yokugezela"
+            ],
+            [
+                "isipunu",
+                "ikhishi"
+            ],
+            [
+                "umnyango",
+                "indhlu"
+            ]
+        ]
+    },
+    {
+        "type": "3",
+        "words_en": [
+            "roof",
+            "bathroom",
+            "broom",
+            "room"
+        ],
+        "words_sn": [
+            "hwindo",
+            "keteni",
+            "wachi",
+            "pasi"
+        ],
+        "words_nd": [
+            "ingubo",
+            "iphilo",
+            "uphahla",
+            "udonga"
+        ]
+    }
+]

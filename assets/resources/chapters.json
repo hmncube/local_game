@@ -6,7 +6,8 @@
     "theme": "Household objects and family life",
     "theme_sn": "Zvinhu zviri mumba uye hupenyu hwemhuri",
     "theme_nd": "Izinto ezisemzini lokuphila komndeni",
-    "difficulty": "easy"
+    "difficulty": "easy",
+    "levels": "1,2,3"
   },
   {
     "title": "My Family",
@@ -15,7 +16,8 @@
     "theme": "Family members and relationships",
     "theme_sn": "Nhengo dzemhuri uye hukama",
     "theme_nd": "Amalunga omndeni lobudlelwano",
-    "difficulty": "easy"
+    "difficulty": "easy",
+    "levels": "4,5,6"
   },
   {
     "title": "At School",
@@ -24,7 +26,8 @@
     "theme": "School items and learning",
     "theme_sn": "Zvinhu zvechikoro uye kudzidza",
     "theme_nd": "Izinto zesikolo lokufunda",
-    "difficulty": "easy"
+    "difficulty": "easy",
+    "levels": "7,8,9"
   },
   {
     "title": "Fruits and Vegetables",
@@ -33,7 +36,8 @@
     "theme": "Common fruits and vegetables",
     "theme_sn": "Michero nemiriwo inozivikanwa",
     "theme_nd": "Izithelo lezithombo ezivamayo",
-    "difficulty": "easy"
+    "difficulty": "easy",
+    "levels": "10,11,12"
   },
   {
     "title": "Animals",
@@ -42,7 +46,8 @@
     "theme": "Wild and domestic animals",
     "theme_sn": "Mhuka dzesango nedzemumba",
     "theme_nd": "Izilwane zasendle lezasekhaya",
-    "difficulty": "easy"
+    "difficulty": "easy",
+    "levels": "13,14,15"
   },
   {
     "title": "Body Parts",
@@ -51,7 +56,8 @@
     "theme": "Human body and health",
     "theme_sn": "Muviri wemunhu uye hutano",
     "theme_nd": "Umzimba womuntu lempilo",
-    "difficulty": "easy"
+    "difficulty": "easy",
+    "levels": "16,17,18"
   },
   {
     "title": "Colours and Shapes",
@@ -60,7 +66,8 @@
     "theme": "Describing colours and shapes",
     "theme_sn": "Tsananguro yemavara nechimiro",
     "theme_nd": "Incazelo yemibala lezimo",
-    "difficulty": "easy"
+    "difficulty": "easy",
+    "levels": "19,20,21"
   },
   {
     "title": "Numbers and Counting",
@@ -69,7 +76,8 @@
     "theme": "Learning numbers and counting",
     "theme_sn": "Kudzidza manhamba nekuverenga",
     "theme_nd": "Ukufunda amanani lokubala",
-    "difficulty": "easy"
+    "difficulty": "easy",
+    "levels": "22,23,24"
   },
   {
     "title": "Weather and Seasons",
@@ -78,7 +86,8 @@
     "theme": "Rain, sun, wind, and seasons",
     "theme_sn": "Mvura, zuva, mhepo nemwaka",
     "theme_nd": "Imvula, ilanga, umoya lamaxesha onyaka",
-    "difficulty": "medium"
+    "difficulty": "medium",
+    "levels": "25,26,27"
   },
   {
     "title": "Clothes and Attire",
@@ -87,7 +96,8 @@
     "theme": "Everyday and traditional clothes",
     "theme_sn": "Zvipfeko zvezuva nezuva nezvetsika",
     "theme_nd": "Izembatho zansuku zonke lezemvelo",
-    "difficulty": "medium"
+    "difficulty": "medium",
+    "levels": "28,29,30"
   },
   {
     "title": "Food and Cooking",
@@ -96,7 +106,8 @@
     "theme": "Meals and kitchen items",
     "theme_sn": "Zvekudya nezviri mukicheni",
     "theme_nd": "Ukudla lezinto zasekhishini",
-    "difficulty": "medium"
+    "difficulty": "medium",
+    "levels": "31,32,33"
   },
   {
     "title": "Community Helpers",
@@ -105,7 +116,8 @@
     "theme": "Jobs and roles in the community",
     "theme_sn": "Mabasa nevarairidzi venharaunda",
     "theme_nd": "Imisebenzi labasizi emphakathini",
-    "difficulty": "medium"
+    "difficulty": "medium",
+    "levels": "34,35,36"
   },
   {
     "title": "Farm and Garden",
@@ -114,7 +126,8 @@
     "theme": "Crops, tools, and animals",
     "theme_sn": "Zvirimwa, midziyo nemhuka",
     "theme_nd": "Izitshalo, amathuluzi lezilwane",
-    "difficulty": "medium"
+    "difficulty": "medium",
+    "levels": "37,38,39"
   },
   {
     "title": "Transport",
@@ -123,7 +136,8 @@
     "theme": "Ways of travel and transport",
     "theme_sn": "Nzira dzekufamba nezvekufambisa",
     "theme_nd": "Izindlela zokuhamba lezokuthutha",
-    "difficulty": "medium"
+    "difficulty": "medium",
+    "levels": "40,41,42"
   },
   {
     "title": "Places Around Us",
@@ -132,7 +146,8 @@
     "theme": "Common community and natural places",
     "theme_sn": "Nzvimbo dzinowanikwa munharaunda",
     "theme_nd": "Izindawo ezivamileyo emphakathini",
-    "difficulty": "medium"
+    "difficulty": "medium",
+    "levels": "43,44,45"
   },
   {
     "title": "Traditional Life",
@@ -141,7 +156,8 @@
     "theme": "Culture, totems, and customs",
     "theme_sn": "Tsika, madzitateguru netsika dzechivanhu",
     "theme_nd": "Amasiko, iziduko lezindlela zesintu",
-    "difficulty": "hard"
+    "difficulty": "hard",
+    "levels": "46,47,48"
   },
   {
     "title": "Festivals and Celebrations",
@@ -150,7 +166,8 @@
     "theme": "Cultural and joyful events",
     "theme_sn": "Mitambo netsika dzekufara",
     "theme_nd": "Imikhosi lamathuba okujabula",
-    "difficulty": "hard"
+    "difficulty": "hard",
+    "levels": "49,50,51"
   },
   {
     "title": "Health and Body Care",
@@ -159,7 +176,8 @@
     "theme": "Health, hygiene, and wellbeing",
     "theme_sn": "Utano, hutsanana uye kugara zvakanaka",
     "theme_nd": "Impilo, ukuhlanzeka lokuphila kahle",
-    "difficulty": "hard"
+    "difficulty": "hard",
+    "levels": "52,53,54"
   },
   {
     "title": "Time and Calendar",
@@ -168,7 +186,8 @@
     "theme": "Days, months, and time words",
     "theme_sn": "Mazuva, mwedzi nenguva",
     "theme_nd": "Izinsuku, izinyanga lesikhathi",
-    "difficulty": "hard"
+    "difficulty": "hard",
+    "levels": "55,56,57"
   },
   {
     "title": "Nature and Environment",
@@ -177,6 +196,7 @@
     "theme": "Earth, plants, and environment care",
     "theme_sn": "Pasi, miti, uye kuchengetedza zvakatipoteredza",
     "theme_nd": "Umhlaba, izitshalo lokulondoloza imvelo",
-    "difficulty": "hard"
+    "difficulty": "hard",
+    "levels": "58,59,60"
   }
 ]

@@ -24,27 +24,7 @@ class LevelDao {
   Future<LevelModel?> getLevelById(int id) async {
     final db = await _dbProvider.database;
     final maps = await db.query('levels', where: 'id = ?', whereArgs: [id]);
-
-    if (maps.isNotEmpty) {
-      final levelWordsList = await db.query(
-        'level_words',
-        where: 'level_id = ?',
-        whereArgs: [id],
-      );
-
-      final List<WordModel> words = [];
-      for (final levelWordMap in levelWordsList) {
-        final levelWord = LevelWordModel.fromMap(levelWordMap);
-        final word = await _wordDao.find(levelWord.wordId);
-        if (word != null) {
-          words.add(word);
-        }
-      }
-
-      final level = LevelModel.fromMap(maps.first);
-      return level.copyWith(words: words);
-    }
-    return null;
+    return LevelModel.fromMap(maps.first);
   }
 
   Future<void> updateLevel(LevelModel? level) async {

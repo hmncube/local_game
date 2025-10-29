@@ -1,0 +1,409 @@
+[
+  {
+    "id": "3_1",
+    "chapter": "In the Kitchen",
+    "word": {
+      "en": "knife",
+      "sn": "banga",
+      "nd": "umese"
+    },
+    "word_length": 5,
+    "difficulty": 1
+  },
+  {
+    "id": "3_2",
+    "chapter": "In the Kitchen",
+    "word": {
+      "en": "fork",
+      "sn": "foloko",
+      "nd": "ifolokwe"
+    },
+    "word_length": 4,
+    "difficulty": 1
+  },
+  {
+    "id": "3_3",
+    "chapter": "In the Kitchen",
+    "word": {
+      "en": "plate",
+      "sn": "ndirowa",
+      "nd": "ipulethi"
+    },
+    "word_length": 5,
+    "difficulty": 1
+  },
+  {
+    "id": "3_4",
+    "chapter": "In the Kitchen",
+    "word": {
+      "en": "spoon",
+      "sn": "chipunu",
+      "nd": "isipunu"
+    },
+    "word_length": 5,
+    "difficulty": 1
+  },
+  {
+    "id": "3_5",
+    "chapter": "In the Kitchen",
+    "word": {
+      "en": "pot",
+      "sn": "hari",
+      "nd": "imbiza"
+    },
+    "word_length": 3,
+    "difficulty": 1
+  },
+  {
+    "id": "3_6",
+    "chapter": "In the Kitchen",
+    "word": {
+      "en": "pan",
+      "sn": "pani",
+      "nd": "ipan"
+    },
+    "word_length": 3,
+    "difficulty": 1
+  },
+  {
+    "id": "3_7",
+    "chapter": "In the Kitchen",
+    "word": {
+      "en": "cup",
+      "sn": "kapu",
+      "nd": "ikomishi"
+    },
+    "word_length": 3,
+    "difficulty": 1
+  },
+  {
+    "id": "3_8",
+    "chapter": "In the Kitchen",
+    "word": {
+      "en": "glass",
+      "sn": "girazi",
+      "nd": "iglasi"
+    },
+    "word_length": 5,
+    "difficulty": 1
+  },
+  {
+    "id": "3_9",
+    "chapter": "In the Kitchen",
+    "word": {
+      "en": "fridge",
+      "sn": "firiji",
+      "nd": "ifriji"
+    },
+    "word_length": 6,
+    "difficulty": 1
+  },
+  {
+    "id": "3_10",
+    "chapter": "In the Kitchen",
+    "word": {
+      "en": "stove",
+      "sn": "sitovu",
+      "nd": "isitofu"
+    },
+    "word_length": 5,
+    "difficulty": 1
+  },
+  {
+    "id": "3_11",
+    "chapter": "In the Kitchen",
+    "word": {
+      "en": "microwave",
+      "sn": "maikorowevhi",
+      "nd": "imayikhrowevhi"
+    },
+    "word_length": 9,
+    "difficulty": 1
+  },
+  {
+    "id": "3_12",
+    "chapter": "In the Kitchen",
+    "word": {
+      "en": "sink",
+      "sn": "siniki",
+      "nd": "isinki"
+    },
+    "word_length": 4,
+    "difficulty": 1
+  },
+  {
+    "id": "3_13",
+    "chapter": "In the Kitchen",
+    "word": {
+      "en": "soap",
+      "sn": "sipo",
+      "nd": "isipho"
+    },
+    "word_length": 4,
+    "difficulty": 1
+  },
+  {
+    "id": "3_14",
+    "chapter": "In the Kitchen",
+    "word": {
+      "en": "towel",
+      "sn": "tauro",
+      "nd": "ithawula"
+    },
+    "word_length": 5,
+    "difficulty": 1
+  },
+  {
+    "id": "3_15",
+    "chapter": "In the Kitchen",
+    "word": {
+      "en": "table",
+      "sn": "tafura",
+      "nd": "itafula"
+    },
+    "word_length": 5,
+    "difficulty": 1
+  },
+  {
+    "id": "3_16",
+    "chapter": "In the Kitchen",
+    "word": {
+      "en": "chair",
+      "sn": "chigaro",
+      "nd": "isihlalo"
+    },
+    "word_length": 5,
+    "difficulty": 1
+  },
+  {
+    "id": "3_17",
+    "chapter": "In the Kitchen",
+    "word": {
+      "en": "cupboard",
+      "sn": "kabati",
+      "nd": "ikhabethe"
+    },
+    "word_length": 8,
+    "difficulty": 1
+  },
+  {
+    "id": "3_18",
+    "chapter": "In the Kitchen",
+    "word": {
+      "en": "spice",
+      "sn": "mhiripiri",
+      "nd": "izinongo"
+    },
+    "word_length": 5,
+    "difficulty": 1
+  },
+  {
+    "id": "3_19",
+    "chapter": "In the Kitchen",
+    "word": {
+      "en": "salt",
+      "sn": "munyu",
+      "nd": "usawoti"
+    },
+    "word_length": 4,
+    "difficulty": 1
+  },
+  {
+    "id": "3_20",
+    "chapter": "In the Kitchen",
+    "word": {
+      "en": "sugar",
+      "sn": "shuga",
+      "nd": "ushukela"
+    },
+    "word_length": 5,
+    "difficulty": 1
+  },
+  {
+    "id": "3_21",
+    "chapter": "In the Kitchen",
+    "word": {
+      "en": "tea",
+      "sn": "tii",
+      "nd": "itiye"
+    },
+    "word_length": 3,
+    "difficulty": 1
+  },
+  {
+    "id": "3_22",
+    "chapter": "In the Kitchen",
+    "word": {
+      "en": "coffee",
+      "sn": "kofi",
+      "nd": "ikhofi"
+    },
+    "word_length": 6,
+    "difficulty": 1
+  },
+  {
+    "id": "3_23",
+    "chapter": "In the Kitchen",
+    "word": {
+      "en": "water",
+      "sn": "mvura",
+      "nd": "amanzi"
+    },
+    "word_length": 5,
+    "difficulty": 1
+  },
+  {
+    "id": "3_24",
+    "chapter": "In the Kitchen",
+    "word": {
+      "en": "juice",
+      "sn": "jusi",
+      "nd": "ijusi"
+    },
+    "word_length": 5,
+    "difficulty": 1
+  },
+  {
+    "id": "3_25",
+    "chapter": "In the Kitchen",
+    "word": {
+      "en": "plate rack",
+      "sn": "raki yendirowa",
+      "nd": "iraki yamapuleti"
+    },
+    "word_length": 10,
+    "difficulty": 1
+  },
+  {
+    "id": "3_26",
+    "chapter": "In the Kitchen",
+    "word": {
+      "en": "bowl",
+      "sn": "mbiya",
+      "nd": "imbiza encane"
+    },
+    "word_length": 4,
+    "difficulty": 1
+  },
+  {
+    "id": "3_27",
+    "chapter": "In the Kitchen",
+    "word": {
+      "en": "knife set",
+      "sn": "mapanga",
+      "nd": "amasethi wemimese"
+    },
+    "word_length": 9,
+    "difficulty": 1
+  },
+  {
+    "id": "3_28",
+    "chapter": "In the Kitchen",
+    "word": {
+      "en": "cutting board",
+      "sn": "bhodhi rekugadzira",
+      "nd": "ibhodi lokusika"
+    },
+    "word_length": 13,
+    "difficulty": 1
+  },
+  {
+    "id": "3_29",
+    "chapter": "In the Kitchen",
+    "word": {
+      "en": "kettle",
+      "sn": "keturu",
+      "nd": "iketela"
+    },
+    "word_length": 6,
+    "difficulty": 1
+  },
+  {
+    "id": "3_30",
+    "chapter": "In the Kitchen",
+    "word": {
+      "en": "oven",
+      "sn": "ovheni",
+      "nd": "i-oveni"
+    },
+    "word_length": 4,
+    "difficulty": 1
+  },
+  {
+    "id": "3_31",
+    "chapter": "In the Kitchen",
+    "word": {
+      "en": "tray",
+      "sn": "treyi",
+      "nd": "itreyi"
+    },
+    "word_length": 4,
+    "difficulty": 1
+  },
+  {
+    "id": "3_32",
+    "chapter": "In the Kitchen",
+    "word": {
+      "en": "napkin",
+      "sn": "napukini",
+      "nd": "inapikini"
+    },
+    "word_length": 6,
+    "difficulty": 1
+  },
+  {
+    "id": "3_33",
+    "chapter": "In the Kitchen",
+    "word": {
+      "en": "mop",
+      "sn": "mopu",
+      "nd": "imopu"
+    },
+    "word_length": 3,
+    "difficulty": 1
+  },
+  {
+    "id": "3_34",
+    "chapter": "In the Kitchen",
+    "word": {
+      "en": "bucket",
+      "sn": "bhakiti",
+      "nd": "ibhakede"
+    },
+    "word_length": 6,
+    "difficulty": 1
+  },
+  {
+    "id": "3_35",
+    "chapter": "In the Kitchen",
+    "word": {
+      "en": "cleaner",
+      "sn": "muchenesi",
+      "nd": "umhlanzeli"
+    },
+    "word_length": 7,
+    "difficulty": 1
+  },
+  {
+    "id": "3_36",
+    "chapter": "In the Kitchen",
+    "word": {
+      "en": "dish",
+      "sn": "dish",
+      "nd": "idishe"
+    },
+    "word_length": 4,
+    "difficulty": 1
+  },
+  {
+    "id": "3_37",
+    "chapter": "In the Kitchen",
+    "word": {
+      "en": "soap bar",
+      "sn": "bhawa resipo",
+      "nd": "ibhawa yesipho"
+    },
+    "word_length": 8,
+    "difficulty": 1
+  }
+]

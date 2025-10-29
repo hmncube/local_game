@@ -30,7 +30,7 @@ class GameCubit extends BaseCubitWrapper<GameState> {
 
     final user = await _userDao.getUser();
     if (levelModel != null) {
-      final words = levelModel.words.map((m) => m.word).toList();
+      final words = levelModel.wordsEn;
       if (words.isNotEmpty) {
         emit(
           state.copyWith(

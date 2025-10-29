@@ -38,7 +38,8 @@ CREATE TABLE chapters (
     theme TEXT,
     theme_sn TEXT,
     theme_nd TEXT,
-    difficulty TEXT
+    difficulty TEXT,
+    levels TEXT
 );
 
 -- 5. Levels Table
@@ -49,7 +50,10 @@ CREATE TABLE levels (
     difficulty INTEGER DEFAULT 0,
     level_type INTEGER DEFAULT 1,
     finished_at INTEGER,
-    started_at INTEGER
+    started_at INTEGER,
+    words_en TEXT,
+    words_sn TEXT,
+    words_nd TEXT
 );
 
 -- 6. Level Words Table (Associative Table)
