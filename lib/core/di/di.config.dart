@@ -56,9 +56,6 @@ Future<_i174.GetIt> init(
   );
   gh.factory<_i390.UserDao>(() => _i390.UserDao(gh<_i90.DatabaseProvider>()));
   gh.factory<_i861.WordDao>(() => _i861.WordDao(gh<_i90.DatabaseProvider>()));
-  gh.factory<_i387.SimilarWordsGameCubit>(
-    () => _i387.SimilarWordsGameCubit(gh<_i861.WordDao>()),
-  );
   gh.factory<_i69.OnboardingCubit>(
     () => _i69.OnboardingCubit(
       gh<_i959.PlayerIconDao>(),
@@ -84,6 +81,9 @@ Future<_i174.GetIt> init(
       gh<_i390.UserDao>(),
       gh<_i0.LevelDao>(),
     ),
+  );
+  gh.factory<_i387.SimilarWordsGameCubit>(
+    () => _i387.SimilarWordsGameCubit(gh<_i0.LevelDao>(), gh<_i390.UserDao>()),
   );
   return getIt;
 }

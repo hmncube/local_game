@@ -72,12 +72,12 @@ class AppRoutes {
       GoRoute(
         path: Routes.similarWords.toPath,
         name: Routes.similarWords.toNamed,
-        builder: (context, state) => const SimilarWordsGameScreen(),
+        builder: (context, state) =>  SimilarWordsGameScreen(levelId: (state.extra as int),),
         pageBuilder:
             (context, state) => buildPageWithDefaultTransition(
               context: context,
               state: state,
-              child: const SimilarWordsGameScreen(),
+              child:  SimilarWordsGameScreen(levelId: (state.extra as int),),
             ),
       ),
       GoRoute(

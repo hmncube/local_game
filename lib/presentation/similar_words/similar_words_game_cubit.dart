@@ -1,32 +1,42 @@
 import 'package:injectable/injectable.dart';
 import 'package:local_game/core/base/cubit/base_cubit_wrapper.dart';
 import 'package:local_game/core/base/cubit/cubit_status.dart';
-import 'package:local_game/data/dao/word_dao.dart';
+import 'package:local_game/core/game_system/points_management.dart';
+import 'package:local_game/data/dao/level_dao.dart';
+import 'package:local_game/data/dao/user_dao.dart';
 import 'package:local_game/presentation/similar_words/similar_words_game_state.dart';
 
 @injectable
 class SimilarWordsGameCubit extends BaseCubitWrapper<SimilarWordsGameState> {
-  final WordDao _wordDao;
-  SimilarWordsGameCubit(this._wordDao)
+  final LevelDao _levelDao;
+  final UserDao _userDao;
+
+  SimilarWordsGameCubit(this._levelDao, this._userDao)
     : super(SimilarWordsGameState(cubitState: CubitInitial()));
 
   @override
   void dispose() {}
 
-  @override
-  Future<void> initialize() async {
+  Future<void> initializeGame({required int levelId}) async {
     emit(state.copyWith(cubitState: CubitLoading()));
-    final Map<String, String> questionAnswers = {
-      'Happy': 'Joyful',
-      'Big': 'Large',
-      'Fast': 'Quick',
-      'Smart': 'Intelligent',
-    };
+    final level = await _levelDao.getLevelById(levelId);
+    final words = level?.wordsEn ?? [];
 
-    List<String> availableWords = [
-      'Joyful', 'Large', 'Quick', 'Intelligent', // Correct answers
-      'Elephant', 'Purple', 'Swimming', // Random words
-    ];
+    Map<String, String> questionAnswers = {};
+    List<String> availableWords = List.empty(growable: true);
+    for (int i = 0; i < words.length; i += 2) {
+      questionAnswers[words[i]] = words[i + 1];
+      availableWords.add(words[i + 1]);
+    }
+
+    // get random words
+    final random = await _levelDao.getLevelById(levelId - 1);
+    final randomWords = random?.wordsEn ?? [];
+
+    final set = Set.from(availableWords);
+    set.addAll(randomWords);
+
+    availableWords = List.from(set);
 
     Map<String, String?> userAnswers = {};
     for (String question in questionAnswers.keys) {
@@ -35,39 +45,49 @@ class SimilarWordsGameCubit extends BaseCubitWrapper<SimilarWordsGameState> {
     // Shuffle the available words
     availableWords.shuffle();
 
-    emit(state.copyWith(
-      availableWords: availableWords,
-      userAnswers: userAnswers,
-      questionAnswers: questionAnswers
-    ));
+    final user = await _userDao.getUser();
+
+    emit(
+      state.copyWith(
+        availableWords: availableWords,
+        userAnswers: userAnswers,
+        questionAnswers: questionAnswers,
+        hints: user?.hints,
+        score: user?.totalScore,
+        userId: user?.id,
+      ),
+    );
   }
 
-void onWordDropped(String questionWord, String droppedWord) {
-  Map<String, String?> userAnswers = Map.from(state.userAnswers);
-  Set<String> usedWords = Set.from(state.usedWords);
+  void onWordDropped(String questionWord, String droppedWord) {
+    Map<String, String?> userAnswers = Map.from(state.userAnswers);
+    Set<String> usedWords = Set.from(state.usedWords);
 
-  if (userAnswers[questionWord] != null) {
-    usedWords.remove(userAnswers[questionWord]!);
+    if (userAnswers[questionWord] != null) {
+      usedWords.remove(userAnswers[questionWord]!);
+    }
+
+    // Set new answer
+    userAnswers[questionWord] = droppedWord;
+    final isGameComplete = userAnswers.values.every((value) => value != null);
+    usedWords.add(droppedWord);
+    int points = state.score;
+    if (isCorrectAnswer(questionWord, droppedWord)) {
+      points = points + PointsManagement().calculatePoints(droppedWord);
+      _userDao.updateTotalScore(state.userId, points);
+    }
+    emit(
+      state.copyWith(
+        usedWords: usedWords,
+        userAnswers: userAnswers,
+        score: points,
+        isGameComplete: isGameComplete,
+      ),
+    );
   }
-  
-  // Set new answer
-  userAnswers[questionWord] = droppedWord;
-  usedWords.add(droppedWord);
-  emit(state.copyWith(usedWords: usedWords, userAnswers: userAnswers));
-}
 
   bool isCorrectAnswer(String question, String? answer) {
     return state.questionAnswers[question] == answer;
-  }
-
-  int _getScore() {
-    int correct = 0;
-    state.userAnswers.forEach((question, answer) {
-      if (isCorrectAnswer(question, answer)) {
-        correct++;
-      }
-    });
-    return correct;
   }
 
   void resetGame() {
@@ -85,4 +105,7 @@ void onWordDropped(String questionWord, String droppedWord) {
       ),
     );
   }
+
+  @override
+  void initialize() {}
 }

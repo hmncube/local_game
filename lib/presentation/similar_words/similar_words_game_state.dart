@@ -8,6 +8,9 @@ class SimilarWordsGameState extends Equatable {
   final Map<String, String?> userAnswers;
   final Set<String> usedWords;
   final int score;
+  final int hints;
+  final String userId;
+  final bool isGameComplete;
 
   const SimilarWordsGameState({
     required this.cubitState,
@@ -16,6 +19,9 @@ class SimilarWordsGameState extends Equatable {
     this.userAnswers = const {},
     this.usedWords = const {},
     this.score = 0,
+    this.hints = 0,
+    this.userId = '',
+    this.isGameComplete = false,
   });
 
   SimilarWordsGameState copyWith({
@@ -25,6 +31,9 @@ class SimilarWordsGameState extends Equatable {
     Map<String, String?>? userAnswers,
     Set<String>? usedWords,
     int? score,
+    int? hints,
+    String? userId,
+    bool? isGameComplete,
   }) {
     return SimilarWordsGameState(
       cubitState: cubitState ?? this.cubitState,
@@ -33,6 +42,9 @@ class SimilarWordsGameState extends Equatable {
       userAnswers: userAnswers ?? this.userAnswers,
       usedWords: usedWords ?? this.usedWords,
       score: score ?? this.score,
+      hints: hints ?? this.hints,
+      userId: userId ?? this.userId,
+      isGameComplete: isGameComplete ?? this.isGameComplete,
     );
   }
 
@@ -44,5 +56,8 @@ class SimilarWordsGameState extends Equatable {
     userAnswers,
     usedWords,
     score,
+    hints,
+    userId,
+    isGameComplete,
   ];
 }
