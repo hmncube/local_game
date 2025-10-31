@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:local_game/app/themes/app_text_styles.dart';
+import 'package:local_game/core/constants/app_assets.dart';
 
 class LetterContainer extends StatefulWidget {
   final String letter;
@@ -17,14 +19,17 @@ class LetterContainer extends StatefulWidget {
 class _LetterContainerState extends State<LetterContainer> {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: widget.size == LetterContainerSize.small ? 50 : 50,
+    return SizedBox(
+      width: 50,
       height: 60,
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.white, width: 1),
-        borderRadius: BorderRadius.circular(8),
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: SvgPicture.asset(AppAssets.btnGreenSvg, fit: BoxFit.fill),
+          ),
+          Center(child: Text(widget.letter, style: AppTextStyles.heading1)),
+        ],
       ),
-      child: Center(child: Text(widget.letter, style: AppTextStyles.heading1)),
     );
   }
 }

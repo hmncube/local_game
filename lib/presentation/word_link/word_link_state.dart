@@ -2,7 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:local_game/core/base/cubit/cubit_status.dart';
 import 'package:local_game/data/model/level_model.dart';
 
-class GameState extends Equatable {
+class WordLinkState extends Equatable {
   final BaseCubitState cubitState;
   final int level;
   final int points;
@@ -14,12 +14,13 @@ class GameState extends Equatable {
   final bool wasWordEnteredBefore;
   final LevelModel? levelModel;
   final String hint;
+  final String userId;
   final List<String> letters;
   final List<String> words;
   final List<String> filledWords;
   final List<String> currentWord;
 
-  const GameState({
+  const WordLinkState({
     required this.cubitState,
     this.level = 0,
     this.hintsCount = 0,
@@ -29,6 +30,7 @@ class GameState extends Equatable {
     this.wasWordEnteredBefore = false,
     this.isLevelComplete = false,
     this.hint = '',
+    this.userId = '',
     this.letters = const [],
     this.words = const [],
     this.filledWords = const [],
@@ -37,7 +39,7 @@ class GameState extends Equatable {
     this.isWordCorrect = false,
   });
 
-  GameState copyWith({
+  WordLinkState copyWith({
     BaseCubitState? cubitState,
     int? level,
     int? hintsCount,
@@ -50,11 +52,12 @@ class GameState extends Equatable {
     List<String>? words,
     List<String>? currentWord,
     List<String>? filledWords,
+    String? userId,
     bool? isWordWrong,
     bool? isWordCorrect,
     bool? wasWordEnteredBefore,
   }) {
-    return GameState(
+    return WordLinkState(
       cubitState: cubitState ?? this.cubitState,
       level: level ?? this.level,
       letters: letters ?? this.letters,
@@ -70,6 +73,7 @@ class GameState extends Equatable {
       wasWordEnteredBefore: wasWordEnteredBefore ?? this.wasWordEnteredBefore,
       hint: hint ?? this.hint,
       hintWordIndex: hintWordIndex ?? this.hintWordIndex,
+      userId: userId ?? this.userId,
     );
   }
 
@@ -90,5 +94,6 @@ class GameState extends Equatable {
     isWordWrong,
     isLevelComplete,
     wasWordEnteredBefore,
+    userId,
   ];
 }

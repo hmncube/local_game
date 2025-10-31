@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:local_game/presentation/game/widgets/letter_container.dart';
+import 'package:local_game/presentation/word_link/widgets/letter_container.dart';
 
 class TextDisplay extends StatefulWidget {
   final List<String> words;
@@ -12,20 +12,13 @@ class TextDisplay extends StatefulWidget {
 class _TextDisplayState extends State<TextDisplay> {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.white, width: 1),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Column(
-        spacing: 16,
-        children: [
-          const SizedBox(height: 16),
-          ..._buildWordDisplay(widget.words),
-          const SizedBox(height: 16),
-        ],
-      ),
+    return Column(
+      spacing: 16, 
+      children: [
+        const SizedBox(height: 16),
+        ..._buildWordDisplay(widget.words),
+        const SizedBox(height: 16),
+      ],
     );
   }
 

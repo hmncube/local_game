@@ -1,41 +1,42 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:local_game/app/themes/app_text_styles.dart';
 import 'package:local_game/app/themes/app_theme.dart';
 import 'package:local_game/core/base/cubit/cubit_status.dart';
 import 'package:local_game/core/constants/app_assets.dart';
 import 'package:local_game/core/di/di.dart';
-import 'package:local_game/presentation/game/game_cubit.dart';
-import 'package:local_game/presentation/game/game_state.dart';
-import 'package:local_game/presentation/game/widgets/hint_widget.dart';
-import 'package:local_game/presentation/game/widgets/swipe_keyboard.dart';
-import 'package:local_game/presentation/game/widgets/text_display.dart';
+import 'package:local_game/core/routes.dart';
+import 'package:local_game/presentation/word_link/word_link_cubit.dart';
+import 'package:local_game/presentation/word_link/word_link_state.dart';
+import 'package:local_game/presentation/word_link/widgets/swipe_keyboard.dart';
+import 'package:local_game/presentation/word_link/widgets/text_display.dart';
 import 'package:local_game/presentation/widget/app_button.dart';
-import 'package:local_game/presentation/widget/app_animated_icon.dart';
 import 'package:local_game/presentation/widget/loading_screen.dart';
 import 'package:local_game/presentation/widget/game_top_bar.dart';
 
 import 'package:lottie/lottie.dart';
 
-class GameScreen extends StatefulWidget {
+class WordLinkScreen extends StatefulWidget {
   final int level;
-  const GameScreen({super.key, required this.level});
+  const WordLinkScreen({super.key, required this.level});
 
   @override
-  State<GameScreen> createState() => _GameScreenState();
+  State<WordLinkScreen> createState() => _WordLinkScreenState();
 }
 
-class _GameScreenState extends State<GameScreen>
+class _WordLinkScreenState extends State<WordLinkScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
-  late final GameCubit _cubit;
+  late final WordLinkCubit _cubit;
 
   @override
   void initState() {
     super.initState();
-    _cubit = getIt.get<GameCubit>()..init(level: widget.level);
+    _cubit = getIt.get<WordLinkCubit>()..init(level: widget.level);
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 800),
@@ -66,7 +67,7 @@ class _GameScreenState extends State<GameScreen>
   bool _showAlreadyEntered = false;
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<GameCubit, GameState>(
+    return BlocConsumer<WordLinkCubit, WordLinkState>(
       bloc: _cubit,
       listener: (context, state) {
         if (state.isLevelComplete) {
@@ -82,6 +83,10 @@ class _GameScreenState extends State<GameScreen>
               setState(() => _showAlreadyEntered = false);
             }
           });
+        }
+
+        if (state.isLevelComplete) {
+          context.go(Routes.levelCompleteScreen.toPath);
         }
       },
       builder: (context, state) {
@@ -99,20 +104,10 @@ class _GameScreenState extends State<GameScreen>
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
                     children: [
-                      Row(
-                        children: [
-                          Row(
-                            spacing: 16,
-                            children: [
-                              AppAnimatedIcon(icon: Icons.home),
-                              AppAnimatedIcon(icon: Icons.settings),
-                            ],
-                          ),
-                          Spacer(),
-                          GameTopBar(points: state.points, 
-                          hints: state.hintsCount,
-                          onHintClicked: (){},),
-                        ],
+                      GameTopBar(
+                        points: state.points,
+                        hints: state.hintsCount,
+                        onHintClicked: () {},
                       ),
                       const SizedBox(height: 60),
                       TextDisplay(words: state.filledWords),
@@ -128,26 +123,24 @@ class _GameScreenState extends State<GameScreen>
                         ),
                       ),
                       Spacer(),
-                      HintWidget(
-                        hints: state.hintsCount,
-                        showHint: () => _cubit.showHint(),
-                      ),
-                      const SizedBox(height: 16),
-                      Container(
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.white, width: 2),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Center(
-                            child: Text(
-                              state.currentWord.join(''),
-                              style: AppTextStyles.heading1,
+                      Stack(
+                        children: [
+                          Positioned.fill(
+                            child: SvgPicture.asset(
+                              AppAssets.inputSvg,
+                              fit: BoxFit.fill,
                             ),
                           ),
-                        ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Center(
+                              child: Text(
+                                state.currentWord.join(''),
+                                style: AppTextStyles.heading1,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                       const SizedBox(height: 16),
                       SwipeKeyboard(
@@ -155,7 +148,7 @@ class _GameScreenState extends State<GameScreen>
                         onKeyPressed: (letter) {
                           _cubit.updateCurrentWord(letter);
                         },
-                        onCheckUserInput: (){
+                        onCheckUserInput: () {
                           _cubit.onCheckUserInput();
                         },
                       ),

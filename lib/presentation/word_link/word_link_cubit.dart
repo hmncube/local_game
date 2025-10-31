@@ -1,20 +1,21 @@
 import 'package:injectable/injectable.dart';
 import 'package:local_game/core/base/cubit/base_cubit_wrapper.dart';
+import 'package:local_game/core/game_system/points_management.dart';
 import 'package:local_game/core/sound/sound_manager.dart';
 import 'package:local_game/data/dao/level_dao.dart';
 import 'package:local_game/data/dao/user_dao.dart';
-import 'package:local_game/presentation/game/game_state.dart';
+import 'package:local_game/presentation/word_link/word_link_state.dart';
 
 import '../../core/base/cubit/cubit_status.dart';
 
 @injectable
-class GameCubit extends BaseCubitWrapper<GameState> {
+class WordLinkCubit extends BaseCubitWrapper<WordLinkState> {
   final LevelDao _levelDao;
   final UserDao _userDao;
   final SoundManager _soundManager;
 
-  GameCubit(this._levelDao, this._userDao, this._soundManager)
-    : super(GameState(cubitState: CubitInitial()));
+  WordLinkCubit(this._levelDao, this._userDao, this._soundManager)
+    : super(WordLinkState(cubitState: CubitInitial()));
 
   @override
   void dispose() {}
@@ -32,16 +33,19 @@ class GameCubit extends BaseCubitWrapper<GameState> {
     if (levelModel != null) {
       final words = levelModel.wordsEn;
       if (words.isNotEmpty) {
+        Map<String, int> letterCount = getMaxLetterCount(words);
+        List<String> letterList = createLetterList(letterCount);
         emit(
           state.copyWith(
             cubitState: CubitSuccess(),
             level: levelId,
             words: words..sort((a, b) => a.length.compareTo(b.length)),
             hintsCount: user?.hints,
+            userId: user?.id,
             points: user?.totalScore,
             levelModel: levelModel,
             filledWords: dashWords(words),
-            letters: words.expand((word) => word.split('')).toSet().toList(),
+            letters: letterList,
           ),
         );
       } else {
@@ -87,7 +91,8 @@ class GameCubit extends BaseCubitWrapper<GameState> {
       filledWords[filledWordIndex] = nw;
       newFilledWords = filledWords;
 
-      final points = _calculatePoints();
+      final points = _calculatePoints(nw);
+      _updatePoints(points);
 
       bool isLevelComplete = handleCompleteLevel(newFilledWords, points);
 
@@ -96,16 +101,20 @@ class GameCubit extends BaseCubitWrapper<GameState> {
           currentWord: [],
           filledWords: newFilledWords,
           isWordCorrect: true,
-          points: isLevelComplete ? points + state.points : state.points,
+          points: points + state.points,
           isLevelComplete: isLevelComplete,
           hint: '',
           hintWordIndex: -1,
         ),
       );
     } else {
-        _soundManager.playWrongAnswerSound();
+      _soundManager.playWrongAnswerSound();
       emit(state.copyWith(currentWord: [state.hint], isWordWrong: true));
     }
+  }
+
+  void _updatePoints(int points) {
+    _userDao.updateTotalScore(state.userId, points + state.points);
   }
 
   void updateCurrentWord(String letter) {
@@ -161,9 +170,8 @@ class GameCubit extends BaseCubitWrapper<GameState> {
     emit(state.copyWith(wasWordEnteredBefore: false));
   }
 
-  int _calculatePoints() {
-    final words = state.words;
-    return words.fold(0, (total, word) => total + word.length);
+  int _calculatePoints(String word) {
+    return PointsManagement().calculatePoints(word);
   }
 
   void loadNextLevel() {
@@ -186,7 +194,7 @@ class GameCubit extends BaseCubitWrapper<GameState> {
       '-',
     );
     final isWordComplete = !hintedWord.contains('-');
-    final points = _calculatePoints();
+    final points = _calculatePoints(hintedWord);
 
     final newFilledWords = filledWords..[firstWordIndex] = hintedWord;
     bool isLevelComplete = handleCompleteLevel(newFilledWords, points);
@@ -200,5 +208,38 @@ class GameCubit extends BaseCubitWrapper<GameState> {
         isLevelComplete: isLevelComplete,
       ),
     );
+  }
+
+  Map<String, int> getMaxLetterCount(List<String> words) {
+    Map<String, int> maxCount = {};
+
+    for (String word in words) {
+      // Count letters in current word
+      Map<String, int> wordCount = {};
+      for (int i = 0; i < word.length; i++) {
+        String letter = word[i].toLowerCase();
+        wordCount[letter] = (wordCount[letter] ?? 0) + 1;
+      }
+
+      // Update max count
+      wordCount.forEach((letter, count) {
+        if (!maxCount.containsKey(letter) || count > maxCount[letter]!) {
+          maxCount[letter] = count;
+        }
+      });
+    }
+    return maxCount;
+  }
+
+  List<String> createLetterList(Map<String, int> letterCount) {
+    List<String> result = [];
+
+    letterCount.forEach((letter, count) {
+      for (int i = 0; i < count; i++) {
+        result.add(letter);
+      }
+    });
+
+    return result;
   }
 }

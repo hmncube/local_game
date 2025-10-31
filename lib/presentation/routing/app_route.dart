@@ -2,7 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:local_game/core/routes.dart';
 import 'package:local_game/presentation/crossword/crossword_screen.dart';
-import 'package:local_game/presentation/game/game_screen.dart';
+import 'package:local_game/presentation/word_link/word_link_screen.dart';
 import 'package:local_game/presentation/level_complete/level_complete_screen.dart';
 import 'package:local_game/presentation/map/map_screen.dart';
 import 'package:local_game/presentation/onboarding/onboarding_screen.dart';
@@ -53,7 +53,7 @@ class AppRoutes {
             (context, state) => buildPageWithDefaultTransition(
               context: context,
               state: state,
-              child: GameScreen(level: (state.extra as int)),
+              child: WordLinkScreen(level: (state.extra as int)),
             ),
       ),
       GoRoute(

@@ -1,8 +1,9 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:local_game/app/themes/app_text_styles.dart';
-import 'package:local_game/core/base/state/common_base_state_wrapper.dart';
 import 'package:local_game/core/base/state/toast_type.dart';
+import 'package:local_game/core/constants/app_assets.dart';
 import 'package:local_game/core/extensions/context_extension.dart';
 
 class SwipeKeyboard extends StatefulWidget {
@@ -40,8 +41,6 @@ class _SwipeKeyboardState extends State<SwipeKeyboard>
   void initState() {
     super.initState();
     _keyboardLetters = widget.enabledLetters;
-
-    // Initialize animation controllers
     _rotationController = AnimationController(
       duration: const Duration(milliseconds: 800),
       vsync: this,
@@ -87,7 +86,7 @@ class _SwipeKeyboardState extends State<SwipeKeyboard>
       final dx = centerX + radius * cos(angle - pi / 2);
       final dy = centerY + radius * sin(angle - pi / 2);
 
-      _letterPositions[_keyboardLetters[i]] = Rect.fromCenter(
+      _letterPositions['${_keyboardLetters[i]}_$i'] = Rect.fromCenter(
         center: Offset(dx, dy),
         width: 40,
         height: 40,
@@ -104,7 +103,7 @@ class _SwipeKeyboardState extends State<SwipeKeyboard>
       if (entry.value.contains(position) &&
           !_swipedLetters.contains(entry.key)) {
         _swipedLetters.add(entry.key);
-        widget.onKeyPressed(entry.key);
+        widget.onKeyPressed(entry.key.split('_').first);
         _swipePath.add(entry.value.center);
       }
     }
@@ -114,7 +113,10 @@ class _SwipeKeyboardState extends State<SwipeKeyboard>
 
   void _onPanEnd() {
     if (_swipedLetters.length == 1) {
-      context.showToast('Please swipe to make the words', type: ToastType.error);
+      context.showToast(
+        'Please swipe to make the words',
+        type: ToastType.error,
+      );
     }
     _clearSwipePath();
     _swipePath.add(Offset.zero);
@@ -208,10 +210,23 @@ class _SwipeKeyboardState extends State<SwipeKeyboard>
                                   child: AnimatedOpacity(
                                     opacity: _isAnimating ? 0.7 : 1.0,
                                     duration: Duration(milliseconds: 200),
-                                    child: Text(
-                                      entry.key,
-                                      style: AppTextStyles.tileLetter.copyWith(
-                                        color: Colors.white,
+                                    child: SizedBox(
+                                      width: 20,
+                                      child: Stack(
+                                        children: [
+                                          Positioned.fill(
+                                            child: SvgPicture.asset(
+                                              AppAssets.inputSvg,
+                                              fit: BoxFit.fill,
+                                            ),
+                                          ),
+                                          Center(
+                                            child: Text(
+                                              entry.key.split('_').first,
+                                              style: AppTextStyles.tileLetter,
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   ),
