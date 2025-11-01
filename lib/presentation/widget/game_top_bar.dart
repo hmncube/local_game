@@ -48,9 +48,12 @@ class GameTopBar extends StatelessWidget {
           Align(
             alignment: Alignment.center,
             child: GestureDetector(
-              onTap: () {
-                onHintClicked!();
-              },
+              onTap:
+                  onHintClicked != null
+                      ? () {
+                        onHintClicked!();
+                      }
+                      : null,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [

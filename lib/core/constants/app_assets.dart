@@ -27,8 +27,8 @@ mixin AppAssets {
   static const langSvg = 'assets/svg/lang.svg';
   static const circleSvg = 'assets/svg/circle.svg';
 
-
   static const starSvg = 'assets/svg/star.svg';
+  static const filledStarSvg = 'assets/svg/filled_star.svg';
   static const matchSvg = 'assets/svg/match.svg';
   static const linkSvg = 'assets/svg/link.svg';
   static const fnderSvg = 'assets/svg/finder.svg';

@@ -105,7 +105,7 @@ class _WordLinkScreenState extends State<WordLinkScreen>
                   child: Column(
                     children: [
                       GameTopBar(
-                        points: state.points,
+                        points: state.totalPoints,
                         hints: state.hintsCount,
                         onHintClicked: () {},
                       ),

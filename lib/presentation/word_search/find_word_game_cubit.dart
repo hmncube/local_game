@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:injectable/injectable.dart';
 import 'package:local_game/core/base/cubit/base_cubit_wrapper.dart';
 import 'package:local_game/core/base/cubit/cubit_status.dart';
+import 'package:local_game/core/constants/app_values.dart';
 import 'package:local_game/core/game_system/points_management.dart';
 import 'package:local_game/data/dao/level_dao.dart';
 import 'package:local_game/data/dao/user_dao.dart';
@@ -44,11 +45,10 @@ class FindWordGameCubit extends BaseCubitWrapper<FindWordGameState> {
 
     final newGridSize = gridSize ?? state.gridSize;
     var grid = List.generate(newGridSize, (_) => List.filled(newGridSize, ''));
+    final levelModel = (await _levelDao.getLevelById(level));
+
     final wordsToFind =
-        (await _levelDao.getLevelById(
-          level,
-        ))?.wordsEn.map((w) => w.toUpperCase()).toList() ??
-        [];
+        levelModel?.wordsEn.map((w) => w.toUpperCase()).toList() ?? [];
     final wordPositions = <String, List<Position>>{};
 
     _placeWords(wordsToFind, grid, newGridSize, wordPositions);
@@ -59,6 +59,7 @@ class FindWordGameCubit extends BaseCubitWrapper<FindWordGameState> {
     emit(
       state.copyWith(
         cubitState: CubitSuccess(),
+        level: levelModel,
         gridSize: newGridSize,
         grid: grid,
         wordsToFind: wordsToFind,
@@ -173,7 +174,7 @@ class FindWordGameCubit extends BaseCubitWrapper<FindWordGameState> {
     emit(state.copyWith(selectedPositions: selectedPositions));
   }
 
-  void onDragEnd() {
+  Future<void> onDragEnd() async {
     String newFoundWord = '';
     var newFoundWords = state.foundWords;
     var newWordColors = state.wordColors;
@@ -202,18 +203,29 @@ class FindWordGameCubit extends BaseCubitWrapper<FindWordGameState> {
         newFoundWord = matchedWord;
       }
     }
-    final points = PointsManagement().calculatePoints(newFoundWord);
+    final points = PointsManagement.calculatePoints(newFoundWord);
     _updatePoints(points);
+    final isAllComplete = newFoundWords.length == state.wordsToFind.length;
+    if (isAllComplete) {
+      final newLevel = state.level?.copyWith(
+        points: state.levelPoints,
+        finishedAt: DateTime.now().millisecondsSinceEpoch,
+        status: AppValues.levelDone,
+      );
+      await _levelDao.updateLevel(newLevel);
+    }
+
     emit(
       state.copyWith(
         selectedPositions: [],
         startPosition: const Position.invalid(),
         isDragging: false,
         foundWords: newFoundWords,
-        isAllComplete: newFoundWords.length == state.wordsToFind.length,
+        isAllComplete: isAllComplete,
         wordColors: newWordColors,
         newFoundWord: newFoundWord,
         points: state.points + points,
+        levelPoints: state.levelPoints + points,
       ),
     );
   }

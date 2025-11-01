@@ -29,6 +29,8 @@ class LevelDao {
 
   Future<void> updateLevel(LevelModel? level) async {
     if (level == null) return;
+    print('pundez dao id ${level.id}');
+    print(level);
     final db = await _dbProvider.database;
     await db.update(
       'levels',

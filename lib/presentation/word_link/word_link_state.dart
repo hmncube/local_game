@@ -4,15 +4,15 @@ import 'package:local_game/data/model/level_model.dart';
 
 class WordLinkState extends Equatable {
   final BaseCubitState cubitState;
-  final int level;
-  final int points;
+  final LevelModel? level;
+  final int totalPoints;
   final int hintsCount;
+  final int levelPoints;
   final int hintWordIndex;
   final bool isWordWrong;
   final bool isWordCorrect;
   final bool isLevelComplete;
   final bool wasWordEnteredBefore;
-  final LevelModel? levelModel;
   final String hint;
   final String userId;
   final List<String> letters;
@@ -22,11 +22,11 @@ class WordLinkState extends Equatable {
 
   const WordLinkState({
     required this.cubitState,
-    this.level = 0,
+    this.level,
+    this.levelPoints = 0,
     this.hintsCount = 0,
-    this.points = 0,
+    this.totalPoints = 0,
     this.hintWordIndex = 0,
-    this.levelModel,
     this.wasWordEnteredBefore = false,
     this.isLevelComplete = false,
     this.hint = '',
@@ -41,11 +41,11 @@ class WordLinkState extends Equatable {
 
   WordLinkState copyWith({
     BaseCubitState? cubitState,
-    int? level,
     int? hintsCount,
-    int? points,
+    int? totalPoints,
+    int? levelPoints,
     int? hintWordIndex,
-    LevelModel? levelModel,
+    LevelModel? level,
     bool? isLevelComplete,
     String? hint,
     List<String>? letters,
@@ -63,8 +63,8 @@ class WordLinkState extends Equatable {
       letters: letters ?? this.letters,
       words: words ?? this.words,
       hintsCount: hintsCount ?? this.hintsCount,
-      points: points ?? this.points,
-      levelModel: levelModel ?? this.levelModel,
+      totalPoints: totalPoints ?? this.totalPoints,
+      levelPoints: levelPoints ?? this.levelPoints,
       currentWord: currentWord ?? this.currentWord,
       filledWords: filledWords ?? this.filledWords,
       isWordCorrect: isWordCorrect ?? this.isWordCorrect,
@@ -83,11 +83,10 @@ class WordLinkState extends Equatable {
     level,
     letters,
     words,
-    points,
+    totalPoints,
     hintsCount,
     hint,
     hintWordIndex,
-    levelModel,
     currentWord,
     filledWords,
     isWordCorrect,
@@ -95,5 +94,6 @@ class WordLinkState extends Equatable {
     isLevelComplete,
     wasWordEnteredBefore,
     userId,
+    levelPoints,
   ];
 }

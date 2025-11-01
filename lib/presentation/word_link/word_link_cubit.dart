@@ -1,5 +1,6 @@
 import 'package:injectable/injectable.dart';
 import 'package:local_game/core/base/cubit/base_cubit_wrapper.dart';
+import 'package:local_game/core/constants/app_values.dart';
 import 'package:local_game/core/game_system/points_management.dart';
 import 'package:local_game/core/sound/sound_manager.dart';
 import 'package:local_game/data/dao/level_dao.dart';
@@ -38,12 +39,11 @@ class WordLinkCubit extends BaseCubitWrapper<WordLinkState> {
         emit(
           state.copyWith(
             cubitState: CubitSuccess(),
-            level: levelId,
             words: words..sort((a, b) => a.length.compareTo(b.length)),
             hintsCount: user?.hints,
             userId: user?.id,
-            points: user?.totalScore,
-            levelModel: levelModel,
+            totalPoints: user?.totalScore,
+            level: levelModel,
             filledWords: dashWords(words),
             letters: letterList,
           ),
@@ -72,7 +72,7 @@ class WordLinkCubit extends BaseCubitWrapper<WordLinkState> {
       ..sort((a, b) => a.length.compareTo(b.length));
   }
 
-  void onCheckUserInput() {
+  void onCheckUserInput() async {
     final word = state.currentWord;
     final nw = word.join('');
     if (state.filledWords.contains(nw.toLowerCase())) {
@@ -95,13 +95,21 @@ class WordLinkCubit extends BaseCubitWrapper<WordLinkState> {
       _updatePoints(points);
 
       bool isLevelComplete = handleCompleteLevel(newFilledWords, points);
-
+      if (isLevelComplete) {
+        final newLevel = state.level?.copyWith(
+          points: state.levelPoints,
+          finishedAt: DateTime.now().millisecondsSinceEpoch,
+          status: AppValues.levelDone,
+        );
+        await _levelDao.updateLevel(newLevel);
+      }
       emit(
         state.copyWith(
           currentWord: [],
           filledWords: newFilledWords,
           isWordCorrect: true,
-          points: points + state.points,
+          totalPoints: points + state.totalPoints,
+          levelPoints: state.levelPoints + points,
           isLevelComplete: isLevelComplete,
           hint: '',
           hintWordIndex: -1,
@@ -114,7 +122,7 @@ class WordLinkCubit extends BaseCubitWrapper<WordLinkState> {
   }
 
   void _updatePoints(int points) {
-    _userDao.updateTotalScore(state.userId, points + state.points);
+    _userDao.updateTotalScore(state.userId, points + state.totalPoints);
   }
 
   void updateCurrentWord(String letter) {
@@ -127,7 +135,7 @@ class WordLinkCubit extends BaseCubitWrapper<WordLinkState> {
     bool isLevelComplete = newFilledWords.every((word) => !word.contains('-'));
 
     if (isLevelComplete) {
-      final level = state.levelModel;
+      final level = state.level;
       _levelDao.updateLevel(
         level?.copyWith(
           status: 1,
@@ -171,11 +179,11 @@ class WordLinkCubit extends BaseCubitWrapper<WordLinkState> {
   }
 
   int _calculatePoints(String word) {
-    return PointsManagement().calculatePoints(word);
+    return PointsManagement.calculatePoints(word);
   }
 
   void loadNextLevel() {
-    init(level: state.level + 1);
+    init(level: (state.level?.id ?? 0) + 1);
   }
 
   void showHint() {
@@ -204,7 +212,8 @@ class WordLinkCubit extends BaseCubitWrapper<WordLinkState> {
         hintWordIndex: isWordComplete ? -1 : firstWordIndex,
         filledWords: newFilledWords,
         currentWord: isWordComplete ? [] : [newHint],
-        points: isLevelComplete ? points + state.points : state.points,
+        totalPoints:
+            isLevelComplete ? points + state.totalPoints : state.totalPoints,
         isLevelComplete: isLevelComplete,
       ),
     );

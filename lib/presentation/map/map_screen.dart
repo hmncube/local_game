@@ -7,6 +7,7 @@ import 'package:local_game/core/base/cubit/cubit_status.dart';
 import 'package:local_game/core/constants/app_assets.dart';
 import 'package:local_game/core/constants/app_values.dart';
 import 'package:local_game/core/di/di.dart';
+import 'package:local_game/core/game_system/points_management.dart';
 import 'package:local_game/core/routes.dart';
 import 'package:local_game/presentation/map/map_cubit.dart';
 import 'package:local_game/presentation/map/map_state.dart';
@@ -77,7 +78,10 @@ class _MapScreenState extends State<MapScreen> {
                         children: [
                           SizedBox(
                             height: 60,
-                            child: GameTopBar(points: 100, hints: 3),
+                            child: GameTopBar(
+                              points: state.userModel?.totalScore ?? 0,
+                              hints: state.userModel?.hints ?? 0,
+                            ),
                           ),
                           const SizedBox(height: 16),
                           Expanded(
@@ -93,12 +97,19 @@ class _MapScreenState extends State<MapScreen> {
                               itemBuilder: (context, index) {
                                 final level = state.levels[index];
                                 final isCompleted = level.status == 1;
-                                final isUnLocked =  true;//unLocked.id == level.id;
+                                final isUnLocked = unLocked.id == level.id;
                                 return LevelButton(
                                   levelId: level.id,
                                   type: level.type,
                                   isCompleted: isCompleted,
+                                  stars:
+                                      level.status == AppValues.levelDone
+                                          ? PointsManagement.calculateStars(
+                                            level.points,
+                                          )
+                                          : 0,
                                   onTap: () {
+                                    //todo unloack completed level
                                     !isUnLocked
                                         ? null
                                         : context.go(
@@ -107,7 +118,9 @@ class _MapScreenState extends State<MapScreen> {
                                         );
                                   },
                                   difficulty: level.difficulty,
-                                  isUnLocked: isUnLocked,
+                                  isUnLocked:
+                                      level.status == AppValues.levelDone ||
+                                      isUnLocked,
                                 );
                               },
                             ),
@@ -144,6 +157,7 @@ class LevelButton extends StatelessWidget {
   final VoidCallback onTap;
   final int difficulty;
   final int type;
+  final int stars;
   final bool isUnLocked;
 
   const LevelButton({
@@ -153,6 +167,7 @@ class LevelButton extends StatelessWidget {
     required this.onTap,
     required this.difficulty,
     required this.type,
+    required this.stars,
     required this.isUnLocked,
   });
 
@@ -199,11 +214,14 @@ class LevelButton extends StatelessWidget {
           Center(
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SvgPicture.asset(AppAssets.starSvg, height: 35, width: 35),
-                SvgPicture.asset(AppAssets.starSvg, height: 35, width: 35),
-                SvgPicture.asset(AppAssets.starSvg, height: 35, width: 35),
-              ],
+              children: List.generate(
+                3,
+                (index) => SvgPicture.asset(
+                  index < stars ? AppAssets.filledStarSvg : AppAssets.starSvg,
+                  height: 35,
+                  width: 35,
+                ),
+              ),
             ),
           ),
         ],

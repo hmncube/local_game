@@ -1,6 +1,7 @@
 import 'package:injectable/injectable.dart';
 import 'package:local_game/core/base/cubit/base_cubit_wrapper.dart';
 import 'package:local_game/core/base/cubit/cubit_status.dart';
+import 'package:local_game/core/constants/app_values.dart';
 import 'package:local_game/core/game_system/points_management.dart';
 import 'package:local_game/data/dao/level_dao.dart';
 import 'package:local_game/data/dao/user_dao.dart';
@@ -55,11 +56,12 @@ class SimilarWordsGameCubit extends BaseCubitWrapper<SimilarWordsGameState> {
         hints: user?.hints,
         score: user?.totalScore,
         userId: user?.id,
+        level: level,
       ),
     );
   }
 
-  void onWordDropped(String questionWord, String droppedWord) {
+  Future<void> onWordDropped(String questionWord, String droppedWord) async {
     Map<String, String?> userAnswers = Map.from(state.userAnswers);
     Set<String> usedWords = Set.from(state.usedWords);
 
@@ -70,17 +72,29 @@ class SimilarWordsGameCubit extends BaseCubitWrapper<SimilarWordsGameState> {
     // Set new answer
     userAnswers[questionWord] = droppedWord;
     final isGameComplete = userAnswers.values.every((value) => value != null);
+    if (isGameComplete) {
+      final newLevel = state.level?.copyWith(
+        points: state.levelPoints,
+        finishedAt: DateTime.now().millisecondsSinceEpoch,
+        status: AppValues.levelDone,
+      );
+      await _levelDao.updateLevel(newLevel);
+    }
     usedWords.add(droppedWord);
-    int points = state.score;
+    int totalPoints = state.score;
+    int levelPoints = state.levelPoints;
     if (isCorrectAnswer(questionWord, droppedWord)) {
-      points = points + PointsManagement().calculatePoints(droppedWord);
-      _userDao.updateTotalScore(state.userId, points);
+      final newPoints = PointsManagement.calculatePoints(droppedWord);
+      totalPoints = totalPoints + newPoints;
+      levelPoints = levelPoints + newPoints;
+      _userDao.updateTotalScore(state.userId, totalPoints);
     }
     emit(
       state.copyWith(
         usedWords: usedWords,
         userAnswers: userAnswers,
-        score: points,
+        score: totalPoints,
+        levelPoints: levelPoints,
         isGameComplete: isGameComplete,
       ),
     );

@@ -1,10 +1,12 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:local_game/core/base/cubit/cubit_status.dart';
+import 'package:local_game/data/model/level_model.dart';
 
 class FindWordGameState extends Equatable {
   final BaseCubitState cubitState;
   final int gridSize;
+  final LevelModel? level;
   final List<List<String>> grid;
   final List<String> wordsToFind;
   final List<String> foundWords;
@@ -17,12 +19,14 @@ class FindWordGameState extends Equatable {
   final String newFoundWord;
   final int points;
   final int hints;
+  final int levelPoints;
   final String userId;
   final String? hintError;
   final Position? hintPosition;
 
   const FindWordGameState({
     required this.cubitState,
+    this.level,
     this.gridSize = 10,
     this.grid = const [],
     this.wordsToFind = const [],
@@ -36,6 +40,7 @@ class FindWordGameState extends Equatable {
     this.newFoundWord = '',
     this.points = 0,
     this.hints = 0,
+    this.levelPoints = 0,
     this.userId = '',
     this.hintError,
     this.hintPosition,
@@ -43,6 +48,7 @@ class FindWordGameState extends Equatable {
 
   FindWordGameState copyWith({
     BaseCubitState? cubitState,
+    LevelModel? level,
     int? gridSize,
     List<List<String>>? grid,
     List<String>? wordsToFind,
@@ -56,6 +62,7 @@ class FindWordGameState extends Equatable {
     String? newFoundWord,
     int? points,
     int? hints,
+    int? levelPoints,
     String? userId,
     String? hintError,
     Position? hintPosition,
@@ -63,6 +70,7 @@ class FindWordGameState extends Equatable {
     return FindWordGameState(
       cubitState: cubitState ?? this.cubitState,
       gridSize: gridSize ?? this.gridSize,
+      level: level ?? this.level,
       grid: grid ?? this.grid,
       wordsToFind: wordsToFind ?? this.wordsToFind,
       foundWords: foundWords ?? this.foundWords,
@@ -78,6 +86,7 @@ class FindWordGameState extends Equatable {
       hints: hints ?? this.hints,
       hintError: hintError ?? this.hintError,
       hintPosition: hintPosition ?? this.hintPosition,
+      levelPoints: levelPoints ?? this.levelPoints,
     );
   }
 
@@ -99,6 +108,8 @@ class FindWordGameState extends Equatable {
     hints,
     hintPosition,
     isAllComplete,
+    level,
+    levelPoints,
   ];
 }
 

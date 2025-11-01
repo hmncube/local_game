@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:local_game/core/base/cubit/cubit_status.dart';
+import 'package:local_game/data/model/level_model.dart';
 
 class SimilarWordsGameState extends Equatable {
   final BaseCubitState cubitState;
@@ -9,6 +10,8 @@ class SimilarWordsGameState extends Equatable {
   final Set<String> usedWords;
   final int score;
   final int hints;
+  final LevelModel? level;
+  final int levelPoints;
   final String userId;
   final bool isGameComplete;
 
@@ -21,6 +24,8 @@ class SimilarWordsGameState extends Equatable {
     this.score = 0,
     this.hints = 0,
     this.userId = '',
+    this.level,
+    this.levelPoints = 0,
     this.isGameComplete = false,
   });
 
@@ -30,6 +35,8 @@ class SimilarWordsGameState extends Equatable {
     List<String>? availableWords,
     Map<String, String?>? userAnswers,
     Set<String>? usedWords,
+    LevelModel? level,
+    int? levelPoints,
     int? score,
     int? hints,
     String? userId,
@@ -44,6 +51,8 @@ class SimilarWordsGameState extends Equatable {
       score: score ?? this.score,
       hints: hints ?? this.hints,
       userId: userId ?? this.userId,
+      levelPoints: levelPoints ?? this.levelPoints,
+      level: level ?? this.level,
       isGameComplete: isGameComplete ?? this.isGameComplete,
     );
   }
@@ -59,5 +68,7 @@ class SimilarWordsGameState extends Equatable {
     hints,
     userId,
     isGameComplete,
+    level,
+    levelPoints,
   ];
 }
