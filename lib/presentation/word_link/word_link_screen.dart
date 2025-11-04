@@ -98,63 +98,59 @@ class _WordLinkScreenState extends State<WordLinkScreen>
           backgroundColor: AppTheme.accentGreen,
           body: Stack(
             children: [
-              // Main game content
               SafeArea(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    children: [
-                      GameTopBar(
-                        points: state.totalPoints,
-                        hints: state.hintsCount,
-                        onHintClicked: () {},
-                      ),
-                      const SizedBox(height: 60),
-                      TextDisplay(words: state.filledWords),
-                      Spacer(),
-                      AnimatedOpacity(
-                        opacity: _showAlreadyEntered ? 1.0 : 0.0,
-                        duration: const Duration(milliseconds: 800),
-                        child: Text(
-                          'Shoko iri ratopinda kare',
-                          style: AppTextStyles.heading1.copyWith(
-                            color: Colors.white,
-                          ),
+                child: Column(
+                  children: [
+                    GameTopBar(
+                      points: state.totalPoints,
+                      hints: state.hintsCount,
+                      onHintClicked: () {},
+                    ),
+                    const SizedBox(height: 12),
+                    TextDisplay(words: state.filledWords),
+                    Spacer(),
+                    AnimatedOpacity(
+                      opacity: _showAlreadyEntered ? 1.0 : 0.0,
+                      duration: const Duration(milliseconds: 800),
+                      child: Text(
+                        'Shoko iri ratopinda kare',
+                        style: AppTextStyles.heading1.copyWith(
+                          color: Colors.white,
                         ),
                       ),
-                      Spacer(),
-                      Stack(
-                        children: [
-                          Positioned.fill(
-                            child: SvgPicture.asset(
-                              AppAssets.inputSvg,
-                              fit: BoxFit.fill,
+                    ),
+                    Spacer(),
+                    Stack(
+                      children: [
+                        Positioned.fill(
+                          child: SvgPicture.asset(
+                            AppAssets.inputSvg,
+                            fit: BoxFit.fill,
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Center(
+                            child: Text(
+                              state.currentWord.join(''),
+                              style: AppTextStyles.heading1,
                             ),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Center(
-                              child: Text(
-                                state.currentWord.join(''),
-                                style: AppTextStyles.heading1,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      SwipeKeyboard(
-                        enabledLetters: state.letters,
-                        onKeyPressed: (letter) {
-                          _cubit.updateCurrentWord(letter);
-                        },
-                        onCheckUserInput: () {
-                          _cubit.onCheckUserInput();
-                        },
-                      ),
-                      const SizedBox(height: 32),
-                    ],
-                  ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    SwipeKeyboard(
+                      enabledLetters: state.letters,
+                      onKeyPressed: (letter) {
+                        _cubit.updateCurrentWord(letter);
+                      },
+                      onCheckUserInput: () {
+                        _cubit.onCheckUserInput();
+                      },
+                    ),
+                    const SizedBox(height: 32),
+                  ],
                 ),
               ),
               if (state.isLevelComplete) Center(child: _buildLevelComplete()),

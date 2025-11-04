@@ -59,76 +59,77 @@ class _MapScreenState extends State<MapScreen> {
                 (level) => level.status == 0,
               );
               return Scaffold(
-                body: SafeArea(
-                  child: Stack(
-                    children: [
-                      SizedBox(
-                        height: double.infinity,
-                        child: SvgPicture.asset(
-                          AppAssets.backgroundSvg,
-                          fit: BoxFit.fill,
-                        ),
+                body: Stack(
+                  children: [
+                    SizedBox(
+                      height: double.infinity,
+                      child: SvgPicture.asset(
+                        AppAssets.backgroundSvg,
+                        fit: BoxFit.fill,
                       ),
-                      Container(
-                        width: double.infinity,
-                        height: double.infinity,
-                        color: Colors.white54,
-                      ),
-                      Column(
-                        children: [
-                          SizedBox(
+                    ),
+                    Container(
+                      width: double.infinity,
+                      height: double.infinity,
+                      color: Colors.white54,
+                    ),
+                    Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(top: 42.0),
+                          child: SizedBox(
                             height: 60,
                             child: GameTopBar(
                               points: state.userModel?.totalScore ?? 0,
                               hints: state.userModel?.hints ?? 0,
                             ),
                           ),
-                          const SizedBox(height: 16),
-                          Expanded(
-                            child: GridView.builder(
-                              gridDelegate:
-                                  const SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 3,
-                                    crossAxisSpacing: 16.0,
-                                    mainAxisSpacing: 16.0,
-                                    childAspectRatio: 1.0,
-                                  ),
-                              itemCount: state.levels.length,
-                              itemBuilder: (context, index) {
-                                final level = state.levels[index];
-                                final isCompleted = level.status == 1;
-                                final isUnLocked = unLocked.id == level.id;
-                                return LevelButton(
-                                  levelId: level.id,
-                                  type: level.type,
-                                  isCompleted: isCompleted,
-                                  stars:
-                                      level.status == AppValues.levelDone
-                                          ? PointsManagement.calculateStars(
-                                            level.points,
-                                          )
-                                          : 0,
-                                  onTap: () {
-                                    //todo unloack completed level
-                                    !isUnLocked
-                                        ? null
-                                        : context.go(
-                                          _getTypeScreenLocation(level.type),
-                                          extra: level.id,
-                                        );
-                                  },
-                                  difficulty: level.difficulty,
-                                  isUnLocked:
-                                      level.status == AppValues.levelDone ||
-                                      isUnLocked,
-                                );
-                              },
-                            ),
+                        ),
+                        const SizedBox(height: 16),
+                        Expanded(
+                          child: GridView.builder(
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 3,
+                                  crossAxisSpacing: 16.0,
+                                  mainAxisSpacing: 16.0,
+                                  childAspectRatio: 1.0,
+                                ),
+                            itemCount: state.levels.length,
+                            itemBuilder: (context, index) {
+                              final level = state.levels[index];
+                              final isCompleted = level.status == 1;
+                              final isUnLocked = unLocked.id == level.id;
+                              return LevelButton(
+                                levelId: level.id,
+                                type: level.type,
+                                isCompleted: isCompleted,
+                                stars:
+                                    level.status == AppValues.levelDone
+                                        ? PointsManagement.calculateStars(
+                                          level.points,
+                                        )
+                                        : 0,
+                                onTap: () {
+                                  //todo unloack completed level animatio
+                                  !isUnLocked
+                                      ? null
+                                      : context.go(
+                                        _getTypeScreenLocation(level.type),
+                                        extra: level.id,
+                                      );
+                                },
+                                difficulty: level.difficulty,
+                                isUnLocked:
+                                    level.status == AppValues.levelDone ||
+                                    isUnLocked,
+                              );
+                            },
                           ),
-                        ],
-                      ),
-                    ],
-                  ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               );
             }
@@ -180,7 +181,7 @@ class LevelButton extends StatelessWidget {
           Stack(
             children: [
               SizedBox(
-                height: 100,
+                height: 70,
                 width: 100,
                 child: Stack(
                   children: [
@@ -199,14 +200,17 @@ class LevelButton extends StatelessWidget {
               ),
               Visibility(
                 visible: !isUnLocked,
-                child: Container(
-                  height: 100,
-                  width: 100,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(100),
-                    color: Colors.white54,
+                child: Align(
+                  alignment: Alignment.center,
+                  child: Container(
+                    height: 70,
+                    width: 70,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(100),
+                      color: Colors.white54,
+                    ),
+                    child: Icon(Icons.lock),
                   ),
-                  child: Icon(Icons.lock),
                 ),
               ),
             ],

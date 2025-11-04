@@ -13,11 +13,11 @@ class _TextDisplayState extends State<TextDisplay> {
   @override
   Widget build(BuildContext context) {
     return Column(
-      spacing: 16, 
+      spacing: 8, 
       children: [
-        const SizedBox(height: 16),
+        const SizedBox(height: 8),
         ..._buildWordDisplay(widget.words),
-        const SizedBox(height: 16),
+        const SizedBox(height: 8),
       ],
     );
   }
