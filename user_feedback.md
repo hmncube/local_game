@@ -1,8 +1,3 @@
-Of course! A great survey for user testing a mobile word game should be a mix of quantitative (ratings) and qualitative (open-ended) questions. It should validate the core idea, assess the gameplay loop, and identify friction points.
-
-Here is a comprehensive "Questenior" (Questionnaire + Senior, implying it's well-crafted and thorough) that you can adapt.
-
----
 
 ### **Word Game User Testing Feedback**
 
@@ -105,16 +100,3 @@ Hello, and thank you for testing our new word game! Your feedback is crucial in 
 ---
 
 **Thank you so much for your time and valuable feedback! Your input will directly help shape the future of our game.**
-
----
-
-### **How to Use This Questenior Effectively:**
-
-1.  **Timing is Key:** Don't give this *before* they play. Have them play the game for at least 10-15 minutes, ideally going through a few levels or rounds to get a proper feel.
-2.  **Keep it Anonymous:** Assure users their responses are anonymous to get more honest, critical feedback.
-3.  **Adapt It:** Remove or rephrase questions that aren't relevant to your specific game mechanics (e.g., if you don't have power-ups, remove that part from question 6).
-4.  **Use a Platform:** Use a free tool like **Google Forms** or **Typeform** to create and distribute this survey easily. They provide great data summaries.
-5.  **Incentivize (Optional):** If possible, offer a small incentive (a $5 coffee gift card, entry into a raffle) to increase completion rates.
-6.  **Look for Patterns:** After collecting 20-30 responses, look for recurring themes. If multiple people mention the same frustration, you've found a critical issue to fix. If they all love a specific feature, you know to double down on it.
-
-This "Questenior" will give you a robust set of data to validate your game's potential and significantly improve its quality. Good luck
