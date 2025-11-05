@@ -62,42 +62,76 @@ class SimilarWordsGameCubit extends BaseCubitWrapper<SimilarWordsGameState> {
   }
 
   Future<void> onWordDropped(String questionWord, String droppedWord) async {
-    Map<String, String?> userAnswers = Map.from(state.userAnswers);
-    Set<String> usedWords = Set.from(state.usedWords);
+    final userAnswers = _updateUserAnswers(questionWord, droppedWord);
+    final usedWords = _updateUsedWords(questionWord, droppedWord);
+    final isGameComplete = _isGameComplete(userAnswers);
 
-    if (userAnswers[questionWord] != null) {
-      usedWords.remove(userAnswers[questionWord]!);
-    }
-
-    // Set new answer
-    userAnswers[questionWord] = droppedWord;
-    final isGameComplete = userAnswers.values.every((value) => value != null);
     if (isGameComplete) {
-      final newLevel = state.level?.copyWith(
-        points: state.levelPoints,
-        finishedAt: DateTime.now().millisecondsSinceEpoch,
-        status: AppValues.levelDone,
-      );
-      await _levelDao.updateLevel(newLevel);
+      await _completeLevel();
     }
-    usedWords.add(droppedWord);
-    int totalPoints = state.score;
-    int levelPoints = state.levelPoints;
-    if (isCorrectAnswer(questionWord, droppedWord)) {
-      final newPoints = PointsManagement.calculatePoints(droppedWord);
-      totalPoints = totalPoints + newPoints;
-      levelPoints = levelPoints + newPoints;
-      _userDao.updateTotalScore(state.userId, totalPoints);
-    }
+
+    final points = await _calculateAndUpdatePoints(questionWord, droppedWord);
+
     emit(
       state.copyWith(
         usedWords: usedWords,
         userAnswers: userAnswers,
-        score: totalPoints,
-        levelPoints: levelPoints,
+        score: points.totalScore,
+        levelPoints: points.levelScore,
         isGameComplete: isGameComplete,
       ),
     );
+  }
+
+  Map<String, String?> _updateUserAnswers(
+    String questionWord,
+    String droppedWord,
+  ) {
+    final userAnswers = Map<String, String?>.from(state.userAnswers);
+    userAnswers[questionWord] = droppedWord;
+    return userAnswers;
+  }
+
+  Set<String> _updateUsedWords(String questionWord, String droppedWord) {
+    final usedWords = Set<String>.from(state.usedWords);
+
+    final previousAnswer = state.userAnswers[questionWord];
+    if (previousAnswer != null) {
+      usedWords.remove(previousAnswer);
+    }
+
+    usedWords.add(droppedWord);
+    return usedWords;
+  }
+
+  bool _isGameComplete(Map<String, String?> userAnswers) {
+    return userAnswers.values.every((value) => value != null);
+  }
+
+  Future<void> _completeLevel() async {
+    final completedLevel = state.level?.copyWith(
+      points: state.levelPoints,
+      finishedAt: DateTime.now().millisecondsSinceEpoch,
+      status: AppValues.levelDone,
+    );
+    await _levelDao.updateLevel(completedLevel);
+  }
+
+  Future<({int totalScore, int levelScore})> _calculateAndUpdatePoints(
+    String questionWord,
+    String droppedWord,
+  ) async {
+    int totalScore = state.score;
+    int levelScore = state.levelPoints;
+
+    if (isCorrectAnswer(questionWord, droppedWord)) {
+      final earnedPoints = PointsManagement.calculatePoints(droppedWord);
+      totalScore += earnedPoints;
+      levelScore += earnedPoints;
+      await _userDao.updateTotalScore(state.userId, totalScore);
+    }
+
+    return (totalScore: totalScore, levelScore: levelScore);
   }
 
   bool isCorrectAnswer(String question, String? answer) {
