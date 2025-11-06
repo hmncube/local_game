@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:injectable/injectable.dart';
 import 'package:local_game/core/base/cubit/base_cubit_wrapper.dart';
 import 'package:local_game/core/constants/app_values.dart';
@@ -48,6 +50,7 @@ class WordLinkCubit extends BaseCubitWrapper<WordLinkState> {
             letters: letterList,
           ),
         );
+        startGame();
       } else {
         emit(
           state.copyWith(
@@ -64,6 +67,23 @@ class WordLinkCubit extends BaseCubitWrapper<WordLinkState> {
         ),
       );
     }
+  }
+
+  Timer? _timer;
+  void startGame() {
+    _timer?.cancel();
+    emit(state.copyWith(seconds: AppValues.timerTime));
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      emit(
+        state.copyWith(
+          seconds: state.seconds - 1,
+          progressValue: (state.seconds - 1) / AppValues.timerTime,
+        ),
+      );
+      if (state.seconds <= 0) {
+        _timer?.cancel();
+      }
+    });
   }
 
   List<String> dashWords(List<String> words) {
@@ -95,7 +115,9 @@ class WordLinkCubit extends BaseCubitWrapper<WordLinkState> {
       _updatePoints(points);
 
       bool isLevelComplete = handleCompleteLevel(newFilledWords, points);
+      int bonus = 0;
       if (isLevelComplete) {
+        bonus = _calculateBonus(AppValues.timerTime - state.seconds);
         final newLevel = state.level?.copyWith(
           points: state.levelPoints,
           finishedAt: DateTime.now().millisecondsSinceEpoch,
@@ -112,6 +134,7 @@ class WordLinkCubit extends BaseCubitWrapper<WordLinkState> {
           levelPoints: state.levelPoints + points,
           isLevelComplete: isLevelComplete,
           hint: '',
+          bonus: bonus,
           hintWordIndex: -1,
         ),
       );
@@ -250,5 +273,9 @@ class WordLinkCubit extends BaseCubitWrapper<WordLinkState> {
     });
 
     return result;
+  }
+
+  int _calculateBonus(int timeLeft) {
+    return PointsManagement.calculateTimeLeftPoints(timeLeft: timeLeft);
   }
 }

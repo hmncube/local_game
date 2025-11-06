@@ -3,11 +3,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:local_game/app/themes/app_text_styles.dart';
-import 'package:local_game/app/themes/app_theme.dart';
 import 'package:local_game/core/base/cubit/cubit_status.dart';
 import 'package:local_game/core/constants/app_assets.dart';
 import 'package:local_game/core/di/di.dart';
 import 'package:local_game/core/routes.dart';
+import 'package:local_game/presentation/models/points.dart';
+import 'package:local_game/presentation/widget/animated_timer_bar.dart';
 import 'package:local_game/presentation/word_link/word_link_cubit.dart';
 import 'package:local_game/presentation/word_link/word_link_state.dart';
 import 'package:local_game/presentation/word_link/widgets/swipe_keyboard.dart';
@@ -86,7 +87,14 @@ class _WordLinkScreenState extends State<WordLinkScreen>
         }
 
         if (state.isLevelComplete) {
-          context.go(Routes.levelCompleteScreen.toPath);
+          context.go(
+            Routes.levelCompleteScreen.toPath,
+            extra: Points(
+              levelPoints: state.levelPoints,
+              totalPoints: state.totalPoints,
+              bonusPoints: state.bonus,
+            ),
+          );
         }
       },
       builder: (context, state) {
@@ -95,7 +103,6 @@ class _WordLinkScreenState extends State<WordLinkScreen>
           return LoadingScreen();
         }
         return Scaffold(
-          backgroundColor: AppTheme.accentGreen,
           body: Stack(
             children: [
               SafeArea(
@@ -107,6 +114,11 @@ class _WordLinkScreenState extends State<WordLinkScreen>
                       onHintClicked: () {},
                     ),
                     const SizedBox(height: 12),
+                    Text('Bonus timer'),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: AnimatedTimerBar(value: state.progressValue),
+                    ),
                     TextDisplay(words: state.filledWords),
                     Spacer(),
                     AnimatedOpacity(

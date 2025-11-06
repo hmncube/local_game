@@ -8,7 +8,10 @@ class WordLinkState extends Equatable {
   final int totalPoints;
   final int hintsCount;
   final int levelPoints;
+  final int bonus;
+  final int seconds;
   final int hintWordIndex;
+  final double progressValue;
   final bool isWordWrong;
   final bool isWordCorrect;
   final bool isLevelComplete;
@@ -27,6 +30,9 @@ class WordLinkState extends Equatable {
     this.hintsCount = 0,
     this.totalPoints = 0,
     this.hintWordIndex = 0,
+    this.bonus = 0,
+    this.seconds = 0,
+    this.progressValue = 0.0,
     this.wasWordEnteredBefore = false,
     this.isLevelComplete = false,
     this.hint = '',
@@ -44,7 +50,10 @@ class WordLinkState extends Equatable {
     int? hintsCount,
     int? totalPoints,
     int? levelPoints,
+    int? seconds,
+    int? bonus,
     int? hintWordIndex,
+    double? progressValue,
     LevelModel? level,
     bool? isLevelComplete,
     String? hint,
@@ -62,6 +71,8 @@ class WordLinkState extends Equatable {
       level: level ?? this.level,
       letters: letters ?? this.letters,
       words: words ?? this.words,
+      seconds: seconds ?? this.seconds,
+      bonus: bonus ?? this.bonus,
       hintsCount: hintsCount ?? this.hintsCount,
       totalPoints: totalPoints ?? this.totalPoints,
       levelPoints: levelPoints ?? this.levelPoints,
@@ -74,6 +85,7 @@ class WordLinkState extends Equatable {
       hint: hint ?? this.hint,
       hintWordIndex: hintWordIndex ?? this.hintWordIndex,
       userId: userId ?? this.userId,
+      progressValue: progressValue ?? this.progressValue,
     );
   }
 
@@ -86,6 +98,8 @@ class WordLinkState extends Equatable {
     totalPoints,
     hintsCount,
     hint,
+    seconds,
+    bonus,
     hintWordIndex,
     currentWord,
     filledWords,
@@ -95,5 +109,6 @@ class WordLinkState extends Equatable {
     wasWordEnteredBefore,
     userId,
     levelPoints,
+    progressValue,
   ];
 }

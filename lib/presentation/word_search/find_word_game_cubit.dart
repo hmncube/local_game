@@ -8,16 +8,14 @@ import 'package:local_game/core/constants/app_values.dart';
 import 'package:local_game/core/game_system/points_management.dart';
 import 'package:local_game/data/dao/level_dao.dart';
 import 'package:local_game/data/dao/user_dao.dart';
-import 'package:local_game/data/dao/word_dao.dart';
 import 'package:local_game/presentation/word_search/find_word_game_state.dart';
 
 @injectable
 class FindWordGameCubit extends BaseCubitWrapper<FindWordGameState> {
-  final WordDao _wordDao;
   final UserDao _userDao;
   final LevelDao _levelDao;
 
-  FindWordGameCubit(this._wordDao, this._userDao, this._levelDao)
+  FindWordGameCubit(this._userDao, this._levelDao)
     : super(FindWordGameState(cubitState: CubitInitial()));
 
   final List<Color> _availableColors = [
