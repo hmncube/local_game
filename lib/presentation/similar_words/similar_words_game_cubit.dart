@@ -147,23 +147,6 @@ class SimilarWordsGameCubit extends BaseCubitWrapper<SimilarWordsGameState> {
     await _levelDao.updateLevel(completedLevel);
   }
 
-  Future<({int totalScore, int levelScore})> _calculateAndUpdatePoints(
-    String questionWord,
-    String droppedWord,
-  ) async {
-    int totalScore = state.score;
-    int levelScore = state.levelPoints;
-
-    if (isCorrectAnswer(questionWord, droppedWord)) {
-      final earnedPoints = PointsManagement.calculatePoints(droppedWord);
-      totalScore += earnedPoints;
-      levelScore += earnedPoints;
-      await _userDao.updateTotalScore(state.userId, totalScore);
-    }
-
-    return (totalScore: totalScore, levelScore: levelScore);
-  }
-
   bool isCorrectAnswer(String question, String? answer) {
     return state.questionAnswers[question] == answer;
   }
