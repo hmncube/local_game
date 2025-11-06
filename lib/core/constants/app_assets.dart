@@ -32,6 +32,7 @@ mixin AppAssets {
   static const matchSvg = 'assets/svg/match.svg';
   static const linkSvg = 'assets/svg/link.svg';
   static const fnderSvg = 'assets/svg/finder.svg';
+
   //buttons
   static const btnBlueSvg = 'assets/svg/btn_blue.svg';
   static const btnGreenSvg = 'assets/svg/btn_green.svg';
@@ -42,4 +43,7 @@ mixin AppAssets {
   static const maskotSvg = 'assets/svg/mascot-learning.svg';
   static const maskotCelebratingSvg = 'assets/svg/mascot-celebration.svg';
   static const mascotSadSvg = 'assets/svg/mascot_sad.svg';
+
+  //animals
+  static const celebrationSvg = 'assets/svg/celebration.svg';
 }

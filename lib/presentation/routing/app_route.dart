@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:local_game/core/routes.dart';
 import 'package:local_game/presentation/crossword/crossword_screen.dart';
+import 'package:local_game/presentation/models/points.dart';
 import 'package:local_game/presentation/word_link/word_link_screen.dart';
 import 'package:local_game/presentation/level_complete/level_complete_screen.dart';
 import 'package:local_game/presentation/map/map_screen.dart';
@@ -72,12 +73,14 @@ class AppRoutes {
       GoRoute(
         path: Routes.similarWords.toPath,
         name: Routes.similarWords.toNamed,
-        builder: (context, state) =>  SimilarWordsGameScreen(levelId: (state.extra as int),),
+        builder:
+            (context, state) =>
+                SimilarWordsGameScreen(levelId: (state.extra as int)),
         pageBuilder:
             (context, state) => buildPageWithDefaultTransition(
               context: context,
               state: state,
-              child:  SimilarWordsGameScreen(levelId: (state.extra as int),),
+              child: SimilarWordsGameScreen(levelId: (state.extra as int)),
             ),
       ),
       GoRoute(
@@ -91,15 +94,17 @@ class AppRoutes {
               child: const CrosswordScreen(),
             ),
       ),
-       GoRoute(
+      GoRoute(
         path: Routes.levelCompleteScreen.toPath,
         name: Routes.levelCompleteScreen.toNamed,
-        builder: (context, state) => const LevelCompleteScreen(),
+        builder:
+            (context, state) =>
+                LevelCompleteScreen(points: state.extra as Points),
         pageBuilder:
             (context, state) => buildPageWithDefaultTransition(
               context: context,
               state: state,
-              child: const LevelCompleteScreen(),
+              child: LevelCompleteScreen(points: state.extra as Points),
             ),
       ),
     ],

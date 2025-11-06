@@ -20,6 +20,9 @@ class FindWordGameState extends Equatable {
   final int points;
   final int hints;
   final int levelPoints;
+  final int seconds;
+  final int bonus;
+  final double progressValue;
   final String userId;
   final String? hintError;
   final Position? hintPosition;
@@ -40,7 +43,10 @@ class FindWordGameState extends Equatable {
     this.newFoundWord = '',
     this.points = 0,
     this.hints = 0,
+    this.bonus = 0,
     this.levelPoints = 0,
+    this.seconds = 0,
+    this.progressValue = 0.0,
     this.userId = '',
     this.hintError,
     this.hintPosition,
@@ -63,6 +69,9 @@ class FindWordGameState extends Equatable {
     int? points,
     int? hints,
     int? levelPoints,
+    int? bonus,
+    int? seconds,
+    double? progressValue,
     String? userId,
     String? hintError,
     Position? hintPosition,
@@ -81,7 +90,10 @@ class FindWordGameState extends Equatable {
       wordColors: wordColors ?? this.wordColors,
       newFoundWord: newFoundWord ?? this.newFoundWord,
       points: points ?? this.points,
+      bonus: bonus ?? this.bonus,
       userId: userId ?? this.userId,
+      seconds: seconds ?? this.seconds,
+      progressValue: progressValue ?? this.progressValue,
       isAllComplete: isAllComplete ?? this.isAllComplete,
       hints: hints ?? this.hints,
       hintError: hintError ?? this.hintError,
@@ -106,10 +118,13 @@ class FindWordGameState extends Equatable {
     points,
     userId,
     hints,
+    bonus,
     hintPosition,
     isAllComplete,
     level,
     levelPoints,
+    seconds,
+    progressValue,
   ];
 }
 

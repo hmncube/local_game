@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:injectable/injectable.dart';
@@ -75,6 +76,24 @@ class FindWordGameCubit extends BaseCubitWrapper<FindWordGameState> {
         userId: user?.id,
       ),
     );
+    startGame();
+  }
+
+  Timer? _timer;
+  void startGame() {
+    _timer?.cancel();
+    emit(state.copyWith(seconds: AppValues.timerTime));
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      emit(
+        state.copyWith(
+          seconds: state.seconds - 1,
+          progressValue: (state.seconds - 1) / AppValues.timerTime,
+        ),
+      );
+      if (state.seconds <= 0) {
+        _timer?.cancel();
+      }
+    });
   }
 
   void _placeWords(
@@ -175,57 +194,132 @@ class FindWordGameCubit extends BaseCubitWrapper<FindWordGameState> {
   }
 
   Future<void> onDragEnd() async {
-    String newFoundWord = '';
-    var newFoundWords = state.foundWords;
-    var newWordColors = state.wordColors;
+    final selectedWord = _getSelectedWord();
+    final matchedWord = _findMatchedWord(selectedWord);
 
-    if (state.selectedPositions.length > 1) {
-      String selectedWord = state.selectedPositions
-          .map((pos) => state.grid[pos.row][pos.col])
-          .join('');
-      String reversedWord = selectedWord.split('').reversed.join('');
-      String? matchedWord;
-
-      if (state.wordsToFind.contains(selectedWord) &&
-          !state.foundWords.contains(selectedWord)) {
-        matchedWord = selectedWord;
-      } else if (state.wordsToFind.contains(reversedWord) &&
-          !state.foundWords.contains(reversedWord)) {
-        matchedWord = reversedWord;
-      }
-
-      if (matchedWord != null) {
-        newFoundWords = List<String>.from(state.foundWords)..add(matchedWord);
-        newWordColors = Map<String, Color>.from(state.wordColors);
-        int colorIndex = newFoundWords.length - 1;
-        newWordColors[matchedWord] =
-            _availableColors[colorIndex % _availableColors.length];
-        newFoundWord = matchedWord;
-      }
-    }
-    final points = PointsManagement.calculatePoints(newFoundWord);
-    _updatePoints(points);
-    final isAllComplete = newFoundWords.length == state.wordsToFind.length;
-    if (isAllComplete) {
-      final newLevel = state.level?.copyWith(
-        points: state.levelPoints,
-        finishedAt: DateTime.now().millisecondsSinceEpoch,
-        status: AppValues.levelDone,
+    if (matchedWord != null) {
+      final updatedFoundWords = _addFoundWord(matchedWord);
+      final wordColor = _assignColorToWord(
+        matchedWord,
+        updatedFoundWords.length,
       );
-      await _levelDao.updateLevel(newLevel);
+      final points = _calculatePoints(word: matchedWord);
+      final isComplete = _isLevelComplete(updatedFoundWords);
+      int bonus = 0;
+      if (isComplete) {
+        bonus = _calculateBonus(AppValues.timerTime - state.seconds);
+        await _completeLevel();
+      }
+      _updatePoints(points + bonus);
+      await _updateTotalScore(points);
+
+      _emitStateWithFoundWord(
+        matchedWord: matchedWord,
+        foundWords: updatedFoundWords,
+        wordColor: wordColor,
+        points: points,
+        isComplete: isComplete,
+        bonus: bonus,
+      );
+    } else {
+      _emitStateWithoutMatch();
     }
+  }
+
+  String _getSelectedWord() {
+    return state.selectedPositions
+        .map((pos) => state.grid[pos.row][pos.col])
+        .join('');
+  }
+
+  String? _findMatchedWord(String selectedWord) {
+    if (state.selectedPositions.length <= 1) {
+      return null;
+    }
+
+    if (_isValidWord(selectedWord)) {
+      return selectedWord;
+    }
+
+    final reversedWord = _reverseWord(selectedWord);
+    if (_isValidWord(reversedWord)) {
+      return reversedWord;
+    }
+
+    return null;
+  }
+
+  bool _isValidWord(String word) {
+    return state.wordsToFind.contains(word) && !state.foundWords.contains(word);
+  }
+
+  String _reverseWord(String word) {
+    return word.split('').reversed.join('');
+  }
+
+  List<String> _addFoundWord(String word) {
+    return List<String>.from(state.foundWords)..add(word);
+  }
+
+  Color _assignColorToWord(String word, int foundWordsCount) {
+    final colorIndex = foundWordsCount - 1;
+    return _availableColors[colorIndex % _availableColors.length];
+  }
+
+  int _calculatePoints({required String word}) {
+    return PointsManagement.calculatePoints(word);
+  }
+
+  bool _isLevelComplete(List<String> foundWords) {
+    return foundWords.length == state.wordsToFind.length;
+  }
+
+  Future<void> _completeLevel() async {
+    final completedLevel = state.level?.copyWith(
+      points: state.levelPoints,
+      finishedAt: DateTime.now().millisecondsSinceEpoch,
+      status: AppValues.levelDone,
+    );
+    await _levelDao.updateLevel(completedLevel);
+  }
+
+  Future<void> _updateTotalScore(int points) async {
+    await _userDao.updateTotalScore(state.userId, state.points + points);
+  }
+
+  void _emitStateWithFoundWord({
+    required String matchedWord,
+    required List<String> foundWords,
+    required Color wordColor,
+    required int points,
+    required int bonus,
+    required bool isComplete,
+  }) {
+    final updatedWordColors = Map<String, Color>.from(state.wordColors);
+    updatedWordColors[matchedWord] = wordColor;
 
     emit(
       state.copyWith(
         selectedPositions: [],
         startPosition: const Position.invalid(),
         isDragging: false,
-        foundWords: newFoundWords,
-        isAllComplete: isAllComplete,
-        wordColors: newWordColors,
-        newFoundWord: newFoundWord,
+        foundWords: foundWords,
+        isAllComplete: isComplete,
+        wordColors: updatedWordColors,
+        newFoundWord: matchedWord,
+        bonus: bonus,
         points: state.points + points,
         levelPoints: state.levelPoints + points,
+      ),
+    );
+  }
+
+  void _emitStateWithoutMatch() {
+    emit(
+      state.copyWith(
+        selectedPositions: [],
+        startPosition: const Position.invalid(),
+        isDragging: false,
       ),
     );
   }
@@ -287,5 +381,9 @@ class FindWordGameCubit extends BaseCubitWrapper<FindWordGameState> {
 
   void updateHintDb(int hints) {
     _userDao.updateHints(state.userId, hints);
+  }
+
+  int _calculateBonus(int timeLeft) {
+    return PointsManagement.calculateTimeLeftPoints(timeLeft: timeLeft);
   }
 }

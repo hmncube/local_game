@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:local_game/core/di/di.dart';
 import 'package:local_game/core/routes.dart';
+import 'package:local_game/presentation/models/points.dart';
+import 'package:local_game/presentation/widget/animated_timer_bar.dart';
 import 'package:local_game/presentation/widget/game_top_bar.dart';
 import 'package:local_game/presentation/word_search/find_word_game_cubit.dart';
 import 'package:local_game/presentation/word_search/find_word_game_state.dart';
@@ -62,7 +64,14 @@ class _FindWordGameScreenState extends State<FindWordGameScreen> {
           }
 
           if (state.isAllComplete) {
-            context.go(Routes.levelCompleteScreen.toPath);
+            context.go(
+              Routes.levelCompleteScreen.toPath,
+              extra: Points(
+                levelPoints: state.levelPoints,
+                totalPoints: state.points,
+                bonusPoints: state.bonus,
+              ),
+            );
           }
         },
         builder: (context, state) {
@@ -77,7 +86,10 @@ class _FindWordGameScreenState extends State<FindWordGameScreen> {
                       hints: state.hints,
                       onHintClicked: () => _cubit.onHintClicked(),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 8),
+                    Text('Bonus timer'),
+                    AnimatedTimerBar(value: state.progressValue),
+                    const SizedBox(height: 8),
                     GameGrid(
                       state: state,
                       cubit: _cubit,

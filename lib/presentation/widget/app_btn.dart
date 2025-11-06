@@ -7,11 +7,13 @@ class AppBtn extends StatefulWidget {
   final Function onClick;
   final bool isEnabled;
   final String title;
+  final double? width;
   const AppBtn({
     super.key,
     required this.onClick,
     required this.title,
     required this.isEnabled,
+    this.width,
   });
 
   @override
@@ -37,7 +39,7 @@ class _AppBtnState extends State<AppBtn> {
       },
       child: SizedBox(
         height: 60,
-        width: 200,
+        width: widget.width ?? 200,
         child: Stack(
           children: [
             Positioned.fill(

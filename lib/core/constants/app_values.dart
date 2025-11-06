@@ -7,4 +7,7 @@ mixin AppValues {
   // 0 not done and 1 done
   static const int levelNotDone = 0;
   static const int levelDone = 1;
+
+
+  static const int timerTime = 90;
 }

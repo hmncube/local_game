@@ -4,6 +4,14 @@ class PointsManagement {
   static const int perfectTimeSeconds = 3;
   static const int goodTimeSeconds = 10;
 
+  static const int maxTimeBonus = 50;
+  static const int totalGameTime = 90; // seconds
+
+  // Time thresholds (remaining time)
+  static const int excellentTimeRemaining = 60; // 30s used = excellent
+  static const int goodTimeRemaining = 30; // 60s used = good
+  static const int fairTimeRemaining = 10; // 80s used = fair
+
   static int calculateTimePoints(String word, {required int seconds}) {
     return calculatePoints(word) + _calculateTimeBonus(seconds);
   }
@@ -74,5 +82,41 @@ class PointsManagement {
     } else {
       return 1;
     }
+  }
+
+  static int calculateTimeLeftPoints({required int timeLeft}) {
+    return _calculateTimeLeftBonus(timeLeft);
+  }
+
+  static int _calculateTimeLeftBonus(int remainingSeconds) {
+    // Clamp to valid range
+    remainingSeconds = remainingSeconds.clamp(0, totalGameTime);
+
+    if (remainingSeconds >= excellentTimeRemaining) {
+      // Excellent: Still have 60+ seconds = Full bonus
+      return maxTimeBonus;
+    } else if (remainingSeconds >= goodTimeRemaining) {
+      // Good: 30-60 seconds remaining = 70-100% bonus
+      final ratio =
+          (remainingSeconds - goodTimeRemaining) /
+          (excellentTimeRemaining - goodTimeRemaining);
+      final bonusPercent = 0.7 + (ratio * 0.3); // 70% to 100%
+      return (maxTimeBonus * bonusPercent).round();
+    } else if (remainingSeconds >= fairTimeRemaining) {
+      // Fair: 10-30 seconds remaining = 30-70% bonus
+      final ratio =
+          (remainingSeconds - fairTimeRemaining) /
+          (goodTimeRemaining - fairTimeRemaining);
+      final bonusPercent = 0.3 + (ratio * 0.4); // 30% to 70%
+      return (maxTimeBonus * bonusPercent).round();
+    } else if (remainingSeconds > 0) {
+      // Poor: 1-10 seconds remaining = 10-30% bonus
+      final ratio = remainingSeconds / fairTimeRemaining;
+      final bonusPercent = 0.1 + (ratio * 0.2); // 10% to 30%
+      return (maxTimeBonus * bonusPercent).round();
+    }
+
+    // Time's up: minimum bonus
+    return (maxTimeBonus * 0.05).round(); // 5% bonus
   }
 }
