@@ -67,18 +67,14 @@ Future<_i174.GetIt> init(
   gh.factory<_i0.LevelDao>(
     () => _i0.LevelDao(gh<_i90.DatabaseProvider>(), gh<_i861.WordDao>()),
   );
+  gh.factory<_i359.FindWordGameCubit>(
+    () => _i359.FindWordGameCubit(gh<_i390.UserDao>(), gh<_i0.LevelDao>()),
+  );
   gh.factory<_i901.WordLinkCubit>(
     () => _i901.WordLinkCubit(
       gh<_i0.LevelDao>(),
       gh<_i390.UserDao>(),
       gh<_i64.SoundManager>(),
-    ),
-  );
-  gh.factory<_i359.FindWordGameCubit>(
-    () => _i359.FindWordGameCubit(
-      gh<_i861.WordDao>(),
-      gh<_i390.UserDao>(),
-      gh<_i0.LevelDao>(),
     ),
   );
   gh.factory<_i621.MapCubit>(

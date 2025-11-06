@@ -169,19 +169,20 @@ class _LevelCompleteScreenState extends State<LevelCompleteScreen>
                 child: ScaleTransition(
                   scale: _scaleAnimation,
                   child: Column(
-                    children: [
-                      Lottie.asset(
-                        width: double.infinity,
-                        height: 200,
-                        AppAssets.fallingCoins,
-                        repeat: false,
-                      ),                      
+                    children: [              
                       // Points Display
                       _buildPointsDisplay(),
 
                       Lottie.asset(
                         width: double.infinity,
-                        height: 200,
+                        height: 100,
+                        AppAssets.fallingCoins,
+                        repeat: false,
+                      ),        
+                      
+                      Lottie.asset(
+                        width: double.infinity,
+                        height: 100,
                         AppAssets.coinsChest,
                         repeat: false,
                       ),
@@ -209,7 +210,7 @@ class _LevelCompleteScreenState extends State<LevelCompleteScreen>
       children: [
         Positioned(
           child: SizedBox(
-            height: 400,
+            height: 350,
             child: SvgPicture.asset(AppAssets.inputSvg, fit: BoxFit.fill),
           ),
         ),
