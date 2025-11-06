@@ -12,6 +12,7 @@ class SimilarWordsGameState extends Equatable {
   final int hints;
   final LevelModel? level;
   final int levelPoints;
+  final int bonus;
   final int seconds;
   final String userId;
   final bool isGameComplete;
@@ -24,6 +25,7 @@ class SimilarWordsGameState extends Equatable {
     this.usedWords = const {},
     this.score = 0,
     this.hints = 0,
+    this.bonus = 0,
     this.seconds = 0,
     this.userId = '',
     this.level,
@@ -42,6 +44,7 @@ class SimilarWordsGameState extends Equatable {
     int? score,
     int? hints,
     int? seconds,
+    int? bonus,
     String? userId,
     bool? isGameComplete,
   }) {
@@ -58,6 +61,7 @@ class SimilarWordsGameState extends Equatable {
       level: level ?? this.level,
       isGameComplete: isGameComplete ?? this.isGameComplete,
       seconds: seconds ?? this.seconds,
+      bonus: bonus ?? this.bonus,
     );
   }
 
@@ -74,6 +78,7 @@ class SimilarWordsGameState extends Equatable {
     isGameComplete,
     level,
     levelPoints,
+    bonus,
     seconds,
   ];
 }

@@ -5,6 +5,7 @@ import 'package:local_game/app/themes/app_text_styles.dart';
 import 'package:local_game/core/di/di.dart';
 import 'package:local_game/core/extensions/time_extension.dart';
 import 'package:local_game/core/routes.dart';
+import 'package:local_game/presentation/models/points.dart';
 import 'package:local_game/presentation/similar_words/similar_words_game_cubit.dart';
 import 'package:local_game/presentation/similar_words/similar_words_game_state.dart';
 import 'package:local_game/presentation/widget/game_top_bar.dart';
@@ -34,7 +35,14 @@ class _SimilarWordsGameScreenState extends State<SimilarWordsGameScreen> {
       child: BlocConsumer<SimilarWordsGameCubit, SimilarWordsGameState>(
         listener: (context, state) {
           if (state.isGameComplete) {
-            context.go(Routes.levelCompleteScreen.toPath);
+            context.go(
+              Routes.levelCompleteScreen.toPath,
+              extra: Points(
+                totalPoints: state.score,
+                levelPoints: state.levelPoints,
+                bonusPoints: state.bonus,
+              ),
+            );
           }
         },
         builder: (context, state) {
@@ -53,7 +61,12 @@ class _SimilarWordsGameScreenState extends State<SimilarWordsGameScreen> {
                     const SizedBox(height: 20),
                     Stack(
                       children: [
-                        Text(state.seconds.toTimeString(), style: AppTextStyles.keyboardKey.copyWith(fontSize: 24),),
+                        Text(
+                          state.seconds.toTimeString(),
+                          style: AppTextStyles.keyboardKey.copyWith(
+                            fontSize: 24,
+                          ),
+                        ),
                       ],
                     ),
                     const SizedBox(height: 12),
@@ -413,11 +426,6 @@ class _SimilarWordsGameScreenState extends State<SimilarWordsGameScreen> {
 
                     const SizedBox(height: 20),
 
-                    // Check answers button
-                    // pano
-                    // points
-                    // UI
-                    // onComplete
                     if (state.userAnswers.values.every(
                       (answer) => answer != null,
                     ))

@@ -13,10 +13,10 @@ class PointsManagement {
   static const int fairTimeRemaining = 10; // 80s used = fair
 
   static int calculateTimePoints(String word, {required int seconds}) {
-    return calculatePoints(word) + _calculateTimeBonus(seconds);
+    return calculatePoints(word) + calculateTimeBonus(seconds);
   }
 
-  static int _calculateTimeBonus(int seconds) {
+  static int calculateTimeBonus(int seconds) {
     if (seconds <= perfectTimeSeconds) {
       return timeBonus; // Full bonus
     } else if (seconds <= goodTimeSeconds) {

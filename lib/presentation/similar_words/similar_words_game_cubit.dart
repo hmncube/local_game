@@ -91,25 +91,27 @@ class SimilarWordsGameCubit extends BaseCubitWrapper<SimilarWordsGameState> {
         userAnswers: userAnswers,
         score: points.totalScore,
         levelPoints: points.levelScore,
+        bonus: state.bonus + points.bonus,
         isGameComplete: isGameComplete,
       ),
     );
     startGame();
   }
 
-  Future<({int totalScore, int levelScore})> _updatePoints(
+  Future<({int totalScore, int levelScore, int bonus})> _updatePoints(
     String droppedWord,
   ) async {
-    final earnedPoints = PointsManagement.calculateTimePoints(
+    final earnedPoints = PointsManagement.calculatePoints(
       droppedWord,
-      seconds: state.seconds,
     );
+
+    final bonus = PointsManagement.calculateTimeBonus(state.seconds);
     final totalScore = state.score + earnedPoints;
     final levelScore = state.levelPoints + earnedPoints;
 
     await _userDao.updateTotalScore(state.userId, totalScore);
 
-    return (totalScore: totalScore, levelScore: levelScore);
+    return (totalScore: totalScore, levelScore: levelScore, bonus: bonus);
   }
 
   Map<String, String?> _updateUserAnswers(
