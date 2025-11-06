@@ -75,29 +75,37 @@ class _FindWordGameScreenState extends State<FindWordGameScreen> {
           }
         },
         builder: (context, state) {
-          return Scaffold(
-            body: SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  children: [
-                    GameTopBar(
-                      points: state.points,
-                      hints: state.hints,
-                      onHintClicked: () => _cubit.onHintClicked(),
-                    ),
-                    const SizedBox(height: 8),
-                    Text('Bonus timer'),
-                    AnimatedTimerBar(value: state.progressValue),
-                    const SizedBox(height: 8),
-                    GameGrid(
-                      state: state,
-                      cubit: _cubit,
-                      hintPosition: state.hintPosition,
-                    ),
-                    const SizedBox(height: 16),
-                    WordsToFind(state: state),
-                  ],
+          return PopScope(
+            canPop: false,
+            onPopInvokedWithResult: (didPop, result) {
+              if (!didPop) {
+                context.go(Routes.mapScreen.toPath);
+              }
+            },
+            child: Scaffold(
+              body: SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      GameTopBar(
+                        points: state.points,
+                        hints: state.hints,
+                        onHintClicked: () => _cubit.onHintClicked(),
+                      ),
+                      const SizedBox(height: 8),
+                      Text('Bonus timer'),
+                      AnimatedTimerBar(value: state.progressValue),
+                      const SizedBox(height: 8),
+                      GameGrid(
+                        state: state,
+                        cubit: _cubit,
+                        hintPosition: state.hintPosition,
+                      ),
+                      const SizedBox(height: 16),
+                      WordsToFind(state: state),
+                    ],
+                  ),
                 ),
               ),
             ),

@@ -4,6 +4,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:local_game/app/themes/app_text_styles.dart';
 import 'package:local_game/core/base/cubit/cubit_status.dart';
+import 'package:local_game/core/base/state/common_base_state_wrapper.dart';
 import 'package:local_game/core/constants/app_assets.dart';
 import 'package:local_game/core/di/di.dart';
 import 'package:local_game/core/routes.dart';
@@ -65,7 +66,6 @@ class _WordLinkScreenState extends State<WordLinkScreen>
     _controller.forward(from: 0);
   }
 
-  bool _showAlreadyEntered = false;
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<WordLinkCubit, WordLinkState>(
@@ -76,14 +76,21 @@ class _WordLinkScreenState extends State<WordLinkScreen>
         }
 
         if (state.wasWordEnteredBefore) {
-          setState(() => _showAlreadyEntered = true);
-
-          Future.delayed(const Duration(seconds: 3), () {
-            if (mounted) {
-              _cubit.resetWasWordEnteredBefore();
-              setState(() => _showAlreadyEntered = false);
-            }
-          });
+          _cubit.resetWasWordEnteredBefore();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'The word has been entered before',
+                style: AppTextStyles.heading2,
+              ),
+              duration: const Duration(seconds: 2),
+              behavior: SnackBarBehavior.floating,
+              margin: const EdgeInsets.all(16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+          );
         }
 
         if (state.isLevelComplete) {
@@ -102,71 +109,68 @@ class _WordLinkScreenState extends State<WordLinkScreen>
             state.cubitState is CubitInitial) {
           return LoadingScreen();
         }
-        return Scaffold(
-          body: Stack(
-            children: [
-              SafeArea(
-                child: Column(
-                  children: [
-                    GameTopBar(
-                      points: state.totalPoints,
-                      hints: state.hintsCount,
-                      onHintClicked: () {},
-                    ),
-                    const SizedBox(height: 12),
-                    Text('Bonus timer'),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: AnimatedTimerBar(value: state.progressValue),
-                    ),
-                    TextDisplay(words: state.filledWords),
-                    Spacer(),
-                    AnimatedOpacity(
-                      opacity: _showAlreadyEntered ? 1.0 : 0.0,
-                      duration: const Duration(milliseconds: 800),
-                      child: Text(
-                        'Shoko iri ratopinda kare',
-                        style: AppTextStyles.heading1.copyWith(
-                          color: Colors.white,
-                        ),
+        return PopScope(
+          canPop: false,
+          onPopInvokedWithResult: (didPop, result) {
+            if (!didPop) {
+              context.go(Routes.mapScreen.toPath);
+            }
+          },
+          child: Scaffold(
+            backgroundColor: const Color.fromARGB(255, 99, 91, 18),
+            body: Stack(
+              children: [
+                SafeArea(
+                  child: Column(
+                    children: [
+                      GameTopBar(
+                        points: state.totalPoints,
+                        hints: state.hintsCount,
+                        onHintClicked: () {},
                       ),
-                    ),
-                    Spacer(),
-                    Stack(
-                      children: [
-                        Positioned.fill(
-                          child: SvgPicture.asset(
-                            AppAssets.inputSvg,
-                            fit: BoxFit.fill,
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Center(
-                            child: Text(
-                              state.currentWord.join(''),
-                              style: AppTextStyles.heading1,
+                      const SizedBox(height: 8),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: AnimatedTimerBar(value: state.progressValue),
+                      ),
+                      TextDisplay(words: state.filledWords),
+                      Spacer(),
+                      Stack(
+                        children: [
+                          Positioned.fill(
+                            child: SvgPicture.asset(
+                              AppAssets.inputSvg,
+                              fit: BoxFit.fill,
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    SwipeKeyboard(
-                      enabledLetters: state.letters,
-                      onKeyPressed: (letter) {
-                        _cubit.updateCurrentWord(letter);
-                      },
-                      onCheckUserInput: () {
-                        _cubit.onCheckUserInput();
-                      },
-                    ),
-                    const SizedBox(height: 32),
-                  ],
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Center(
+                              child: Text(
+                                state.currentWord.join(''),
+                                style: AppTextStyles.heading1,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      SwipeKeyboard(
+                        enabledLetters: state.letters,
+                        onKeyPressed: (letter) {
+                          _cubit.updateCurrentWord(letter);
+                        },
+                        onCheckUserInput: () {
+                          _cubit.onCheckUserInput();
+                        },
+                      ),
+                      const SizedBox(height: 32),
+                    ],
+                  ),
                 ),
-              ),
-              if (state.isLevelComplete) Center(child: _buildLevelComplete()),
-            ],
+                if (state.isLevelComplete) Center(child: _buildLevelComplete()),
+              ],
+            ),
           ),
         );
       },

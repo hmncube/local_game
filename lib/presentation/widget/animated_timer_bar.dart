@@ -31,7 +31,6 @@ class _AnimatedTimerBarState extends State<AnimatedTimerBar>
   void didUpdateWidget(AnimatedTimerBar oldWidget) {
     super.didUpdateWidget(oldWidget);
     
-    // Start pulsing when entering danger zone
     if (widget.value <= 0.2 && oldWidget.value > 0.2) {
       _pulseController.repeat(reverse: true);
     } else if (widget.value > 0.2) {

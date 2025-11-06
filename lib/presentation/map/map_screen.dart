@@ -99,7 +99,7 @@ class _MapScreenState extends State<MapScreen> {
                             itemBuilder: (context, index) {
                               final level = state.levels[index];
                               final isCompleted = level.status == 1;
-                              final isUnLocked = true;//unLocked.id == level.id;
+                              final isUnLocked = unLocked.id == level.id;
                               return LevelButton(
                                 levelId: level.id,
                                 type: level.type,
@@ -111,7 +111,7 @@ class _MapScreenState extends State<MapScreen> {
                                         )
                                         : 0,
                                 onTap: () {
-                                  //todo unloack completed level animatio
+                                  //todo unloack completed level animation
                                   !isUnLocked
                                       ? null
                                       : context.go(
