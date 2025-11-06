@@ -99,7 +99,7 @@ class _MapScreenState extends State<MapScreen> {
                             itemBuilder: (context, index) {
                               final level = state.levels[index];
                               final isCompleted = level.status == 1;
-                              final isUnLocked = unLocked.id == level.id;
+                              final isUnLocked = true;//unLocked.id == level.id;
                               return LevelButton(
                                 levelId: level.id,
                                 type: level.type,

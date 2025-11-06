@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:injectable/injectable.dart';
 import 'package:local_game/core/base/cubit/base_cubit_wrapper.dart';
 import 'package:local_game/core/base/cubit/cubit_status.dart';
@@ -11,12 +13,15 @@ import 'package:local_game/presentation/similar_words/similar_words_game_state.d
 class SimilarWordsGameCubit extends BaseCubitWrapper<SimilarWordsGameState> {
   final LevelDao _levelDao;
   final UserDao _userDao;
+  Timer? _timer;
 
   SimilarWordsGameCubit(this._levelDao, this._userDao)
     : super(SimilarWordsGameState(cubitState: CubitInitial()));
 
   @override
-  void dispose() {}
+  void dispose() {
+    _timer?.cancel();
+  }
 
   Future<void> initializeGame({required int levelId}) async {
     emit(state.copyWith(cubitState: CubitLoading()));
@@ -61,6 +66,14 @@ class SimilarWordsGameCubit extends BaseCubitWrapper<SimilarWordsGameState> {
     );
   }
 
+  void startGame() {
+    _timer?.cancel();
+    emit(state.copyWith(seconds: 0));
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      emit(state.copyWith(seconds: state.seconds + 1));
+    });
+  }
+
   Future<void> onWordDropped(String questionWord, String droppedWord) async {
     final userAnswers = _updateUserAnswers(questionWord, droppedWord);
     final usedWords = _updateUsedWords(questionWord, droppedWord);
@@ -70,7 +83,7 @@ class SimilarWordsGameCubit extends BaseCubitWrapper<SimilarWordsGameState> {
       await _completeLevel();
     }
 
-    final points = await _calculateAndUpdatePoints(questionWord, droppedWord);
+    final points = await _updatePoints(droppedWord);
 
     emit(
       state.copyWith(
@@ -81,6 +94,22 @@ class SimilarWordsGameCubit extends BaseCubitWrapper<SimilarWordsGameState> {
         isGameComplete: isGameComplete,
       ),
     );
+    startGame();
+  }
+
+  Future<({int totalScore, int levelScore})> _updatePoints(
+    String droppedWord,
+  ) async {
+    final earnedPoints = PointsManagement.calculateTimePoints(
+      droppedWord,
+      seconds: state.seconds,
+    );
+    final totalScore = state.score + earnedPoints;
+    final levelScore = state.levelPoints + earnedPoints;
+
+    await _userDao.updateTotalScore(state.userId, totalScore);
+
+    return (totalScore: totalScore, levelScore: levelScore);
   }
 
   Map<String, String?> _updateUserAnswers(
@@ -109,6 +138,7 @@ class SimilarWordsGameCubit extends BaseCubitWrapper<SimilarWordsGameState> {
   }
 
   Future<void> _completeLevel() async {
+    _timer?.cancel();
     final completedLevel = state.level?.copyWith(
       points: state.levelPoints,
       finishedAt: DateTime.now().millisecondsSinceEpoch,

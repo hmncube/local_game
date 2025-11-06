@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:local_game/app/themes/app_text_styles.dart';
 import 'package:local_game/core/di/di.dart';
+import 'package:local_game/core/extensions/time_extension.dart';
 import 'package:local_game/core/routes.dart';
 import 'package:local_game/presentation/similar_words/similar_words_game_cubit.dart';
 import 'package:local_game/presentation/similar_words/similar_words_game_state.dart';
@@ -23,6 +24,7 @@ class _SimilarWordsGameScreenState extends State<SimilarWordsGameScreen> {
     super.initState();
     _cubit = getIt<SimilarWordsGameCubit>();
     _cubit.initializeGame(levelId: widget.levelId);
+    _cubit.startGame();
   }
 
   @override
@@ -49,6 +51,12 @@ class _SimilarWordsGameScreenState extends State<SimilarWordsGameScreen> {
                       onHintClicked: () {},
                     ),
                     const SizedBox(height: 20),
+                    Stack(
+                      children: [
+                        Text(state.seconds.toTimeString(), style: AppTextStyles.keyboardKey.copyWith(fontSize: 24),),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
                     Text(
                       'Drag words from the selection list to match them with similar words below:',
                       style: AppTextStyles.keyboardKey.copyWith(fontSize: 16),

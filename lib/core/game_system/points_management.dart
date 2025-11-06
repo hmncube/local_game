@@ -1,4 +1,26 @@
 class PointsManagement {
+  static const int basePoints = 10;
+  static const int timeBonus = 20;
+  static const int perfectTimeSeconds = 3;
+  static const int goodTimeSeconds = 10;
+
+  static int calculateTimePoints(String word, {required int seconds}) {
+    return calculatePoints(word) + _calculateTimeBonus(seconds);
+  }
+
+  static int _calculateTimeBonus(int seconds) {
+    if (seconds <= perfectTimeSeconds) {
+      return timeBonus; // Full bonus
+    } else if (seconds <= goodTimeSeconds) {
+      // Linear decay between perfect and good time
+      final ratio =
+          (seconds - perfectTimeSeconds) /
+          (goodTimeSeconds - perfectTimeSeconds);
+      return (timeBonus * (1 - ratio)).round();
+    }
+    return 0; // No bonus after good time threshold
+  }
+
   static int calculatePoints(String word) {
     // Letter frequency scores (rarer letters = higher points)
     final Map<String, int> letterScores = {
