@@ -8,25 +8,34 @@
 
 ### Essential Tables Only
 
-#### 1. Words Table
+#### 1. Word Groups Table
 ```sql
-CREATE TABLE words (
+CREATE TABLE word_groups (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    word TEXT NOT NULL,
-    language TEXT NOT NULL CHECK(language IN ('shona', 'ndebele')),
-    word_length INTEGER NOT NULL,
-    difficulty INTEGER DEFAULT 2 CHECK(difficulty BETWEEN 1 AND 3),
-    english_translation TEXT NOT NULL,
-    definition TEXT,
-    is_active BOOLEAN DEFAULT TRUE,
-    created_at INTEGER DEFAULT (strftime('%s', 'now')),
-    UNIQUE(word, language)
+    created_at INTEGER DEFAULT (strftime('%s', 'now'))
 );
 ```
 
-**Why this works**: Single source of truth for vocabulary. English translation embedded for simplicity. Difficulty levels keep it manageable.
+#### 2. Words Table
+```sql
+CREATE TABLE words (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    group_id INTEGER NOT NULL,
+    word TEXT NOT NULL,
+    language TEXT NOT NULL CHECK(language IN ('shona', 'ndebele', 'english')),
+    word_length INTEGER NOT NULL,
+    difficulty INTEGER DEFAULT 2 CHECK(difficulty BETWEEN 1 AND 3),
+    definition TEXT,
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at INTEGER DEFAULT (strftime('%s', 'now')),
+    UNIQUE(word, language),
+    FOREIGN KEY (group_id) REFERENCES word_groups(id) ON DELETE CASCADE
+);
+```
 
-#### 2. Users Table
+**Why this works**: Normalised structure to support translations. A `word_group` represents a concept, and `words` in different languages can belong to a group.
+
+#### 3. Users Table
 ```sql
 CREATE TABLE users (
     id TEXT PRIMARY KEY, -- UUID
@@ -45,7 +54,7 @@ CREATE TABLE users (
 
 **Why this works**: All essential user data in one place. Basic stats that players actually care about. Settings as JSON for flexibility without table bloat.
 
-#### 3. Game Sessions Table
+#### 4. Game Sessions Table
 ```sql
 CREATE TABLE game_sessions (
     id TEXT PRIMARY KEY, -- UUID
@@ -66,7 +75,7 @@ CREATE TABLE game_sessions (
 
 **Why this works**: Complete game state in one record. JSON guesses array stores all attempts without separate table complexity.
 
-#### 4. Daily Challenges Table
+#### 5. Daily Challenges Table
 ```sql
 CREATE TABLE daily_challenges (
     challenge_date DATE PRIMARY KEY,

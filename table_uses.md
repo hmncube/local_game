@@ -237,7 +237,7 @@ INSERT INTO users (id, username, preferred_language)
 VALUES (?, ?, 'shona');
 
 -- User immediately gets today's challenge
-SELECT w.word, w.word_length, w.difficulty, w.english_translation
+SELECT w.word, w.word_length, w.difficulty
 FROM words w
 JOIN daily_challenges dc ON w.id = dc.word_id
 WHERE dc.challenge_date = date('now');

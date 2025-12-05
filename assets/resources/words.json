@@ -1,0 +1,111 @@
+{
+  "words": {
+    "home": [
+      { "en": "house", "sn": "imba", "nd": "indlu" },
+      { "en": "room", "sn": "kamuri", "nd": "igumbi" },
+      { "en": "door", "sn": "suwo", "nd": "isicabha" },
+      { "en": "window", "sn": "hwindo", "nd": "iwindi" },
+      { "en": "kitchen", "sn": "kicheni", "nd": "ikhitshi" },
+      { "en": "bedroom", "sn": "imba yekurara", "nd": "igumbi lokulala" },
+      { "en": "bathroom", "sn": "imba yekugezera", "nd": "indlu yangasese" },
+      { "en": "roof", "sn": "denga", "nd": "uphahla" },
+      { "en": "floor", "sn": "pasi", "nd": "iphansi" },
+      { "en": "wall", "sn": "madziro", "nd": "udonga" },
+      { "en": "chair", "sn": "chigaro", "nd": "isihlalo" },
+      { "en": "table", "sn": "tafura", "nd": "itafula" },
+      { "en": "bed", "sn": "mubhedha", "nd": "umbhede" },
+      { "en": "light", "sn": "chiedza", "nd": "isibani" },
+      { "en": "yard", "sn": "ruvanze", "nd": "igceke" }
+    ],
+
+    "food": [
+      { "en": "food", "sn": "chikafu", "nd": "ukudla" },
+      { "en": "water", "sn": "mvura", "nd": "amanzi" },
+      { "en": "meal", "sn": "kudya", "nd": "isidlo" },
+      { "en": "meat", "sn": "nyama", "nd": "inyama" },
+      { "en": "vegetables", "sn": "muriwo", "nd": "imifino" },
+      { "en": "fruit", "sn": "muchero", "nd": "izithelo" },
+      { "en": "bread", "sn": "chingwa", "nd": "isinkwa" },
+      { "en": "rice", "sn": "mupunga", "nd": "irayisi" },
+      { "en": "maize", "sn": "chibage", "nd": "umbila" },
+      { "en": "milk", "sn": "mukaka", "nd": "ubisi" },
+      { "en": "tea", "sn": "tii", "nd": "itiya" },
+      { "en": "sugar", "sn": "shuga", "nd": "ushukela" },
+      { "en": "salt", "sn": "munyu", "nd": "usawoti" },
+      { "en": "peanut butter", "sn": "dovi", "nd": "ibhotha lamantongomane" },
+      { "en": "sadza", "sn": "sadza", "nd": "isitshwala" }
+    ],
+
+    "family": [
+      { "en": "family", "sn": "mhuri", "nd": "umndeni" },
+      { "en": "person", "sn": "munhu", "nd": "umuntu" },
+      { "en": "father", "sn": "baba", "nd": "ubaba" },
+      { "en": "mother", "sn": "amai", "nd": "umama" },
+      { "en": "child", "sn": "mwana", "nd": "umntwana" },
+      { "en": "son", "sn": "mwanakomana", "nd": "indodana" },
+      { "en": "daughter", "sn": "mwanasikana", "nd": "indodakazi" },
+      { "en": "brother", "sn": "hama yechirume", "nd": "umfowabo" },
+      { "en": "sister", "sn": "hama yechikadzi", "nd": "udadewabo" },
+      { "en": "grandfather", "sn": "sekuru", "nd": "ubabamkhulu" },
+      { "en": "grandmother", "sn": "ambuya", "nd": "ugogo" },
+      { "en": "uncle", "sn": "babamunini / sekuru", "nd": "ubabomncane" },
+      { "en": "aunt", "sn": "mainini / tete", "nd": "ubabekazi" },
+      { "en": "cousin", "sn": "hama", "nd": "umzala" },
+      { "en": "relative", "sn": "hama", "nd": "isihlobo" }
+    ],
+
+    "work": [
+      { "en": "work", "sn": "basa", "nd": "umsebenzi" },
+      { "en": "job", "sn": "basa", "nd": "umsebenzi" },
+      { "en": "money", "sn": "mari", "nd": "imali" },
+      { "en": "office", "sn": "hofisi", "nd": "ihhovisi" },
+      { "en": "farmer", "sn": "murimi", "nd": "umlimi" },
+      { "en": "teacher", "sn": "mudzidzisi", "nd": "uthisha" },
+      { "en": "doctor", "sn": "chiremba", "nd": "udokotela" },
+      { "en": "nurse", "sn": "mukoti", "nd": "unesi" },
+      { "en": "driver", "sn": "mutyairi", "nd": "umshayeli" },
+      { "en": "worker", "sn": "mushandi", "nd": "umsebenzi" },
+      { "en": "market", "sn": "musika", "nd": "imakethe" },
+      { "en": "shop", "sn": "chitoro", "nd": "isitolo" },
+      { "en": "business", "sn": "bhizinesi", "nd": "ibhizimusi" },
+      { "en": "meeting", "sn": "musangano", "nd": "umhlangano" },
+      { "en": "salary", "sn": "muhoro", "nd": "umholo" }
+    ],
+
+    "animals": [
+      { "en": "animal", "sn": "mhuka", "nd": "isilwane" },
+      { "en": "dog", "sn": "imbwa", "nd": "inja" },
+      { "en": "cat", "sn": "katsi", "nd": "ikati" },
+      { "en": "cow", "sn": "mombe", "nd": "inkomo" },
+      { "en": "goat", "sn": "mbudzi", "nd": "imbuzi" },
+      { "en": "chicken", "sn": "huku", "nd": "inkukhu" },
+      { "en": "bird", "sn": "shiri", "nd": "inyoni" },
+      { "en": "fish", "sn": "hove", "nd": "inhlanzi" },
+      { "en": "lion", "sn": "shumba", "nd": "ibhubesi" },
+      { "en": "elephant", "sn": "nzou", "nd": "indlovu" },
+      { "en": "snake", "sn": "nyoka", "nd": "inyoka" },
+      { "en": "rabbit", "sn": "tsuro", "nd": "unogwaja" },
+      { "en": "horse", "sn": "bhiza", "nd": "ihhashi" },
+      { "en": "pig", "sn": "nguruve", "nd": "ingulube" },
+      { "en": "mouse", "sn": "mbeva", "nd": "igundwane" }
+    ],
+
+    "places": [
+      { "en": "place", "sn": "nzvimbo", "nd": "indawo" },
+      { "en": "country", "sn": "nyika", "nd": "ilizwe" },
+      { "en": "city", "sn": "guta", "nd": "idolobho" },
+      { "en": "town", "sn": "dhorobha", "nd": "idolobho" },
+      { "en": "village", "sn": "musha", "nd": "umuzi" },
+      { "en": "school", "sn": "chikoro", "nd": "isikolo" },
+      { "en": "hospital", "sn": "chipatara", "nd": "ibhedlela" },
+      { "en": "church", "sn": "chechi", "nd": "ibandla" },
+      { "en": "river", "sn": "rwizi", "nd": "umfula" },
+      { "en": "mountain", "sn": "gomo", "nd": "intaba" },
+      { "en": "forest", "sn": "sango", "nd": "ihlathi" },
+      { "en": "road", "sn": "mugwagwa", "nd": "umgwaqo" },
+      { "en": "shop", "sn": "chitoro", "nd": "isitolo" },
+      { "en": "market", "sn": "musika", "nd": "imakethe" },
+      { "en": "field", "sn": "munda", "nd": "insimu" }
+    ]
+  }
+}
