@@ -32,17 +32,22 @@ class SimilarWordsGameCubit extends BaseCubitWrapper<SimilarWordsGameState> {
             : level?.languageId == 2
             ? level?.wordsSn ?? []
             : level?.wordsNd ?? [];
-
+final questions = level?.wordsEn ?? [];
     Map<String, String> questionAnswers = {};
     List<String> availableWords = List.empty(growable: true);
     for (int i = 0; i < words.length; i += 2) {
-      questionAnswers[words[i]] = words[i];
+      questionAnswers[questions[i]] = words[i];
       availableWords.add(words[i]);
     }
 
     // get random words
     final random = await _levelDao.getLevelById(levelId - 1);
-    final randomWords = random?.wordsEn ?? [];
+    final randomWords =
+        level?.languageId == 1
+            ? random?.wordsEn ?? []
+            : level?.languageId == 2
+            ? random?.wordsSn ?? []
+            : random?.wordsNd ?? [];
 
     final set = Set.from(availableWords);
     set.addAll(randomWords);
