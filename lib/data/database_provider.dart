@@ -69,16 +69,25 @@ class DatabaseProvider {
 
   //todo run in compute??
   Future<void> _seedDatabase(Database db) async {
-    final String wordsContent =
-        await rootBundle.loadString('assets/resources/words.json');
+    final String wordsContent = await rootBundle.loadString(
+      'assets/resources/words.json',
+    );
     final Map<String, dynamic> wordsData = json.decode(wordsContent);
     final Map<String, dynamic> wordCategories = wordsData['words'];
 
     await db.transaction((txn) async {
       int levelId = 0;
-      const levelType = 1; // Assuming 1 represents a game type like word search
+      int levelTypeCounter = 1;
       final batch = txn.batch();
 
+      // Pre-defined language assignments for each type
+      // You can customize this mapping as needed
+      final Map<int, int> typeToLanguageMap = {
+        1: 1, // Type 1 → Language 1
+        2: 2, // Type 2 → Language 2
+       // 3: 3, // Type 3 → Language 3
+      };
+ 
       for (final category in wordCategories.keys) {
         final List<dynamic> words = wordCategories[category];
         final int totalWords = words.length;
@@ -90,9 +99,10 @@ class DatabaseProvider {
             continue;
           }
 
-          final int end = (start + wordsPerLevel > totalWords)
-              ? totalWords
-              : start + wordsPerLevel;
+          final int end =
+              (start + wordsPerLevel > totalWords)
+                  ? totalWords
+                  : start + wordsPerLevel;
           final List<dynamic> levelWords = words.sublist(start, end);
 
           if (levelWords.isEmpty) {
@@ -106,17 +116,25 @@ class DatabaseProvider {
           final List<String> wordsNd =
               levelWords.map((w) => w['nd'] as String).toList();
 
+          // Get language from mapping
+          final languageId = typeToLanguageMap[levelTypeCounter]!;
+         print('pundez levelId $levelId languageId = $languageId for levelType $levelTypeCounter');
+ 
           final level = LevelModel(
             id: levelId,
             difficulty: i, // 0, 1, 2
-            type: levelType,
+            type: levelTypeCounter,
             wordsEn: wordsEn,
             wordsNd: wordsNd,
             wordsSn: wordsSn,
+            languageId: languageId,
           );
 
           batch.insert('levels', level.toMap());
           levelId++;
+
+          // Move to next type (1→2→3→1)
+          levelTypeCounter = levelTypeCounter % 2 + 1;
         }
       }
       await batch.commit(noResult: true);

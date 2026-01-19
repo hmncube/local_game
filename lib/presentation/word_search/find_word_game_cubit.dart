@@ -46,8 +46,14 @@ class FindWordGameCubit extends BaseCubitWrapper<FindWordGameState> {
     var grid = List.generate(newGridSize, (_) => List.filled(newGridSize, ''));
     final levelModel = (await _levelDao.getLevelById(level));
 
-    final wordsToFind =
-        levelModel?.wordsEn.map((w) => w.toUpperCase()).toList() ?? [];
+    final words =
+        levelModel?.languageId == 1
+            ? levelModel?.wordsEn
+            : levelModel?.languageId == 2
+            ? levelModel?.wordsSn
+            : levelModel?.wordsNd;
+
+    final wordsToFind = words?.map((w) => w.toUpperCase()).toList() ?? [];
     final wordPositions = <String, List<Position>>{};
 
     _placeWords(wordsToFind, grid, newGridSize, wordPositions);

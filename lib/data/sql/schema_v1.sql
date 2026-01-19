@@ -55,6 +55,7 @@ CREATE TABLE levels (
     points INTEGER DEFAULT 0,
     difficulty INTEGER DEFAULT 0,
     level_type INTEGER DEFAULT 1,
+    language_id INTEGER DEFAULT 1,
     finished_at INTEGER,
     started_at INTEGER,
     words_en TEXT,

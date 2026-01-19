@@ -26,13 +26,18 @@ class SimilarWordsGameCubit extends BaseCubitWrapper<SimilarWordsGameState> {
   Future<void> initializeGame({required int levelId}) async {
     emit(state.copyWith(cubitState: CubitLoading()));
     final level = await _levelDao.getLevelById(levelId);
-    final words = level?.wordsEn ?? [];
+    final words =
+        level?.languageId == 1
+            ? level?.wordsEn ?? []
+            : level?.languageId == 2
+            ? level?.wordsSn ?? []
+            : level?.wordsNd ?? [];
 
     Map<String, String> questionAnswers = {};
     List<String> availableWords = List.empty(growable: true);
     for (int i = 0; i < words.length; i += 2) {
-      questionAnswers[words[i]] = words[i + 1];
-      availableWords.add(words[i + 1]);
+      questionAnswers[words[i]] = words[i];
+      availableWords.add(words[i]);
     }
 
     // get random words
@@ -101,9 +106,7 @@ class SimilarWordsGameCubit extends BaseCubitWrapper<SimilarWordsGameState> {
   Future<({int totalScore, int levelScore, int bonus})> _updatePoints(
     String droppedWord,
   ) async {
-    final earnedPoints = PointsManagement.calculatePoints(
-      droppedWord,
-    );
+    final earnedPoints = PointsManagement.calculatePoints(droppedWord);
 
     final bonus = PointsManagement.calculateTimeBonus(state.seconds);
     final totalScore = state.score + earnedPoints;

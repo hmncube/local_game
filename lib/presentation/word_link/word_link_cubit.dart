@@ -34,7 +34,13 @@ class WordLinkCubit extends BaseCubitWrapper<WordLinkState> {
 
     final user = await _userDao.getUser();
     if (levelModel != null) {
-      final words = levelModel.wordsEn;
+       final words =
+        levelModel.languageId == 1
+            ? levelModel.wordsEn
+            : levelModel.languageId == 2
+            ? levelModel.wordsSn
+            : levelModel.wordsNd;
+
       if (words.isNotEmpty) {
         Map<String, int> letterCount = getMaxLetterCount(words);
         List<String> letterList = createLetterList(letterCount);

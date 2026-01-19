@@ -6,6 +6,7 @@ class LevelModel extends Equatable {
   final int points;
   final int difficulty; //1 easy ; 2 moderate; 3 Hard
   final int type; //1 word search;  2 word match; 3 word link;
+  final int languageId; //1 English; 2 Shona; 3 Ndebele
   final int? finishedAt;
   final int? startedAt;
   final List<String> wordsEn;
@@ -20,6 +21,7 @@ class LevelModel extends Equatable {
     this.points = 0,
     this.finishedAt,
     this.startedAt,
+    this.languageId = 1,
     this.wordsEn = const [],
     this.wordsSn = const [],
     this.wordsNd = const [],
@@ -34,6 +36,7 @@ class LevelModel extends Equatable {
       difficulty: map['difficulty'],
       finishedAt: map['finished_at'],
       startedAt: map['started_at'],
+      languageId: map['language_id'],
       wordsEn: _splitStringToList(map['words_en']),
       wordsSn: _splitStringToList(map['words_sn']),
       wordsNd: _splitStringToList(map['words_nd']),
@@ -49,9 +52,10 @@ class LevelModel extends Equatable {
       'difficulty': difficulty,
       'finished_at': finishedAt,
       'started_at': startedAt,
+      'language_id': languageId,
       'words_en': wordsEn.join(','),
-      'words_sn': wordsEn.join(','),
-      'words_nd': wordsEn.join(','),
+      'words_sn': wordsSn.join(','),
+      'words_nd': wordsNd.join(','),
     };
   }
 
