@@ -8,18 +8,15 @@ import 'package:local_game/data/model/user_model.dart';
 import 'package:local_game/presentation/onboarding/onboarding_state.dart';
 
 import '../../core/base/cubit/cubit_status.dart';
-import '../../data/database_provider.dart';
 
 @injectable
 class OnboardingCubit extends BaseCubitWrapper<OnboardingState> {
-  final DatabaseProvider _databaseProvider;
   final LocalProvider _localProvider;
   final UserDao _userDao;
   final PlayerIconDao _playerIconDao;
 
   OnboardingCubit(
     this._playerIconDao,
-    this._databaseProvider,
     this._userDao,
     this._localProvider,
   ) : super(
@@ -34,7 +31,6 @@ class OnboardingCubit extends BaseCubitWrapper<OnboardingState> {
 
   Future<void> _init() async {
     emit(state.copyWith(cubitState: CubitLoading()));
-    await _databaseProvider.database;
     final playerIcons = await _playerIconDao.getAllPlayerIcons();
     emit(
       state.copyWith(

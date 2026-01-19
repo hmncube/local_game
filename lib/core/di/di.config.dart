@@ -48,18 +48,20 @@ Future<_i174.GetIt> init(
   );
   gh.lazySingleton<_i64.SoundManager>(() => _i64.SoundManager());
   gh.lazySingleton<_i1063.LocalProvider>(() => _i1063.LocalProvider());
-  gh.factory<_i447.SplashCubit>(
-    () => _i447.SplashCubit(gh<_i1063.LocalProvider>()),
-  );
   gh.factory<_i959.PlayerIconDao>(
     () => _i959.PlayerIconDao(gh<_i779.Database>()),
+  );
+  gh.factory<_i447.SplashCubit>(
+    () => _i447.SplashCubit(
+      gh<_i1063.LocalProvider>(),
+      gh<_i90.DatabaseProvider>(),
+    ),
   );
   gh.factory<_i390.UserDao>(() => _i390.UserDao(gh<_i90.DatabaseProvider>()));
   gh.factory<_i861.WordDao>(() => _i861.WordDao(gh<_i90.DatabaseProvider>()));
   gh.factory<_i69.OnboardingCubit>(
     () => _i69.OnboardingCubit(
       gh<_i959.PlayerIconDao>(),
-      gh<_i90.DatabaseProvider>(),
       gh<_i390.UserDao>(),
       gh<_i1063.LocalProvider>(),
     ),

@@ -96,26 +96,3 @@ INSERT INTO player_icons (name_en, name_nd, name_sn, path, facts_en, facts_nd, f
 'Shumba inogara mumapoka anonzi mapridhe uye inozivikanwa semambo wesango.'
 ),
 ('Owl', 'Uqhokolo', 'Hukurubwi', 'owl', 'Owls can see clearly at night and turn their heads almost all the way around.', 'Uqhokolo lubona kahle ebusuku futhi luyakwazi ukujika ikhanda cishe ngokupheleleyo.', 'Hukurubwi hunoona zvakanaka usiku uye hunogona kutenderedza musoro kusvika kumashure.');
-
--- Initial Chapters
-INSERT INTO chapters (title, title_sn, title_nd, theme, theme_sn, theme_nd, difficulty) VALUES
-('At Home', 'Pamba', 'Ekhaya', 'Household objects and family life', 'Zvinhu zviri mumba uye hupenyu hwemhuri', 'Izinto ezisemzini lokuphila komndeni', 'easy'),
-('My Family', 'Mhuri Yangu', 'Umndeni Wami', 'Family members and relationships', 'Nhengo dzemhuri uye hukama', 'Amalunga omndeni lobudlelwano', 'easy'),
-('At School', 'Kuchikoro', 'Esikolo', 'School items and learning', 'Zvinhu zvechikoro uye kudzidza', 'Izinto zesikolo lokufunda', 'easy'),
-('Fruits and Vegetables', 'Michero Nemiriwo', 'Izithelo Lezithombo', 'Common fruits and vegetables', 'Michero nemiriwo inozivikanwa', 'Izithelo lezithombo ezivamayo', 'easy'),
-('Animals', 'Mhuka', 'Izilwane', 'Wild and domestic animals', 'Mhuka dzesango nedzemumba', 'Izilwane zasendle lezasekhaya', 'easy'),
-('Body Parts', 'Zvikamu Zvemuviri', 'Izingxenye Zomzimba', 'Human body and health', 'Muviri wemunhu uye hutano', 'Umzimba womuntu lempilo', 'easy'),
-('Colours and Shapes', 'Mavara Nechimiro', 'Imibala Lezimo', 'Describing colours and shapes', 'Tsananguro yemavara nechimiro', 'Incazelo yemibala lezimo', 'easy'),
-('Numbers and Counting', 'Manhamba Nekuverenga', 'Amanani Lokubala', 'Learning numbers and counting', 'Kudzidza manhamba nekuverenga', 'Ukufunda amanani lokubala', 'easy'),
-('Weather and Seasons', 'Mamiro Ekunze Nemwaka', 'Isimo Somoya Lamaxesha', 'Rain, sun, wind, and seasons', 'Mvura, zuva, mhepo nemwaka', 'Imvula, ilanga, umoya lamaxesha onyaka', 'medium'),
-('Clothes and Attire', 'Zvipfeko', 'Izembatho', 'Everyday and traditional clothes', 'Zvipfeko zvezuva nezuva nezvetsika', 'Izembatho zansuku zonke lezemvelo', 'medium'),
-('Food and Cooking', 'Chikafu Nekubika', 'Ukudla Lokupheka', 'Meals and kitchen items', 'Zvekudya nezviri mukicheni', 'Ukudla lezinto zasekhishini', 'medium'),
-('Community Helpers', 'Vanobatsira Munharaunda', 'Abasizi Bomphakathi', 'Jobs and roles in the community', 'Mabasa nevarairidzi venharaunda', 'Imisebenzi labasizi emphakathini', 'medium'),
-('Farm and Garden', 'Papurazi Nebindu', 'Epulazini Lebhindu', 'Crops, tools, and animals', 'Zvirimwa, midziyo nemhuka', 'Izitshalo, amathuluzi lezilwane', 'medium'),
-('Transport', 'Zvekufambisa', 'Ezokuhamba', 'Ways of travel and transport', 'Nzira dzekufamba nezvekufambisa', 'Izindlela zokuhamba lezokuthutha', 'medium'),
-('Places Around Us', 'Nzvimbo Dzakatikomberedza', 'Izindawo Eziseduze', 'Common community and natural places', 'Nzvimbo dzinowanikwa munharaunda', 'Izindawo ezivamileyo emphakathini', 'medium'),
-('Traditional Life', 'Hupenyu Hwechivanhu', 'Impilo Yesintu', 'Culture, totems, and customs', 'Tsika, madzitateguru netsika dzechivanhu', 'Amasiko, iziduko lezindlela zesintu', 'hard'),
-('Festivals and Celebrations', 'Mhemberero Nemitambo', 'Imikhosi Lemiklomelo', 'Cultural and joyful events', 'Mitambo netsika dzekufara', 'Imikhosi lamathuba okujabula', 'hard'),
-('Health and Body Care', 'Utano Nekuchengeta Muviri', 'Impilo Lokunakekela Umzimba', 'Health, hygiene, and wellbeing', 'Utano, hutsanana uye kugara zvakanaka', 'Impilo, ukuhlanzeka lokuphila kahle', 'hard'),
-('Time and Calendar', 'Nguva Nekarenda', 'Isikhathi Lekhalenda', 'Days, months, and time words', 'Mazuva, mwedzi nenguva', 'Izinsuku, izinyanga lesikhathi', 'hard'),
-('Nature and Environment', 'Zvisikwa Nemamiriro Epasirese', 'Imvelo Lemvelo', 'Earth, plants, and environment care', 'Pasi, miti, uye kuchengetedza zvakatipoteredza', 'Umhlaba, izitshalo lokulondoloza imvelo', 'hard');

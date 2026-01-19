@@ -69,48 +69,57 @@ class DatabaseProvider {
 
   //todo run in compute??
   Future<void> _seedDatabase(Database db) async {
-    // Seed chapters
-    final String chaptersContent = await rootBundle.loadString(
-      'assets/resources/chapters.json',
-    );
-    final List<dynamic> chapters = json.decode(chaptersContent);
+    final String wordsContent =
+        await rootBundle.loadString('assets/resources/words.json');
+    final Map<String, dynamic> wordsData = json.decode(wordsContent);
+    final Map<String, dynamic> wordCategories = wordsData['words'];
+
     await db.transaction((txn) async {
+      int levelId = 0;
+      const levelType = 1; // Assuming 1 represents a game type like word search
       final batch = txn.batch();
-      for (final chapter in chapters) {
-        batch.insert('chapters', chapter as Map<String, dynamic>);
+
+      for (final category in wordCategories.keys) {
+        final List<dynamic> words = wordCategories[category];
+        final int totalWords = words.length;
+        final int wordsPerLevel = (totalWords / 3).ceil();
+
+        for (int i = 0; i < 3; i++) {
+          final int start = i * wordsPerLevel;
+          if (start >= totalWords) {
+            continue;
+          }
+
+          final int end = (start + wordsPerLevel > totalWords)
+              ? totalWords
+              : start + wordsPerLevel;
+          final List<dynamic> levelWords = words.sublist(start, end);
+
+          if (levelWords.isEmpty) {
+            continue;
+          }
+
+          final List<String> wordsEn =
+              levelWords.map((w) => w['en'] as String).toList();
+          final List<String> wordsSn =
+              levelWords.map((w) => w['sn'] as String).toList();
+          final List<String> wordsNd =
+              levelWords.map((w) => w['nd'] as String).toList();
+
+          final level = LevelModel(
+            id: levelId,
+            difficulty: i, // 0, 1, 2
+            type: levelType,
+            wordsEn: wordsEn,
+            wordsNd: wordsNd,
+            wordsSn: wordsSn,
+          );
+
+          batch.insert('levels', level.toMap());
+          levelId++;
+        }
       }
       await batch.commit(noResult: true);
-    });
-
-    final String content = await rootBundle.loadString(
-      'assets/resources/chapter1_level.json',
-    );
-    final List<dynamic> levels = json.decode(content);
-
-    await db.transaction((txn) async {
-      int id = 0;
-      for (final levelData in levels) {
-        final levelMap = levelData as Map<String, dynamic>;
-
-        List<String> wordsEn = safeFlatten(levelMap['words_en'] as List);
-        List<String> wordsSn = safeFlatten(levelMap['words_sn'] as List);
-        //(levelMap['words_sn'] as List).cast<String>();
-        List<String> wordsNd = safeFlatten(levelMap['words_nd'] as List);
-        // (levelMap['words_nd'] as List).cast<String>();
-
-        final level = LevelModel(
-          id: id,
-          difficulty: 0,
-          type: int.parse(levelMap['type']),
-          wordsEn: wordsEn,
-          wordsNd: wordsNd,
-          wordsSn: wordsSn,
-        );
-        id++;
-        final batch = txn.batch();
-        batch.insert('levels', level.toMap());
-        await batch.commit(noResult: true);
-      }
     });
   }
 
