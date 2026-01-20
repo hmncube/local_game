@@ -153,7 +153,8 @@ class _LevelCompleteScreenState extends State<LevelCompleteScreen>
           Positioned.fill(
             child: SvgPicture.asset(AppAssets.backgroundSvg, fit: BoxFit.fill),
           ),
-          Positioned.fill(child: SvgPicture.asset(AppAssets.celebrationSvg)),
+          // use high quality image
+          //Positioned.fill(child: SvgPicture.asset(AppAssets.celebrationSvg)),
           if (!_showText)
             Lottie.asset(
               AppAssets.celebrationsAnimation,
@@ -169,7 +170,8 @@ class _LevelCompleteScreenState extends State<LevelCompleteScreen>
                 child: ScaleTransition(
                   scale: _scaleAnimation,
                   child: Column(
-                    children: [              
+                    children: [   
+                      SizedBox(height: 48,),           
                       // Points Display
                       _buildPointsDisplay(),
 

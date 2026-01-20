@@ -82,6 +82,7 @@ class _MapScreenState extends State<MapScreen> {
                             child: GameTopBar(
                               points: state.userModel?.totalScore ?? 0,
                               hints: state.userModel?.hints ?? 0,
+                              showHome: false,
                             ),
                           ),
                         ),
@@ -178,42 +179,45 @@ class LevelButton extends StatelessWidget {
       onTap: onTap,
       child: Column(
         children: [
-          Stack(
-            children: [
-              SizedBox(
-                height: 70,
-                width: 100,
-                child: Stack(
-                  children: [
-                    SvgPicture.asset(_getTypeSvg(type)),
-                    Align(
-                      alignment: Alignment.center,
-                      child: Text(
-                        '$levelId',
-                        style: AppTextStyles.heading1.copyWith(
-                          color: Colors.black,
+          SizedBox(
+            width: 70,height: 70,
+            child: Stack(
+              children: [
+                SizedBox(
+                  height: 70,
+                  width: 100,
+                  child: Stack(
+                    children: [
+                      SvgPicture.asset(_getTypeSvg(type)),
+                      Align(
+                        alignment: Alignment.center,
+                        child: Text(
+                          '$levelId',
+                          style: AppTextStyles.heading1.copyWith(
+                            color: Colors.black,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              ),
-              Visibility(
-                visible: !isUnLocked,
-                child: Align(
-                  alignment: Alignment.center,
-                  child: Container(
-                    height: 70,
-                    width: 70,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(100),
-                      color: Colors.white54,
-                    ),
-                    child: Icon(Icons.lock),
+                    ],
                   ),
                 ),
-              ),
-            ],
+                Visibility(
+                  visible: !isUnLocked,
+                  child: Align(
+                    alignment: Alignment.center,
+                    child: Container(
+                      height: 70,
+                      width: 70,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(100),
+                        color: Colors.white54,
+                      ),
+                      child: Center(child: Icon(Icons.lock)),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
           Center(
             child: Row(

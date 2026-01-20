@@ -11,11 +11,14 @@ class GameTopBar extends StatelessWidget {
   final int points;
   final int hints;
   final Function? onHintClicked;
+  final bool showHome;
+
   const GameTopBar({
     super.key,
     required this.points,
     required this.hints,
     this.onHintClicked,
+    this.showHome = true,
   });
 
   @override
@@ -33,15 +36,16 @@ class GameTopBar extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  GestureDetector(
-                    onTap: () => context.go(Routes.mapScreen.toPath),
-                    child: SvgPicture.asset(
-                      height: 40,
-                      width: 40,
-                      AppAssets.homeSvg,
+                  if (showHome) ...[
+                    GestureDetector(
+                      onTap: () => context.go(Routes.mapScreen.toPath),
+                      child: SvgPicture.asset(
+                        height: 30,
+                        width: 30,
+                        AppAssets.homeSvg,
+                      ),
                     ),
-                  ),
-
+                  ],
                   Row(
                     children: [
                       const SizedBox(width: 8),
@@ -51,12 +55,15 @@ class GameTopBar extends StatelessWidget {
                         AppAssets.coinSvg,
                       ),
                       const SizedBox(width: 4),
-                      Text(
-                        points.toString(),
-                        style: AppTextStyles.body.copyWith(
-                          color: AppTheme.accentGreen,
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
+                      SizedBox(
+                        height: 30,
+                        child: Text(
+                          points.toString(),
+                          style: AppTextStyles.body.copyWith(
+                            color: AppTheme.accentGreen,
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ],
@@ -76,8 +83,9 @@ class GameTopBar extends StatelessWidget {
                           height: 30,
                           width: 30,
                         ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 14.0),
+                        SizedBox(
+                          height: 30,
+                          width: 30,
                           child: Text(
                             hints.toString(),
                             style: AppTextStyles.body.copyWith(
