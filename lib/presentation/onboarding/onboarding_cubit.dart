@@ -74,13 +74,13 @@ class OnboardingCubit extends BaseCubitWrapper<OnboardingState> {
     emit(
       state.copyWith(
         selectedPlayerIcon: playerIcon,
-        canProceed: _checkIfCanProceed(),
+        canProceed: _checkIfCanProceed(playerIcon: playerIcon),
       ),
     );
   }
 
   void onNicknameChanged(String text) {
-    emit(state.copyWith(nickname: text, canProceed: _checkIfCanProceed()));
+    emit(state.copyWith(nickname: text, canProceed: _checkIfCanProceed(nickname: text)));
   }
 
   void onLanguageSelectedChanged(Language language) {
@@ -93,14 +93,14 @@ class OnboardingCubit extends BaseCubitWrapper<OnboardingState> {
     emit(
       state.copyWith(
         selectedLanguage: currentLaguages,
-        canProceed: _checkIfCanProceed(),
+        canProceed: _checkIfCanProceed(languages: currentLaguages),
       ),
     );
   }
 
-  bool _checkIfCanProceed() {
-    return state.nickname.isNotEmpty &&
-        state.selectedPlayerIcon != null &&
-        state.langauges.isNotEmpty;
+  bool _checkIfCanProceed({String? nickname, PlayerIconModel? playerIcon, List<Language>? languages}) {
+    return (nickname?.isNotEmpty ?? state.nickname.isNotEmpty) &&
+        (playerIcon != null || state.selectedPlayerIcon != null) &&
+        (languages?.isNotEmpty ?? state.langauges.isNotEmpty);
   }
 }

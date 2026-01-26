@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:local_game/app/themes/app_text_styles.dart';
 import 'package:local_game/core/di/di.dart';
 import 'package:local_game/core/extensions/time_extension.dart';
 import 'package:local_game/core/routes.dart';
@@ -9,6 +8,8 @@ import 'package:local_game/presentation/models/points.dart';
 import 'package:local_game/presentation/similar_words/similar_words_game_cubit.dart';
 import 'package:local_game/presentation/similar_words/similar_words_game_state.dart';
 import 'package:local_game/presentation/widget/game_top_bar.dart';
+import 'package:local_game/presentation/widget/neubrutalism_container.dart';
+import 'package:local_game/presentation/widget/neubrutalism_toast.dart';
 
 class SimilarWordsGameScreen extends StatefulWidget {
   final int levelId;
@@ -20,6 +21,7 @@ class SimilarWordsGameScreen extends StatefulWidget {
 
 class _SimilarWordsGameScreenState extends State<SimilarWordsGameScreen> {
   late final SimilarWordsGameCubit _cubit;
+
   @override
   void initState() {
     super.initState();
@@ -30,6 +32,10 @@ class _SimilarWordsGameScreenState extends State<SimilarWordsGameScreen> {
 
   @override
   Widget build(BuildContext context) {
+    const creamBackground = Color(0xFFFFF9E5);
+    const darkBorderColor = Color(0xFF2B2118);
+    const accentOrange = Color(0xFFE88328);
+
     return BlocProvider.value(
       value: _cubit,
       child: BlocConsumer<SimilarWordsGameCubit, SimilarWordsGameState>(
@@ -54,35 +60,63 @@ class _SimilarWordsGameScreenState extends State<SimilarWordsGameScreen> {
               }
             },
             child: Scaffold(
+              backgroundColor: creamBackground,
               body: SafeArea(
                 child: Padding(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.all(24.0),
                   child: Column(
                     children: [
-                      // Instructions
                       GameTopBar(
                         points: state.score,
                         hints: state.hints,
                         onHintClicked: () {},
                       ),
-                      const SizedBox(height: 20),
-                      Stack(
-                        children: [
-                          Text(
-                            state.seconds.toTimeString(),
-                            style: AppTextStyles.keyboardKey.copyWith(
-                              fontSize: 24,
+                      const SizedBox(height: 24),
+
+                      // Timer and Instructions
+                      NeubrutalismContainer(
+                        borderRadius: 20,
+                        backgroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.timer_outlined,
+                              size: 20,
+                              color: darkBorderColor,
                             ),
-                          ),
-                        ],
+                            const SizedBox(width: 8),
+                            Text(
+                              state.seconds.toTimeString(),
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w900,
+                                color: darkBorderColor,
+                              ),
+                            ),
+                            const Spacer(),
+                            const Icon(
+                              Icons.info_outline,
+                              size: 18,
+                              color: Colors.blue,
+                            ),
+                          ],
+                        ),
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 16),
                       Text(
-                        'Drag words from the selection list to match them with similar words below:',
-                        style: AppTextStyles.keyboardKey.copyWith(fontSize: 16),
+                        'Match words by dragging them over!',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w900,
+                          color: darkBorderColor.withOpacity(0.6),
+                        ),
                         textAlign: TextAlign.center,
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 24),
 
                       Expanded(
                         child: Row(
@@ -90,25 +124,23 @@ class _SimilarWordsGameScreenState extends State<SimilarWordsGameScreen> {
                             // Questions side (left)
                             Expanded(
                               flex: 1,
-                              child: Container(
-                                padding: const EdgeInsets.all(12),
-                                decoration: BoxDecoration(
-                                  color: Colors.grey.shade100,
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(
-                                    color: Colors.grey.shade300,
-                                  ),
-                                ),
+                              child: NeubrutalismContainer(
+                                borderRadius: 20,
+                                backgroundColor: Colors.white,
+                                padding: const EdgeInsets.all(16),
                                 child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(
-                                      'Find Similar Words:',
-                                      style: AppTextStyles.keyboardKey.copyWith(
-                                        fontWeight: FontWeight.bold,
+                                    const Text(
+                                      'SIMILAR WORDS',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w900,
                                         color: Colors.blue,
+                                        letterSpacing: 1.2,
                                       ),
                                     ),
+                                    const SizedBox(height: 12),
+                                    const Divider(height: 1),
                                     const SizedBox(height: 16),
                                     Expanded(
                                       child: ListView.builder(
@@ -126,143 +158,29 @@ class _SimilarWordsGameScreenState extends State<SimilarWordsGameScreen> {
                                                 userAnswer,
                                               );
 
-                                          return Container(
-                                            margin: const EdgeInsets.only(
-                                              bottom: 12,
+                                          return Padding(
+                                            padding: const EdgeInsets.only(
+                                              bottom: 16,
                                             ),
                                             child: Column(
                                               crossAxisAlignment:
                                                   CrossAxisAlignment.start,
                                               children: [
                                                 Text(
-                                                  question,
-                                                  style: AppTextStyles
-                                                      .keyboardKey
-                                                      .copyWith(
-                                                        fontSize: 16,
-                                                        fontWeight:
-                                                            FontWeight.w600,
-                                                      ),
+                                                  question.toUpperCase(),
+                                                  style: const TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.w900,
+                                                    color: darkBorderColor,
+                                                  ),
                                                 ),
                                                 const SizedBox(height: 8),
-                                                DragTarget<String>(
-                                                  onWillAcceptWithDetails: (
-                                                    droppedWord,
-                                                  ) {
-                                                    // Only accept if the answer is correct
-                                                    return _cubit
-                                                        .isCorrectAnswer(
-                                                          question,
-                                                          droppedWord.data,
-                                                        );
-                                                  },
-                                                  onAcceptWithDetails: (
-                                                    droppedWord,
-                                                  ) {
-                                                    _cubit.onWordDropped(
-                                                      question,
-                                                      droppedWord.data,
-                                                    );
-                                                  },
-                                                  builder: (
-                                                    context,
-                                                    candidateData,
-                                                    rejectedData,
-                                                  ) {
-                                                    // Show red highlight when wrong answer is being dragged over
-                                                    final bool hasRejectedData =
-                                                        rejectedData.isNotEmpty;
-
-                                                    return Container(
-                                                      width: double.infinity,
-                                                      height: 50,
-                                                      decoration: BoxDecoration(
-                                                        color:
-                                                            userAnswer != null
-                                                                ? (isCorrect
-                                                                    ? Colors
-                                                                        .green
-                                                                        .shade100
-                                                                    : Colors
-                                                                        .red
-                                                                        .shade100)
-                                                                : (hasRejectedData
-                                                                    ? Colors
-                                                                        .red
-                                                                        .shade50
-                                                                    : Colors
-                                                                        .white),
-                                                        border: Border.all(
-                                                          color:
-                                                              hasRejectedData
-                                                                  ? Colors
-                                                                      .red
-                                                                      .shade400
-                                                                  : (candidateData
-                                                                          .isNotEmpty
-                                                                      ? Colors
-                                                                          .blue
-                                                                          .shade400
-                                                                      : Colors
-                                                                          .grey
-                                                                          .shade400),
-                                                          width:
-                                                              candidateData
-                                                                          .isNotEmpty ||
-                                                                      hasRejectedData
-                                                                  ? 2
-                                                                  : 1,
-                                                        ),
-                                                        borderRadius:
-                                                            BorderRadius.circular(
-                                                              8,
-                                                            ),
-                                                      ),
-                                                      child:
-                                                          userAnswer != null
-                                                              ? Row(
-                                                                children: [
-                                                                  Expanded(
-                                                                    child: Center(
-                                                                      child: Text(
-                                                                        userAnswer,
-                                                                        style: AppTextStyles.keyboardKey.copyWith(
-                                                                          fontWeight:
-                                                                              FontWeight.bold,
-                                                                          color:
-                                                                              isCorrect
-                                                                                  ? Colors.green.shade700
-                                                                                  : Colors.red.shade700,
-                                                                        ),
-                                                                      ),
-                                                                    ),
-                                                                  ),
-                                                                ],
-                                                              )
-                                                              : Center(
-                                                                child: Text(
-                                                                  hasRejectedData
-                                                                      ? 'Wrong answer!'
-                                                                      : (candidateData
-                                                                              .isNotEmpty
-                                                                          ? 'Drop here'
-                                                                          : 'Drag word here'),
-                                                                  style: AppTextStyles.keyboardKey.copyWith(
-                                                                    color:
-                                                                        hasRejectedData
-                                                                            ? Colors.red.shade700
-                                                                            : Colors.grey.shade600,
-                                                                    fontSize:
-                                                                        12,
-                                                                    fontWeight:
-                                                                        hasRejectedData
-                                                                            ? FontWeight.bold
-                                                                            : FontWeight.normal,
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                    );
-                                                  },
+                                                _buildDropTarget(
+                                                  question,
+                                                  userAnswer,
+                                                  isCorrect,
+                                                  darkBorderColor,
+                                                  accentOrange,
                                                 ),
                                               ],
                                             ),
@@ -274,159 +192,86 @@ class _SimilarWordsGameScreenState extends State<SimilarWordsGameScreen> {
                                 ),
                               ),
                             ),
-                            const SizedBox(width: 16),
+                            const SizedBox(width: 20),
 
                             // Selection words side (right)
                             Expanded(
                               flex: 1,
-                              child: Container(
-                                padding: const EdgeInsets.all(12),
-                                decoration: BoxDecoration(
-                                  color: Colors.orange.shade50,
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(
-                                    color: Colors.orange.shade200,
-                                  ),
-                                ),
+                              child: NeubrutalismContainer(
+                                borderRadius: 20,
+                                backgroundColor: Colors.white,
+                                padding: const EdgeInsets.all(16),
                                 child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      'Selection Words:',
-                                      style: AppTextStyles.keyboardKey.copyWith(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.orange,
+                                      'SELECTION',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w900,
+                                        color: accentOrange,
+                                        letterSpacing: 1.2,
                                       ),
                                     ),
+                                    const SizedBox(height: 12),
+                                    const Divider(height: 1),
                                     const SizedBox(height: 16),
                                     Expanded(
-                                      child: Wrap(
-                                        spacing: 8,
-                                        runSpacing: 8,
-                                        children:
-                                            state.availableWords
-                                                .where(
-                                                  (word) =>
-                                                      !state.usedWords.contains(
-                                                        word,
-                                                      ),
-                                                )
-                                                .map(
-                                                  (word) => Draggable<String>(
-                                                    data: word,
-                                                    feedback: Material(
-                                                      elevation: 4,
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                            8,
-                                                          ),
-                                                      child: Container(
-                                                        padding:
-                                                            const EdgeInsets.symmetric(
-                                                              horizontal: 16,
-                                                              vertical: 8,
-                                                            ),
-                                                        decoration: BoxDecoration(
-                                                          color:
-                                                              Colors
-                                                                  .blue
-                                                                  .shade400,
-                                                          borderRadius:
-                                                              BorderRadius.circular(
-                                                                8,
+                                      child: SingleChildScrollView(
+                                        child: Wrap(
+                                          spacing: 12,
+                                          runSpacing: 12,
+                                          alignment: WrapAlignment.center,
+                                          children:
+                                              state.availableWords
+                                                  .where(
+                                                    (word) =>
+                                                        !state.usedWords
+                                                            .contains(word),
+                                                  )
+                                                  .map(
+                                                    (word) => Draggable<String>(
+                                                      data: word,
+                                                      feedback: Material(
+                                                        color:
+                                                            Colors.transparent,
+                                                        child: NeubrutalismContainer(
+                                                          borderRadius: 12,
+                                                          backgroundColor:
+                                                              Colors.blue,
+                                                          padding:
+                                                              const EdgeInsets.symmetric(
+                                                                horizontal: 16,
+                                                                vertical: 8,
                                                               ),
+                                                          child: Text(
+                                                            word,
+                                                            style:
+                                                                const TextStyle(
+                                                                  color:
+                                                                      Colors
+                                                                          .white,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w900,
+                                                                ),
+                                                          ),
                                                         ),
-                                                        child: Text(
+                                                      ),
+                                                      childWhenDragging: Opacity(
+                                                        opacity: 0.3,
+                                                        child: _buildWordChip(
                                                           word,
-                                                          style: AppTextStyles
-                                                              .keyboardKey
-                                                              .copyWith(
-                                                                color:
-                                                                    Colors
-                                                                        .white,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w500,
-                                                              ),
+                                                          darkBorderColor,
                                                         ),
                                                       ),
-                                                    ),
-                                                    childWhenDragging: Container(
-                                                      padding:
-                                                          const EdgeInsets.symmetric(
-                                                            horizontal: 16,
-                                                            vertical: 8,
-                                                          ),
-                                                      decoration: BoxDecoration(
-                                                        color:
-                                                            Colors
-                                                                .grey
-                                                                .shade300,
-                                                        borderRadius:
-                                                            BorderRadius.circular(
-                                                              8,
-                                                            ),
-                                                        border: Border.all(
-                                                          color:
-                                                              Colors
-                                                                  .grey
-                                                                  .shade400,
-                                                        ),
-                                                      ),
-                                                      child: Text(
+                                                      child: _buildWordChip(
                                                         word,
-                                                        style: AppTextStyles
-                                                            .keyboardKey
-                                                            .copyWith(
-                                                              color:
-                                                                  Colors
-                                                                      .grey
-                                                                      .shade600,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w500,
-                                                            ),
+                                                        darkBorderColor,
                                                       ),
                                                     ),
-                                                    child: Container(
-                                                      padding:
-                                                          const EdgeInsets.symmetric(
-                                                            horizontal: 16,
-                                                            vertical: 8,
-                                                          ),
-                                                      decoration: BoxDecoration(
-                                                        color:
-                                                            Colors
-                                                                .orange
-                                                                .shade200,
-                                                        borderRadius:
-                                                            BorderRadius.circular(
-                                                              8,
-                                                            ),
-                                                        border: Border.all(
-                                                          color:
-                                                              Colors
-                                                                  .orange
-                                                                  .shade300,
-                                                        ),
-                                                      ),
-                                                      child: Text(
-                                                        word,
-                                                        style: AppTextStyles
-                                                            .keyboardKey
-                                                            .copyWith(
-                                                              color:
-                                                                  Colors
-                                                                      .black87,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w500,
-                                                            ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                )
-                                                .toList(),
+                                                  )
+                                                  .toList(),
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -437,48 +282,40 @@ class _SimilarWordsGameScreenState extends State<SimilarWordsGameScreen> {
                         ),
                       ),
 
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 24),
 
                       if (state.userAnswers.values.every(
                         (answer) => answer != null,
                       ))
-                        ElevatedButton.icon(
-                          onPressed: () {
+                        GestureDetector(
+                          onTap: () {
                             int score = state.score;
-                            showDialog(
-                              context: context,
-                              builder:
-                                  (context) => AlertDialog(
-                                    title: const Text('Game Complete!'),
-                                    content: Text(
-                                      'You got $score out of ${state.questionAnswers.length} correct!\n\n'
-                                      '${score == state.questionAnswers.length ? 'Perfect score! 🎉' : 'Keep practicing to improve your score!'}',
-                                    ),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () {
-                                          Navigator.of(context).pop();
-                                          _cubit.resetGame();
-                                        },
-                                        child: const Text('Play Again'),
-                                      ),
-                                      TextButton(
-                                        onPressed:
-                                            () => Navigator.of(context).pop(),
-                                        child: const Text('OK'),
-                                      ),
-                                    ],
-                                  ),
+                            NeubrutalismToast.show(
+                              context,
+                              message: 'COMPLETED! SCORE: $score',
+                              backgroundColor: Colors.green,
+                              icon: Icons.emoji_events,
                             );
                           },
-                          icon: const Icon(Icons.check_circle),
-                          label: const Text('Check Answers'),
-                          style: ElevatedButton.styleFrom(
+                          child: NeubrutalismContainer(
                             backgroundColor: Colors.green,
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 24,
-                              vertical: 12,
+                            borderRadius: 50,
+                            height: 60,
+                            width: double.infinity,
+                            child: const Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.check_circle, color: Colors.white),
+                                SizedBox(width: 8),
+                                Text(
+                                  'CHECK ANSWERS',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w900,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ),
@@ -490,6 +327,99 @@ class _SimilarWordsGameScreenState extends State<SimilarWordsGameScreen> {
           );
         },
       ),
+    );
+  }
+
+  Widget _buildWordChip(String word, Color darkBorderColor) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: darkBorderColor, width: 2),
+      ),
+      child: Text(
+        word,
+        style: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w900,
+          color: darkBorderColor,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDropTarget(
+    String question,
+    String? userAnswer,
+    bool isCorrect,
+    Color darkBorderColor,
+    Color accentOrange,
+  ) {
+    return DragTarget<String>(
+      onWillAcceptWithDetails: (droppedWord) {
+        return _cubit.isCorrectAnswer(question, droppedWord.data);
+      },
+      onAcceptWithDetails: (droppedWord) {
+        _cubit.onWordDropped(question, droppedWord.data);
+      },
+      builder: (context, candidateData, rejectedData) {
+        final bool isBeingHovered = candidateData.isNotEmpty;
+        final bool isRejected = rejectedData.isNotEmpty;
+
+        Color targetBg = Colors.white;
+        Color targetBorder = darkBorderColor.withOpacity(0.2);
+        double borderWidth = 1.5;
+
+        if (userAnswer != null) {
+          targetBg =
+              isCorrect
+                  ? Colors.green.withOpacity(0.1)
+                  : Colors.red.withOpacity(0.1);
+          targetBorder = isCorrect ? Colors.green : Colors.red;
+          borderWidth = 2.0;
+        } else if (isBeingHovered) {
+          targetBg = Colors.blue.withOpacity(0.05);
+          targetBorder = Colors.blue;
+          borderWidth = 2.5;
+        } else if (isRejected) {
+          targetBg = Colors.red.withOpacity(0.05);
+          targetBorder = Colors.red;
+          borderWidth = 2.0;
+        }
+
+        return Container(
+          width: double.infinity,
+          height: 48,
+          decoration: BoxDecoration(
+            color: targetBg,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: targetBorder, width: borderWidth),
+          ),
+          child: Center(
+            child:
+                userAnswer != null
+                    ? Text(
+                      userAnswer,
+                      style: TextStyle(
+                        fontWeight: FontWeight.w900,
+                        color: isCorrect ? Colors.green : Colors.red,
+                      ),
+                    )
+                    : Text(
+                      isRejected ? '!' : (isBeingHovered ? 'DROP' : '...'),
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w900,
+                        color:
+                            isRejected
+                                ? Colors.red
+                                : darkBorderColor.withOpacity(0.3),
+                      ),
+                    ),
+          ),
+        );
+      },
     );
   }
 }

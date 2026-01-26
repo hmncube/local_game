@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:local_game/app/themes/app_text_styles.dart';
 import 'package:local_game/core/base/cubit/cubit_status.dart';
-import 'package:local_game/core/constants/app_assets.dart';
 import 'package:local_game/core/constants/app_values.dart';
 import 'package:local_game/core/di/di.dart';
 import 'package:local_game/core/game_system/points_management.dart';
@@ -13,6 +10,7 @@ import 'package:local_game/presentation/map/map_cubit.dart';
 import 'package:local_game/presentation/map/map_state.dart';
 import 'package:local_game/presentation/widget/game_top_bar.dart';
 import 'package:local_game/presentation/widget/loading_screen.dart';
+import 'package:local_game/presentation/widget/neubrutalism_container.dart';
 
 class MapScreen extends StatefulWidget {
   const MapScreen({super.key});
@@ -32,9 +30,14 @@ class _MapScreenState extends State<MapScreen> {
 
   @override
   Widget build(BuildContext context) {
+    const creamBackground = Color(0xFFFFF9E5);
+    const darkBorderColor = Color(0xFF2B2118);
+    const accentOrange = Color(0xFFE88328);
+
     return BlocProvider(
       create: (context) => _cubit,
       child: Scaffold(
+        backgroundColor: creamBackground,
         body: BlocConsumer<MapCubit, MapState>(
           listener: (context, state) {
             if (state.cubitState is CubitError) {
@@ -50,85 +53,83 @@ class _MapScreenState extends State<MapScreen> {
           builder: (context, state) {
             final cubitState = state.cubitState;
             if (cubitState is CubitLoading) {
-              return LoadingScreen();
+              return const LoadingScreen();
             } else if (cubitState is CubitSuccess) {
               if (state.levels.isEmpty) {
                 return const Center(child: Text('No levels found.'));
               }
               final unLocked = state.levels.firstWhere(
                 (level) => level.status == 0,
+                orElse: () => state.levels.last,
               );
-              return Scaffold(
-                body: Stack(
+              return SafeArea(
+                child: Column(
                   children: [
-                    SizedBox(
-                      height: double.infinity,
-                      child: SvgPicture.asset(
-                        AppAssets.backgroundSvg,
-                        fit: BoxFit.fill,
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
+                      child: GameTopBar(
+                        points: state.userModel?.totalScore ?? 0,
+                        hints: state.userModel?.hints ?? 0,
+                        showHome: false,
                       ),
                     ),
-                    Container(
-                      width: double.infinity,
-                      height: double.infinity,
-                      color: Colors.white54,
+                    const SizedBox(height: 16),
+                    const Divider(
+                      height: 1,
+                      color: darkBorderColor,
+                      thickness: 2,
                     ),
-                    Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(top: 42.0),
-                          child: SizedBox(
-                            height: 60,
-                            child: GameTopBar(
-                              points: state.userModel?.totalScore ?? 0,
-                              hints: state.userModel?.hints ?? 0,
-                              showHome: false,
+                    const SizedBox(height: 24),
+                    const Text(
+                      'Select a Level',
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.w900,
+                        color: darkBorderColor,
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    Expanded(
+                      child: GridView.builder(
+                        padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 3,
+                              crossAxisSpacing: 16.0,
+                              mainAxisSpacing: 24.0,
+                              childAspectRatio: 0.8,
                             ),
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        Expanded(
-                          child: GridView.builder(
-                            gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 3,
-                                  crossAxisSpacing: 16.0,
-                                  mainAxisSpacing: 16.0,
-                                  childAspectRatio: 1.0,
-                                ),
-                            itemCount: state.levels.length,
-                            itemBuilder: (context, index) {
-                              final level = state.levels[index];
-                              final isCompleted = level.status == 1;
-                              final isUnLocked = unLocked.id == level.id;
-                              return LevelButton(
-                                levelId: level.id,
-                                type: level.type,
-                                isCompleted: isCompleted,
-                                stars:
-                                    level.status == AppValues.levelDone
-                                        ? PointsManagement.calculateStars(
-                                          level.points,
-                                        )
-                                        : 0,
-                                onTap: () {
-                                  //todo unloack completed level animation
-                                  !isUnLocked
-                                      ? null
-                                      : context.go(
-                                        _getTypeScreenLocation(level.type),
-                                        extra: level.id,
-                                      );
-                                },
-                                difficulty: level.difficulty,
-                                isUnLocked:
-                                    level.status == AppValues.levelDone ||
-                                    isUnLocked,
-                              );
+                        itemCount: state.levels.length,
+                        itemBuilder: (context, index) {
+                          final level = state.levels[index];
+                          final isCompleted = level.status == 1;
+                          final isUnLocked =
+                              unLocked.id == level.id || isCompleted;
+                          return LevelButton(
+                            levelId: level.id,
+                            type: level.type,
+                            isCompleted: isCompleted,
+                            stars:
+                                level.status == AppValues.levelDone
+                                    ? PointsManagement.calculateStars(
+                                      level.points,
+                                    )
+                                    : 0,
+                            onTap: () {
+                              if (isUnLocked) {
+                                context.go(
+                                  _getTypeScreenLocation(level.type),
+                                  extra: level.id,
+                                );
+                              }
                             },
-                          ),
-                        ),
-                      ],
+                            difficulty: level.difficulty,
+                            isUnLocked: isUnLocked,
+                            darkBorderColor: darkBorderColor,
+                            accentOrange: accentOrange,
+                          );
+                        },
+                      ),
                     ),
                   ],
                 ),
@@ -161,6 +162,8 @@ class LevelButton extends StatelessWidget {
   final int type;
   final int stars;
   final bool isUnLocked;
+  final Color darkBorderColor;
+  final Color accentOrange;
 
   const LevelButton({
     super.key,
@@ -171,6 +174,8 @@ class LevelButton extends StatelessWidget {
     required this.type,
     required this.stars,
     required this.isUnLocked,
+    required this.darkBorderColor,
+    required this.accentOrange,
   });
 
   @override
@@ -179,56 +184,54 @@ class LevelButton extends StatelessWidget {
       onTap: onTap,
       child: Column(
         children: [
-          SizedBox(
-            width: 70,height: 70,
-            child: Stack(
-              children: [
-                SizedBox(
-                  height: 70,
-                  width: 100,
-                  child: Stack(
-                    children: [
-                      SvgPicture.asset(_getTypeSvg(type)),
-                      Align(
-                        alignment: Alignment.center,
-                        child: Text(
+          Expanded(
+            child: NeubrutalismContainer(
+              borderRadius: 20,
+              borderWidth: 3,
+              shadowOffset: const Offset(0, 4),
+              backgroundColor: isUnLocked ? Colors.white : Colors.grey[300]!,
+              borderColor: isUnLocked ? darkBorderColor : Colors.grey,
+              child: Stack(
+                children: [
+                  Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
                           '$levelId',
-                          style: AppTextStyles.heading1.copyWith(
-                            color: Colors.black,
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.w900,
+                            color:
+                                isUnLocked ? darkBorderColor : Colors.grey[600],
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                ),
-                Visibility(
-                  visible: !isUnLocked,
-                  child: Align(
-                    alignment: Alignment.center,
-                    child: Container(
-                      height: 70,
-                      width: 70,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(100),
-                        color: Colors.white54,
-                      ),
-                      child: Center(child: Icon(Icons.lock)),
+                        const SizedBox(height: 4),
+                        Icon(
+                          _getTypeIcon(type),
+                          size: 16,
+                          color: isUnLocked ? accentOrange : Colors.grey,
+                        ),
+                      ],
                     ),
                   ),
-                ),
-              ],
+                  if (!isUnLocked)
+                    const Center(
+                      child: Icon(Icons.lock, color: Colors.white70, size: 32),
+                    ),
+                ],
+              ),
             ),
           ),
-          Center(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(
-                3,
-                (index) => SvgPicture.asset(
-                  index < stars ? AppAssets.filledStarSvg : AppAssets.starSvg,
-                  height: 35,
-                  width: 35,
-                ),
+          const SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: List.generate(
+              3,
+              (index) => Icon(
+                index < stars ? Icons.star : Icons.star_border,
+                size: 20,
+                color: index < stars ? accentOrange : Colors.grey[400],
               ),
             ),
           ),
@@ -237,14 +240,14 @@ class LevelButton extends StatelessWidget {
     );
   }
 
-  String _getTypeSvg(int type) {
+  IconData _getTypeIcon(int type) {
     switch (type) {
       case AppValues.wordLink:
-        return AppAssets.linkSvg;
+        return Icons.link;
       case AppValues.wordMatch:
-        return AppAssets.matchSvg;
+        return Icons.compare_arrows;
       default:
-        return AppAssets.fnderSvg;
+        return Icons.search;
     }
   }
 }

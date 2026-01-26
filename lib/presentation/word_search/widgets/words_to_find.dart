@@ -1,12 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
-import 'package:local_game/app/themes/app_text_styles.dart';
-import 'package:local_game/core/constants/app_assets.dart';
 import 'package:local_game/presentation/word_search/find_word_game_state.dart';
+
+import 'package:local_game/presentation/widget/neubrutalism_container.dart';
 
 class WordsToFind extends StatefulWidget {
   final FindWordGameState state;
-  const WordsToFind({super.key, required this.state});
+  final Color darkBorderColor;
+  final Color accentOrange;
+
+  const WordsToFind({
+    super.key,
+    required this.state,
+    required this.darkBorderColor,
+    required this.accentOrange,
+  });
 
   @override
   State<WordsToFind> createState() => _WordsToFindState();
@@ -16,58 +23,101 @@ class _WordsToFindState extends State<WordsToFind> {
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      flex: 1,
-      child: Container(
+      flex: 2,
+      child: NeubrutalismContainer(
+        borderRadius: 20,
+        backgroundColor: Colors.white,
+        padding: const EdgeInsets.all(20),
         width: double.infinity,
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.grey.shade50,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: Colors.grey.shade300),
-        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Words to Find:',
-              style: AppTextStyles.tileLetter.copyWith(fontSize: 18),
+            Row(
+              children: [
+                Icon(Icons.list_alt, size: 20, color: widget.darkBorderColor),
+                const SizedBox(width: 8),
+                Text(
+                  'WORDS TO FIND',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w900,
+                    color: widget.darkBorderColor,
+                    letterSpacing: 1.2,
+                  ),
+                ),
+                const Spacer(),
+                Text(
+                  '${widget.state.foundWords.length}/${widget.state.wordsToFind.length}',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w900,
+                    color: widget.accentOrange,
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 16),
+            const Divider(height: 1),
+            const SizedBox(height: 16),
             Expanded(
-              child: Wrap(
-                spacing: 8,
-                runSpacing: 4,
-                children:
-                    widget.state.wordsToFind.map((word) {
-                      bool isFound = widget.state.foundWords.contains(word);
-                      Color wordColor =
-                          widget.state.wordColors[word] ?? Colors.grey;
-                      return Stack(
-                        children: [
-                          Positioned.fill(
-                            child: SvgPicture.asset(
-                              AppAssets.inputSvg,
-                              fit: BoxFit.fill,
+              child: SingleChildScrollView(
+                child: Wrap(
+                  spacing: 12,
+                  runSpacing: 12,
+                  children:
+                      widget.state.wordsToFind.map((word) {
+                        bool isFound = widget.state.foundWords.contains(word);
+                        Color wordColor =
+                            widget.state.wordColors[word] ?? Colors.grey;
+
+                        return Opacity(
+                          opacity: isFound ? 0.5 : 1.0,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 14,
+                              vertical: 8,
                             ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Text(
-                              word,
-                              style: AppTextStyles.keyboardKey.copyWith(
-                                decoration:
-                                    isFound ? TextDecoration.lineThrough : null,
+                            decoration: BoxDecoration(
+                              color:
+                                  isFound
+                                      ? wordColor.withOpacity(0.2)
+                                      : Colors.white,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
                                 color:
                                     isFound
-                                        ? wordColor.withAlpha(100)
-                                        : Colors.black87,
-                                fontWeight: FontWeight.w500,
+                                        ? wordColor
+                                        : widget.darkBorderColor,
+                                width: 2,
                               ),
                             ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                if (isFound)
+                                  Icon(Icons.check, size: 16, color: wordColor),
+                                if (isFound) const SizedBox(width: 4),
+                                Text(
+                                  word,
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w900,
+                                    color:
+                                        isFound
+                                            ? wordColor
+                                            : widget.darkBorderColor,
+                                    decoration:
+                                        isFound
+                                            ? TextDecoration.lineThrough
+                                            : null,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ],
-                      );
-                    }).toList(),
+                        );
+                      }).toList(),
+                ),
               ),
             ),
           ],

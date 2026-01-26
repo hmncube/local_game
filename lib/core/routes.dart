@@ -6,7 +6,8 @@ enum Routes {
   wordSearch,
   similarWords,
   crosswordScreen,
-  levelCompleteScreen
+  levelCompleteScreen,
+  settings,
 }
 
 extension RoutesExt on Routes {

@@ -1,19 +1,25 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:local_game/app/themes/app_text_styles.dart';
 import 'package:local_game/presentation/word_search/find_word_game_cubit.dart';
 import 'package:local_game/presentation/word_search/find_word_game_state.dart';
+
+import 'package:local_game/presentation/widget/neubrutalism_container.dart';
 
 class GameGrid extends StatefulWidget {
   final FindWordGameState state;
   final FindWordGameCubit cubit;
   final Position? hintPosition;
+  final Color darkBorderColor;
+  final Color accentOrange;
+
   const GameGrid({
     super.key,
     required this.state,
     required this.cubit,
     required this.hintPosition,
+    required this.darkBorderColor,
+    required this.accentOrange,
   });
 
   @override
@@ -30,13 +36,12 @@ class _GameGridState extends State<GameGrid> {
       );
     }
     return Expanded(
-      flex: 2,
+      flex: 3,
       child: Center(
-        child: Container(
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey.shade400, width: 2),
-            borderRadius: BorderRadius.circular(8),
-          ),
+        child: NeubrutalismContainer(
+          borderRadius: 20,
+          backgroundColor: Colors.white,
+          padding: const EdgeInsets.all(8),
           child: LayoutBuilder(
             builder: (context, constraints) {
               double gridWidth = constraints.maxWidth;
@@ -82,20 +87,35 @@ class _GameGridState extends State<GameGrid> {
                       return Expanded(
                         child: Row(
                           children: List.generate(widget.state.gridSize, (col) {
+                            final cellColor = _getCellColor(
+                              widget.state,
+                              row,
+                              col,
+                            );
+                            final isSelected = widget.state.selectedPositions
+                                .contains(Position(row, col));
+
                             return Expanded(
                               child: Container(
                                 decoration: BoxDecoration(
-                                  color: _getCellColor(widget.state, row, col),
+                                  color: cellColor,
                                   border: Border.all(
-                                    color: Colors.grey.shade300,
+                                    color: widget.darkBorderColor.withOpacity(
+                                      0.1,
+                                    ),
+                                    width: 0.5,
                                   ),
                                 ),
                                 child: Center(
                                   child: Text(
                                     widget.state.grid[row][col],
-                                    style: AppTextStyles.body.copyWith(
-                                      fontSize: cellSize * 0.4,
-                                      fontWeight: FontWeight.bold,
+                                    style: TextStyle(
+                                      fontSize: cellSize * 0.45,
+                                      fontWeight: FontWeight.w900,
+                                      color:
+                                          isSelected
+                                              ? Colors.white
+                                              : widget.darkBorderColor,
                                     ),
                                   ),
                                 ),
@@ -118,21 +138,21 @@ class _GameGridState extends State<GameGrid> {
   Color _getCellColor(FindWordGameState state, int row, int col) {
     final pos = Position(row, col);
     if (state.selectedPositions.contains(pos)) {
-      return Colors.blue.withAlpha(128);
+      return widget.accentOrange;
     }
     for (String word in state.foundWords) {
       if (state.wordPositions[word]?.contains(pos) == true) {
         Color wordColor = state.wordColors[word] ?? Colors.green;
-        return wordColor.withAlpha(128);
+        return wordColor.withOpacity(0.4);
       }
     }
 
     if (state.hintPosition != null &&
         state.hintPosition?.col == col &&
         state.hintPosition?.row == row) {
-      return Colors.yellow.withAlpha(128);
+      return Colors.yellow.withOpacity(0.6);
     }
 
-    return Colors.grey.shade200;
+    return Colors.transparent;
   }
 }

@@ -21,6 +21,7 @@ import '../../data/database_provider.dart' as _i90;
 import '../../data/local_provider.dart' as _i1063;
 import '../../presentation/map/map_cubit.dart' as _i621;
 import '../../presentation/onboarding/onboarding_cubit.dart' as _i69;
+import '../../presentation/settings/settings_cubit.dart' as _i487;
 import '../../presentation/similar_words/similar_words_game_cubit.dart'
     as _i387;
 import '../../presentation/splash/splash_cubit.dart' as _i447;
@@ -46,8 +47,10 @@ Future<_i174.GetIt> init(
   gh.lazySingleton<_i90.DatabaseProvider>(
     () => registerModule.databaseProvider,
   );
-  gh.lazySingleton<_i64.SoundManager>(() => _i64.SoundManager());
   gh.lazySingleton<_i1063.LocalProvider>(() => _i1063.LocalProvider());
+  gh.lazySingleton<_i64.SoundManager>(
+    () => _i64.SoundManager(gh<_i1063.LocalProvider>()),
+  );
   gh.factory<_i959.PlayerIconDao>(
     () => _i959.PlayerIconDao(gh<_i779.Database>()),
   );
@@ -55,6 +58,12 @@ Future<_i174.GetIt> init(
     () => _i447.SplashCubit(
       gh<_i1063.LocalProvider>(),
       gh<_i90.DatabaseProvider>(),
+    ),
+  );
+  gh.factory<_i487.SettingsCubit>(
+    () => _i487.SettingsCubit(
+      gh<_i1063.LocalProvider>(),
+      gh<_i64.SoundManager>(),
     ),
   );
   gh.factory<_i390.UserDao>(() => _i390.UserDao(gh<_i90.DatabaseProvider>()));

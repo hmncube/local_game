@@ -6,6 +6,8 @@ import 'package:local_game/core/routes.dart';
 import 'package:local_game/presentation/models/points.dart';
 import 'package:local_game/presentation/widget/animated_timer_bar.dart';
 import 'package:local_game/presentation/widget/game_top_bar.dart';
+import 'package:local_game/presentation/widget/neubrutalism_container.dart';
+import 'package:local_game/presentation/widget/neubrutalism_toast.dart';
 import 'package:local_game/presentation/word_search/find_word_game_cubit.dart';
 import 'package:local_game/presentation/word_search/find_word_game_state.dart';
 
@@ -38,28 +40,30 @@ class _FindWordGameScreenState extends State<FindWordGameScreen> {
 
   @override
   Widget build(BuildContext context) {
+    const creamBackground = Color(0xFFFFF9E5);
+    const darkBorderColor = Color(0xFF2B2118);
+    const accentOrange = Color(0xFFE88328);
+
     return BlocProvider.value(
       value: _cubit,
       child: BlocConsumer<FindWordGameCubit, FindWordGameState>(
         listener: (context, state) {
           if (state.newFoundWord.isNotEmpty) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Found: ${state.newFoundWord}!'),
-                duration: const Duration(seconds: 1),
-                backgroundColor: state.wordColors[state.newFoundWord],
-              ),
+            NeubrutalismToast.show(
+              context,
+              message: 'BRAVO: ${state.newFoundWord.toUpperCase()}!',
+              backgroundColor:
+                  state.wordColors[state.newFoundWord] ?? accentOrange,
             );
             _cubit.clearNewFoundWord();
           }
 
           if (state.hintError?.isNotEmpty == true) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.hintError ?? ''),
-                duration: const Duration(seconds: 1),
-                backgroundColor: state.wordColors[state.newFoundWord],
-              ),
+            NeubrutalismToast.show(
+              context,
+              message: state.hintError!,
+              backgroundColor: Colors.red,
+              icon: Icons.error_outline,
             );
           }
 
@@ -83,9 +87,10 @@ class _FindWordGameScreenState extends State<FindWordGameScreen> {
               }
             },
             child: Scaffold(
+              backgroundColor: creamBackground,
               body: SafeArea(
                 child: Padding(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.all(24.0),
                   child: Column(
                     children: [
                       GameTopBar(
@@ -93,17 +98,58 @@ class _FindWordGameScreenState extends State<FindWordGameScreen> {
                         hints: state.hints,
                         onHintClicked: () => _cubit.onHintClicked(),
                       ),
-                      const SizedBox(height: 8),
-                      Text('Bonus timer'),
-                      AnimatedTimerBar(value: state.progressValue),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 24),
+
+                      // Timer Section
+                      NeubrutalismContainer(
+                        borderRadius: 20,
+                        backgroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
+                        child: Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.timer,
+                                  size: 18,
+                                  color: darkBorderColor,
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  'BONUS TIMER',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w900,
+                                    color: darkBorderColor.withOpacity(0.7),
+                                    letterSpacing: 1.2,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            AnimatedTimerBar(value: state.progressValue),
+                          ],
+                        ),
+                      ),
+
+                      const SizedBox(height: 24),
                       GameGrid(
                         state: state,
                         cubit: _cubit,
                         hintPosition: state.hintPosition,
+                        darkBorderColor: darkBorderColor,
+                        accentOrange: accentOrange,
                       ),
-                      const SizedBox(height: 16),
-                      WordsToFind(state: state),
+                      const SizedBox(height: 24),
+                      WordsToFind(
+                        state: state,
+                        darkBorderColor: darkBorderColor,
+                        accentOrange: accentOrange,
+                      ),
                     ],
                   ),
                 ),

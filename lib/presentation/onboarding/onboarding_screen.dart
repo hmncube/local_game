@@ -14,6 +14,8 @@ import 'package:local_game/presentation/widget/app_option_btn.dart';
 import 'package:local_game/presentation/widget/app_text_input.dart';
 import 'package:local_game/presentation/widget/error_screen.dart';
 import 'package:local_game/presentation/widget/loading_screen.dart';
+import 'package:local_game/presentation/widget/neubrutalism_container.dart';
+import 'package:local_game/data/model/player_icon_model.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -56,174 +58,283 @@ class _OnboardingScreenState extends State<OnboardingScreen>
           }
         },
         builder: (context, state) {
-          return (state.cubitState is CubitLoading)
-              ? LoadingScreen()
-              : (state.cubitState is CubitError)
-              ? ErrorScreen()
-              : Scaffold(
-                body: Stack(
-                  children: [
-                    SizedBox(
-                      height: double.infinity,
-                      child: SvgPicture.asset(
-                        AppAssets.backgroundSvg,
-                        fit: BoxFit.fill,
-                      ),
+          if (state.cubitState is CubitLoading) return const LoadingScreen();
+          if (state.cubitState is CubitError) return const ErrorScreen();
+
+          const creamBackground = Color(0xFFFFF9E5);
+          const darkBorderColor = Color(0xFF2B2118);
+          const accentOrange = Color(0xFFE88328);
+
+          return Scaffold(
+            backgroundColor: creamBackground,
+            body: SafeArea(
+              child: Column(
+                children: [
+                  // Top Bar
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24.0,
+                      vertical: 16.0,
                     ),
-                    Column(
+                    child: Row(
                       children: [
-                        Expanded(
-                          child: SingleChildScrollView(
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 20.0,
-                              ),
-                              child: Column(
-                                children: [
-                                  SvgPicture.asset(AppAssets.mavaraSvg),
-                                  Text(
-                                    'Create your profile',
-                                    style: AppTextStyles.heading1.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.brown,
-                                    ),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                  const SizedBox(height: 8),
-                                  SizedBox(
-                                    width: double.infinity,
-                                    child: AppTextInput(
-                                      onTextChanged: (String text) {
-                                        _cubit.onNicknameChanged(text);
-                                      },
-                                    ),
-                                  ),
-                                  const SizedBox(height: 12),
-                                  Text(
-                                    '🐾 Choose Your Animal',
-                                    style: AppTextStyles.heading1.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.brown,
-                                    ),
-                                  ),
-                                  GridView.builder(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 0,
-                                    ),
-                                    shrinkWrap: true,
-                                    physics:
-                                        const NeverScrollableScrollPhysics(),
-                                    gridDelegate:
-                                        const SliverGridDelegateWithFixedCrossAxisCount(
-                                          crossAxisCount: 3,
-                                          childAspectRatio: 1,
-                                          crossAxisSpacing: 1,
-                                          mainAxisSpacing: 1,
-                                        ),
-                                    itemCount: 6,
-                                    itemBuilder: (context, index) {
-                                      final playerIcon =
-                                          state.playerIcons[index];
-                                      final isSelected =
-                                          playerIcon.id ==
-                                          state.selectedPlayerIcon?.id;
-                                      return Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: GestureDetector(
-                                          onTap: () {
-                                            _cubit.onIconSelected(playerIcon);
-                                          },
-                                          child: AnimatedContainer(
-                                            duration: const Duration(
-                                              milliseconds: 200,
-                                            ),
-                                            decoration: BoxDecoration(
-                                              color: Colors.transparent,
-                                              borderRadius:
-                                                  BorderRadius.circular(185),
-                                              border: Border.all(
-                                                color:
-                                                    isSelected
-                                                        ? Colors.white
-                                                        : Colors.transparent,
-                                                width: isSelected ? 3 : 1,
-                                              ),
-                                              boxShadow:
-                                                  isSelected
-                                                      ? [
-                                                        BoxShadow(
-                                                          color: Colors.purple
-                                                              .withOpacity(0.5),
-                                                          blurRadius: 10,
-                                                          spreadRadius: 2,
-                                                        ),
-                                                      ]
-                                                      : [],
-                                            ),
-                                            child: SvgPicture.asset(
-                                              'assets/svg/${playerIcon.path}.svg',
-                                            ),
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    '🌍 Select Language (1-3)',
-                                    style: AppTextStyles.heading1.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.brown,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children:
-                                        state.langauges.map((language) {
-                                          final isSelected =
-                                              state.selectedLanguage?.contains(
-                                                language,
-                                              ) ==
-                                              true;
-                                          return Flexible(
-                                            child: AppOptionBtn(
-                                              onClick: () {
-                                                _cubit
-                                                    .onLanguageSelectedChanged(
-                                                      language,
-                                                    );
-                                              },
-                                              title: language.name,
-                                              isSelected: isSelected,
-                                            ),
-                                          );
-                                        }).toList(),
-                                  ),
-                                  const SizedBox(height: 20),
-                                ],
-                              ),
+                        const Spacer(),
+                        const Center(
+                          child: Text(
+                            'Join the Adventure',
+                            style: TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.w900,
+                              color: darkBorderColor,
                             ),
                           ),
                         ),
-                        // Button at the bottom
-                        Padding(
-                          padding: const EdgeInsets.all(20.0),
-                          child: AppBtn(
-                            onClick: () {
-                              _cubit.saveProfile();
-                            },
-                            title: 'Save',
-                            isEnabled: state.canProceed,
-                          ),
-                        ),
+                        const Spacer(),
                       ],
                     ),
-                  ],
-                ),
-              );
+                  ),
+                  const Divider(
+                    height: 1,
+                    color: darkBorderColor,
+                    thickness: 2,
+                  ),
+                  const SizedBox(height: 24),
+
+                  Expanded(
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                      child: Column(
+                        children: [
+                          const Text(
+                            "What's your name?",
+                            style: TextStyle(
+                              fontSize: 32,
+                              fontWeight: FontWeight.w900,
+                              color: darkBorderColor,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          NeubrutalismContainer(
+                            borderRadius: 50,
+                            height: 70,
+                            padding: const EdgeInsets.symmetric(horizontal: 24),
+                            child: TextField(
+                              controller: _nicknameController,
+                              onChanged:
+                                  (text) => _cubit.onNicknameChanged(text),
+                              decoration: const InputDecoration(
+                                hintText: 'Type your name...',
+                                hintStyle: TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                border: InputBorder.none,
+                              ),
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: darkBorderColor,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 32),
+
+                          const Text(
+                            "Pick your language",
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.w900,
+                              color: darkBorderColor,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          ...state.langauges.map((language) {
+                            final isSelected =
+                                state.selectedLanguage?.contains(language) ==
+                                true;
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 12),
+                              child: GestureDetector(
+                                onTap:
+                                    () => _cubit.onLanguageSelectedChanged(
+                                      language,
+                                    ),
+                                child: NeubrutalismContainer(
+                                  backgroundColor:
+                                      isSelected ? accentOrange : Colors.white,
+                                  borderRadius: 50,
+                                  height: 60,
+                                  width: double.infinity,
+                                  child: Center(
+                                    child: Text(
+                                      language.name,
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w900,
+                                        color:
+                                            isSelected
+                                                ? Colors.white
+                                                : darkBorderColor,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            );
+                          }),
+                          const SizedBox(height: 32),
+
+                          const Text(
+                            "Choose your Mascot",
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.w900,
+                              color: darkBorderColor,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              _buildMascotCard(
+                                state.playerIcons.length > 5
+                                    ? state.playerIcons[5] // Owl as 'Birdie'
+                                    : null,
+                                'Birdie',
+                                state.selectedPlayerIcon?.id ==
+                                    (state.playerIcons.length > 5
+                                        ? state.playerIcons[5].id
+                                        : -1),
+                                darkBorderColor,
+                                accentOrange,
+                              ),
+                              _buildMascotCard(
+                                state.playerIcons.length > 4
+                                    ? state.playerIcons[4] // Lion as 'Simba'
+                                    : null,
+                                'Simba',
+                                state.selectedPlayerIcon?.id ==
+                                    (state.playerIcons.length > 4
+                                        ? state.playerIcons[4].id
+                                        : -1),
+                                darkBorderColor,
+                                accentOrange,
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 32),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  // Bottom Button
+                  Padding(
+                    padding: const EdgeInsets.all(24.0),
+                    child: GestureDetector(
+                      onTap:
+                          state.canProceed ? () => _cubit.saveProfile() : null,
+                      child: Opacity(
+                        opacity: state.canProceed ? 1.0 : 0.5,
+                        child: NeubrutalismContainer(
+                          backgroundColor: accentOrange,
+                          borderRadius: 50,
+                          height: 80,
+                          width: double.infinity,
+                          child: const Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'START ADVENTURE',
+                                style: TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.w900,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              SizedBox(width: 8),
+                              Icon(
+                                Icons.rocket_launch,
+                                color: Colors.white,
+                                size: 32,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
         },
       ),
+    );
+  }
+
+  Widget _buildMascotCard(
+    PlayerIconModel? icon,
+    String name,
+    bool isSelected,
+    Color darkBorderColor,
+    Color accentOrange,
+  ) {
+    return Column(
+      children: [
+        GestureDetector(
+          onTap: icon != null ? () => _cubit.onIconSelected(icon) : null,
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              NeubrutalismContainer(
+                borderRadius: 30,
+                width: 140,
+                height: 140,
+                backgroundColor:
+                    isSelected ? const Color(0xFFFFE0B2) : Colors.white,
+                borderColor: isSelected ? accentOrange : darkBorderColor,
+                padding: const EdgeInsets.all(8),
+                child:
+                    icon != null
+                        ? SvgPicture.asset(
+                          'assets/svg/${icon.path}.svg',
+                          fit: BoxFit.contain,
+                        )
+                        : const SizedBox(),
+              ),
+              if (isSelected)
+                Positioned(
+                  top: -10,
+                  right: -10,
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: accentOrange,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: darkBorderColor, width: 2),
+                    ),
+                    child: const Icon(
+                      Icons.check,
+                      color: Colors.white,
+                      size: 20,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
+        Text(
+          name,
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w900,
+            color: isSelected ? accentOrange : darkBorderColor,
+          ),
+        ),
+      ],
     );
   }
 }

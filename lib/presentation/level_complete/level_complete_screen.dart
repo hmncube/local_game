@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:local_game/app/themes/app_text_styles.dart';
 import 'package:local_game/core/constants/app_assets.dart';
@@ -7,7 +6,7 @@ import 'package:local_game/core/di/di.dart';
 import 'package:local_game/core/routes.dart';
 import 'package:local_game/core/sound/sound_manager.dart';
 import 'package:local_game/presentation/models/points.dart';
-import 'package:local_game/presentation/widget/app_btn.dart';
+import 'package:local_game/presentation/widget/neubrutalism_container.dart';
 import 'package:lottie/lottie.dart';
 
 class LevelCompleteScreen extends StatefulWidget {
@@ -147,107 +146,134 @@ class _LevelCompleteScreenState extends State<LevelCompleteScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
-        children: [
-          Positioned.fill(
-            child: SvgPicture.asset(AppAssets.backgroundSvg, fit: BoxFit.fill),
-          ),
-          // use high quality image
-          //Positioned.fill(child: SvgPicture.asset(AppAssets.celebrationSvg)),
-          if (!_showText)
-            Lottie.asset(
-              AppAssets.celebrationsAnimation,
-              repeat: false,
-              onLoaded: (composition) {
-                Future.delayed(composition.duration, _onAnimationComplete);
-              },
-            ),
-          if (_showText)
-            Center(
-              child: FadeTransition(
-                opacity: _fadeAnimation,
-                child: ScaleTransition(
-                  scale: _scaleAnimation,
-                  child: Column(
-                    children: [   
-                      SizedBox(height: 48,),           
-                      // Points Display
-                      _buildPointsDisplay(),
+    const creamBackground = Color(0xFFFFF9E5);
+    const darkBorderColor = Color(0xFF2B2118);
+    const accentOrange = Color(0xFFE88328);
 
-                      Lottie.asset(
-                        width: double.infinity,
-                        height: 100,
-                        AppAssets.fallingCoins,
-                        repeat: false,
-                      ),        
-                      
-                      Lottie.asset(
-                        width: double.infinity,
-                        height: 100,
-                        AppAssets.coinsChest,
-                        repeat: false,
+    return Scaffold(
+      backgroundColor: creamBackground,
+      body: SafeArea(
+        child: Column(
+          children: [
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if (!_showText)
+                      Expanded(
+                        child: Lottie.asset(
+                          AppAssets.celebrationsAnimation,
+                          repeat: false,
+                          onLoaded: (composition) {
+                            Future.delayed(
+                              composition.duration,
+                              _onAnimationComplete,
+                            );
+                          },
+                        ),
                       ),
-                      const SizedBox(height: 32),
-                      AppBtn(
-                        title: 'Pfuurira Mberi',
-                        onClick: () {
-                          context.go(Routes.mapScreen.toPath);
-                        },
-                        isEnabled: true,
-                        width: 300
+                    if (_showText)
+                      FadeTransition(
+                        opacity: _fadeAnimation,
+                        child: ScaleTransition(
+                          scale: _scaleAnimation,
+                          child: Column(
+                            children: [
+                              const Text(
+                                'Level Complete!',
+                                style: TextStyle(
+                                  fontSize: 32,
+                                  fontWeight: FontWeight.w900,
+                                  color: darkBorderColor,
+                                ),
+                              ),
+                              const SizedBox(height: 24),
+                              _buildPointsDisplay(darkBorderColor),
+                              const SizedBox(height: 16),
+                              Lottie.asset(
+                                width: double.infinity,
+                                height: 100,
+                                AppAssets.fallingCoins,
+                                repeat: false,
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
-                    ],
+                  ],
+                ),
+              ),
+            ),
+            // Bottom Button
+            Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: GestureDetector(
+                onTap: () => context.go(Routes.mapScreen.toPath),
+                child: NeubrutalismContainer(
+                  backgroundColor: accentOrange,
+                  borderRadius: 50,
+                  height: 80,
+                  width: double.infinity,
+                  child: const Center(
+                    child: Text(
+                      'Pfuurira Mberi',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w900,
+                        color: Colors.white,
+                      ),
+                    ),
                   ),
                 ),
               ),
             ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildPointsDisplay() {
-    return Stack(
-      children: [
-        Positioned(
-          child: SizedBox(
-            height: 350,
-            child: SvgPicture.asset(AppAssets.inputSvg, fit: BoxFit.fill),
+  Widget _buildPointsDisplay(Color darkBorderColor) {
+    return NeubrutalismContainer(
+      borderRadius: 30,
+      backgroundColor: Colors.white,
+      padding: const EdgeInsets.all(20),
+      width: double.infinity,
+      child: Column(
+        children: [
+          Text(
+            'Total Points',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: darkBorderColor.withOpacity(0.7),
+            ),
           ),
-        ),
-        Padding(
-          padding: const EdgeInsets.only(top: 64.0, left: 32, right: 32),
-          child: Column(
-            children: [
-              // Total Points (large display)
-              Text(
-                'Total Points',
-                style: AppTextStyles.heading2.copyWith(
-                  fontSize: 20,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                _displayTotal.toString(),
-                style: AppTextStyles.heading2.copyWith(
-                  fontSize: 56,
-                ),
-              ),
-              const SizedBox(height: 24),
-
-              // Breakdown
-              if (_showLevelPoints)
-                _buildPointRow('Level Points', _displayLevel, Colors.blue),
-
-              if (_showLevelPoints) const SizedBox(height: 12),
-
-              if (_showBonusPoints)
-                _buildPointRow('Bonus Points', _displayBonus, Colors.green),
+          const SizedBox(height: 4),
+          Text(
+            _displayTotal.toString(),
+            style: TextStyle(
+              fontSize: 56,
+              fontWeight: FontWeight.w900,
+              color: darkBorderColor,
+            ),
+          ),
+          if (_showLevelPoints || _showBonusPoints) ...[
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 16),
+              child: Divider(height: 1),
+            ),
+            if (_showLevelPoints)
+              _buildPointRow('Level Points', _displayLevel, Colors.blue),
+            if (_showBonusPoints) ...[
+              const SizedBox(height: 12),
+              _buildPointRow('Bonus Points', _displayBonus, Colors.green),
             ],
-          ),
-        ),
-      ],
+          ],
+        ],
+      ),
     );
   }
 

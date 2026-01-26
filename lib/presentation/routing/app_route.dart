@@ -10,6 +10,7 @@ import 'package:local_game/presentation/onboarding/onboarding_screen.dart';
 import 'package:local_game/presentation/similar_words/similar_words_game_screen.dart';
 import 'package:local_game/presentation/splash/splash_screen.dart';
 import 'package:local_game/presentation/word_search/find_word_game_screen.dart';
+import 'package:local_game/presentation/settings/settings_screen.dart';
 
 class AppRoutes {
   static final GoRouter _router = GoRouter(
@@ -105,6 +106,17 @@ class AppRoutes {
               context: context,
               state: state,
               child: LevelCompleteScreen(points: state.extra as Points),
+            ),
+      ),
+      GoRoute(
+        path: Routes.settings.toPath,
+        name: Routes.settings.toNamed,
+        builder: (context, state) => const SettingsScreen(),
+        pageBuilder:
+            (context, state) => buildPageWithDefaultTransition(
+              context: context,
+              state: state,
+              child: const SettingsScreen(),
             ),
       ),
     ],
