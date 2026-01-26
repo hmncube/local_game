@@ -29,7 +29,6 @@ class _LevelCompleteScreenState extends State<LevelCompleteScreen>
 
   // Point animation controllers
   late AnimationController _pointsController;
-  late Animation<int> _totalPointsAnimation;
   late Animation<int> _levelPointsAnimation;
   late Animation<int> _bonusPointsAnimation;
 
@@ -71,24 +70,19 @@ class _LevelCompleteScreenState extends State<LevelCompleteScreen>
 
   void _setupPointAnimations() {
     // Animate total points first (0 to 0.33)
-    _totalPointsAnimation = IntTween(
-      begin: 0,
-      end: widget.points.totalPoints,
-    ).animate(
-      CurvedAnimation(
-        parent: _pointsController,
-        curve: const Interval(0.0, 0.33, curve: Curves.easeOut),
-      ),
-    )..addListener(() {
-      setState(() {
-        _displayTotal = _totalPointsAnimation.value;
-      });
+    // No explicit animation needed for initial total as it stays constant during first phase
+    _pointsController.addListener(() {
+      if (_pointsController.value < 0.33) {
+        setState(() {
+          _displayTotal = widget.points.initialTotalPoints;
+        });
+      }
     });
 
     // Animate level points (0.33 to 0.66)
     _levelPointsAnimation = IntTween(
       begin: 0,
-      end: widget.points.levelPoints,
+      end: widget.points.runPoints,
     ).animate(
       CurvedAnimation(
         parent: _pointsController,
@@ -99,7 +93,6 @@ class _LevelCompleteScreenState extends State<LevelCompleteScreen>
         setState(() {
           _showLevelPoints = true;
           _displayLevel = _levelPointsAnimation.value;
-          _displayTotal = widget.points.totalPoints + _displayLevel;
         });
       }
     });
@@ -118,10 +111,11 @@ class _LevelCompleteScreenState extends State<LevelCompleteScreen>
         setState(() {
           _showBonusPoints = true;
           _displayBonus = _bonusPointsAnimation.value;
-          _displayTotal =
-              widget.points.totalPoints +
-              widget.points.levelPoints +
-              _displayBonus;
+          // After bonus is finished, animate total jump to final value if addedPoints > 0
+          if (_pointsController.status == AnimationStatus.completed) {
+            _displayTotal =
+                widget.points.initialTotalPoints + widget.points.addedPoints;
+          }
         });
       }
     });
@@ -170,8 +164,8 @@ class _LevelCompleteScreenState extends State<LevelCompleteScreen>
                 child: ScaleTransition(
                   scale: _scaleAnimation,
                   child: Column(
-                    children: [   
-                      SizedBox(height: 48,),           
+                    children: [
+                      SizedBox(height: 48),
                       // Points Display
                       _buildPointsDisplay(),
 
@@ -180,8 +174,8 @@ class _LevelCompleteScreenState extends State<LevelCompleteScreen>
                         height: 100,
                         AppAssets.fallingCoins,
                         repeat: false,
-                      ),        
-                      
+                      ),
+
                       Lottie.asset(
                         width: double.infinity,
                         height: 100,
@@ -195,7 +189,7 @@ class _LevelCompleteScreenState extends State<LevelCompleteScreen>
                           context.go(Routes.mapScreen.toPath);
                         },
                         isEnabled: true,
-                        width: 300
+                        width: 300,
                       ),
                     ],
                   ),
@@ -223,27 +217,46 @@ class _LevelCompleteScreenState extends State<LevelCompleteScreen>
               // Total Points (large display)
               Text(
                 'Total Points',
-                style: AppTextStyles.heading2.copyWith(
-                  fontSize: 20,
-                ),
+                style: AppTextStyles.heading2.copyWith(fontSize: 20),
               ),
               const SizedBox(height: 8),
               Text(
                 _displayTotal.toString(),
-                style: AppTextStyles.heading2.copyWith(
-                  fontSize: 56,
-                ),
+                style: AppTextStyles.heading2.copyWith(fontSize: 56),
               ),
               const SizedBox(height: 24),
 
               // Breakdown
               if (_showLevelPoints)
-                _buildPointRow('Level Points', _displayLevel, Colors.blue),
+                _buildPointRow('Zviratidzwa', _displayLevel, Colors.blue),
 
               if (_showLevelPoints) const SizedBox(height: 12),
 
               if (_showBonusPoints)
-                _buildPointRow('Bonus Points', _displayBonus, Colors.green),
+                _buildPointRow('Mamwe Zvibodzwa', _displayBonus, Colors.green),
+
+              if (_showBonusPoints) const SizedBox(height: 24),
+
+              if (_pointsController.status == AnimationStatus.completed)
+                Column(
+                  children: [
+                    const Divider(),
+                    const SizedBox(height: 8),
+                    Text(
+                      widget.points.addedPoints > 0
+                          ? 'Wawedzerwa +${widget.points.addedPoints}!'
+                          : 'Hapana Zvawedzerwa',
+                      style: AppTextStyles.body.copyWith(
+                        color:
+                            widget.points.addedPoints > 0
+                                ? Colors.orange
+                                : Colors.grey,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
+                    ),
+                  ],
+                ),
             ],
           ),
         ),

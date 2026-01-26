@@ -8,6 +8,7 @@ class SimilarWordsGameState extends Equatable {
   final List<String> availableWords;
   final Map<String, String?> userAnswers;
   final Set<String> usedWords;
+  final int initialScore;
   final int score;
   final int hints;
   final LevelModel? level;
@@ -16,6 +17,7 @@ class SimilarWordsGameState extends Equatable {
   final int seconds;
   final String userId;
   final bool isGameComplete;
+  final bool isReplay;
 
   const SimilarWordsGameState({
     required this.cubitState,
@@ -23,6 +25,7 @@ class SimilarWordsGameState extends Equatable {
     this.availableWords = const [],
     this.userAnswers = const {},
     this.usedWords = const {},
+    this.initialScore = 0,
     this.score = 0,
     this.hints = 0,
     this.bonus = 0,
@@ -31,6 +34,7 @@ class SimilarWordsGameState extends Equatable {
     this.level,
     this.levelPoints = 0,
     this.isGameComplete = false,
+    this.isReplay = false,
   });
 
   SimilarWordsGameState copyWith({
@@ -41,12 +45,14 @@ class SimilarWordsGameState extends Equatable {
     Set<String>? usedWords,
     LevelModel? level,
     int? levelPoints,
+    int? initialScore,
     int? score,
     int? hints,
     int? seconds,
     int? bonus,
     String? userId,
     bool? isGameComplete,
+    bool? isReplay,
   }) {
     return SimilarWordsGameState(
       cubitState: cubitState ?? this.cubitState,
@@ -54,6 +60,7 @@ class SimilarWordsGameState extends Equatable {
       availableWords: availableWords ?? this.availableWords,
       userAnswers: userAnswers ?? this.userAnswers,
       usedWords: usedWords ?? this.usedWords,
+      initialScore: initialScore ?? this.initialScore,
       score: score ?? this.score,
       hints: hints ?? this.hints,
       userId: userId ?? this.userId,
@@ -62,6 +69,7 @@ class SimilarWordsGameState extends Equatable {
       isGameComplete: isGameComplete ?? this.isGameComplete,
       seconds: seconds ?? this.seconds,
       bonus: bonus ?? this.bonus,
+      isReplay: isReplay ?? this.isReplay,
     );
   }
 
@@ -72,6 +80,7 @@ class SimilarWordsGameState extends Equatable {
     availableWords,
     userAnswers,
     usedWords,
+    initialScore,
     score,
     hints,
     userId,
@@ -80,5 +89,6 @@ class SimilarWordsGameState extends Equatable {
     levelPoints,
     bonus,
     seconds,
+    isReplay,
   ];
 }

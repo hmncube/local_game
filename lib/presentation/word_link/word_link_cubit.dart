@@ -34,12 +34,12 @@ class WordLinkCubit extends BaseCubitWrapper<WordLinkState> {
 
     final user = await _userDao.getUser();
     if (levelModel != null) {
-       final words =
-        levelModel.languageId == 1
-            ? levelModel.wordsEn
-            : levelModel.languageId == 2
-            ? levelModel.wordsSn
-            : levelModel.wordsNd;
+      final words =
+          levelModel.languageId == 1
+              ? levelModel.wordsEn
+              : levelModel.languageId == 2
+              ? levelModel.wordsSn
+              : levelModel.wordsNd;
 
       if (words.isNotEmpty) {
         Map<String, int> letterCount = getMaxLetterCount(words);
@@ -49,9 +49,11 @@ class WordLinkCubit extends BaseCubitWrapper<WordLinkState> {
             cubitState: CubitSuccess(),
             words: words..sort((a, b) => a.length.compareTo(b.length)),
             hintsCount: user?.hints,
-            userId: user?.id,
+            userId: user?.id ?? '',
+            initialScore: user?.totalScore ?? 0,
             totalPoints: user?.totalScore,
             level: levelModel,
+            isReplay: levelModel.status == AppValues.levelDone,
             filledWords: dashWords(words),
             letters: letterList,
           ),
@@ -117,19 +119,19 @@ class WordLinkCubit extends BaseCubitWrapper<WordLinkState> {
       filledWords[filledWordIndex] = nw;
       newFilledWords = filledWords;
 
+      final isLevelComplete = newFilledWords.every(
+        (word) => !word.contains('-'),
+      );
       final points = _calculatePoints(nw);
       _updatePoints(points);
 
-      bool isLevelComplete = handleCompleteLevel(newFilledWords, points);
-      int bonus = 0;
+      final bonus =
+          isLevelComplete
+              ? _calculateBonus(AppValues.timerTime - state.seconds)
+              : 0;
+
       if (isLevelComplete) {
-        bonus = _calculateBonus(AppValues.timerTime - state.seconds);
-        final newLevel = state.level?.copyWith(
-          points: state.levelPoints,
-          finishedAt: DateTime.now().millisecondsSinceEpoch,
-          status: AppValues.levelDone,
-        );
-        await _levelDao.updateLevel(newLevel);
+        await _completeLevel(bonus);
       }
       emit(
         state.copyWith(
@@ -151,7 +153,9 @@ class WordLinkCubit extends BaseCubitWrapper<WordLinkState> {
   }
 
   void _updatePoints(int points) {
-    _userDao.updateTotalScore(state.userId, points + state.totalPoints);
+    if (!state.isReplay) {
+      _userDao.updateTotalScore(state.userId, points + state.totalPoints);
+    }
   }
 
   void updateCurrentWord(String letter) {
@@ -160,34 +164,46 @@ class WordLinkCubit extends BaseCubitWrapper<WordLinkState> {
     emit(state.copyWith(currentWord: newWord));
   }
 
-  bool handleCompleteLevel(List<String> newFilledWords, int points) {
-    bool isLevelComplete = newFilledWords.every((word) => !word.contains('-'));
+  Future<void> _completeLevel(int bonus) async {
+    _timer?.cancel();
+    final currentBest = state.level?.points ?? 0;
+    final currentTotalScore = state.levelPoints + bonus;
 
-    if (isLevelComplete) {
-      final level = state.level;
-      _levelDao.updateLevel(
-        level?.copyWith(
-          status: 1,
-          points: points,
-          finishedAt: DateTime.now().millisecondsSinceEpoch,
-        ),
-      );
-      _userDao.getUser().then((user) {
+    if (state.isReplay) {
+      if (currentTotalScore > currentBest) {
+        final difference = currentTotalScore - currentBest;
+        final user = await _userDao.getUser();
         if (user != null) {
-          _userDao.update(
-            user.copyWith(
-              totalScore: user.totalScore + points,
-              // currentStreak: user.currentStreak + 1,
-              // longestStreak: user.currentStreak + 1 > user.longestStreak
-              //     ? user.currentStreak + 1
-              //     : user.longestStreak,
-              lastPlayed: DateTime.now().millisecondsSinceEpoch,
-            ),
+          await _userDao.updateTotalScore(
+            state.userId,
+            user.totalScore + difference,
           );
         }
-      });
+
+        final completedLevel = state.level?.copyWith(
+          points: currentTotalScore,
+          finishedAt: DateTime.now().millisecondsSinceEpoch,
+        );
+        await _levelDao.updateLevel(completedLevel);
+      }
+    } else {
+      if (bonus > 0) {
+        final user = await _userDao.getUser();
+        if (user != null) {
+          await _userDao.updateTotalScore(
+            state.userId,
+            user.totalScore + bonus,
+          );
+        }
+      }
+
+      final completedLevel = state.level?.copyWith(
+        points: currentTotalScore,
+        finishedAt: DateTime.now().millisecondsSinceEpoch,
+        status: AppValues.levelDone,
+      );
+      await _levelDao.updateLevel(completedLevel);
     }
-    return isLevelComplete;
   }
 
   int findLongestWord(List<String> words) {
@@ -215,7 +231,7 @@ class WordLinkCubit extends BaseCubitWrapper<WordLinkState> {
     init(level: (state.level?.id ?? 0) + 1);
   }
 
-  void showHint() {
+  void showHint() async {
     int firstWordIndex = 0;
     if (state.hint.isEmpty) {
       firstWordIndex = state.filledWords.indexWhere((w) => w.startsWith('-'));
@@ -234,7 +250,10 @@ class WordLinkCubit extends BaseCubitWrapper<WordLinkState> {
     final points = _calculatePoints(hintedWord);
 
     final newFilledWords = filledWords..[firstWordIndex] = hintedWord;
-    bool isLevelComplete = handleCompleteLevel(newFilledWords, points);
+    final isLevelComplete = newFilledWords.every((word) => !word.contains('-'));
+    if (isLevelComplete) {
+      await _completeLevel(points);
+    }
     emit(
       state.copyWith(
         hint: isWordComplete ? '' : newHint,

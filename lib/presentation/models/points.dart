@@ -1,11 +1,13 @@
 class Points {
-  final int levelPoints;
-  final int totalPoints;
+  final int initialTotalPoints;
+  final int runPoints;
   final int bonusPoints;
+  final int addedPoints; // The actual delta added to the user's total score
 
   Points({
-    required this.levelPoints,
-    required this.totalPoints,
+    required this.initialTotalPoints,
+    required this.runPoints,
     required this.bonusPoints,
+    required this.addedPoints,
   });
 }

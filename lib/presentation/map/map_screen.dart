@@ -57,6 +57,7 @@ class _MapScreenState extends State<MapScreen> {
               }
               final unLocked = state.levels.firstWhere(
                 (level) => level.status == 0,
+                orElse: () => state.levels.last,
               );
               return Scaffold(
                 body: Stack(
@@ -113,7 +114,7 @@ class _MapScreenState extends State<MapScreen> {
                                         : 0,
                                 onTap: () {
                                   //todo unloack completed level animation
-                                  !isUnLocked
+                                  !isUnLocked && !isCompleted
                                       ? null
                                       : context.go(
                                         _getTypeScreenLocation(level.type),
@@ -180,7 +181,8 @@ class LevelButton extends StatelessWidget {
       child: Column(
         children: [
           SizedBox(
-            width: 70,height: 70,
+            width: 70,
+            height: 70,
             child: Stack(
               children: [
                 SizedBox(

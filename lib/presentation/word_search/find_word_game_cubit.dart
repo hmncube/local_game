@@ -75,9 +75,11 @@ class FindWordGameCubit extends BaseCubitWrapper<FindWordGameState> {
         wordPositions: wordPositions,
         wordColors: {},
         newFoundWord: '',
+        initialScore: user?.totalScore ?? 0,
         points: user?.totalScore,
         hints: user?.hints,
-        userId: user?.id,
+        userId: user?.id ?? '',
+        isReplay: levelModel?.status == AppValues.levelDone,
       ),
     );
     startGame();
@@ -214,8 +216,10 @@ class FindWordGameCubit extends BaseCubitWrapper<FindWordGameState> {
         bonus = _calculateBonus(AppValues.timerTime - state.seconds);
         await _completeLevel();
       }
-      _updatePoints(points + bonus);
-      await _updateTotalScore(points);
+      // _updatePoints(points + bonus); // Removed redundant call
+      if (!state.isReplay) {
+        await _updateTotalScore(points + bonus);
+      }
 
       _emitStateWithFoundWord(
         matchedWord: matchedWord,
@@ -279,12 +283,35 @@ class FindWordGameCubit extends BaseCubitWrapper<FindWordGameState> {
   }
 
   Future<void> _completeLevel() async {
-    final completedLevel = state.level?.copyWith(
-      points: state.levelPoints,
-      finishedAt: DateTime.now().millisecondsSinceEpoch,
-      status: AppValues.levelDone,
-    );
-    await _levelDao.updateLevel(completedLevel);
+    _timer?.cancel();
+    final currentBest = state.level?.points ?? 0;
+    final currentTotalScore = state.levelPoints + state.bonus;
+
+    if (state.isReplay) {
+      if (currentTotalScore > currentBest) {
+        final difference = currentTotalScore - currentBest;
+        final user = await _userDao.getUser();
+        if (user != null) {
+          await _userDao.updateTotalScore(
+            state.userId,
+            user.totalScore + difference,
+          );
+        }
+
+        final completedLevel = state.level?.copyWith(
+          points: currentTotalScore,
+          finishedAt: DateTime.now().millisecondsSinceEpoch,
+        );
+        await _levelDao.updateLevel(completedLevel);
+      }
+    } else {
+      final completedLevel = state.level?.copyWith(
+        points: currentTotalScore,
+        finishedAt: DateTime.now().millisecondsSinceEpoch,
+        status: AppValues.levelDone,
+      );
+      await _levelDao.updateLevel(completedLevel);
+    }
   }
 
   Future<void> _updateTotalScore(int points) async {
@@ -356,12 +383,16 @@ class FindWordGameCubit extends BaseCubitWrapper<FindWordGameState> {
   }
 
   void clearNewFoundWord() {
-    emit(state.copyWith(newFoundWord: ''));
+    emit(
+      state.copyWith(
+        newFoundWord: '',
+        hintError: '',
+        hintPosition: const Position.invalid(),
+      ),
+    );
   }
 
-  void _updatePoints(int points) {
-    _userDao.updateTotalScore(state.userId, points + state.points);
-  }
+  // Removed redundant _updatePoints method
 
   void onHintClicked() {
     if (state.hints == 0) {

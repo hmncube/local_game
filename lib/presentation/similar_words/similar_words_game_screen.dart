@@ -38,9 +38,18 @@ class _SimilarWordsGameScreenState extends State<SimilarWordsGameScreen> {
             context.go(
               Routes.levelCompleteScreen.toPath,
               extra: Points(
-                totalPoints: state.score,
-                levelPoints: state.levelPoints,
+                initialTotalPoints: state.initialScore,
+                runPoints: state.levelPoints,
                 bonusPoints: state.bonus,
+                addedPoints:
+                    state.isReplay
+                        ? (state.levelPoints + state.bonus >
+                                (state.level?.points ?? 0)
+                            ? (state.levelPoints +
+                                state.bonus -
+                                (state.level?.points ?? 0))
+                            : 0)
+                        : (state.levelPoints + state.bonus),
               ),
             );
           }
@@ -118,12 +127,14 @@ class _SimilarWordsGameScreenState extends State<SimilarWordsGameScreen> {
                                               .questionAnswers
                                               .keys
                                               .elementAt(index);
-                                          String? userAnswer =
+                                          String? userAnswerKey =
                                               state.userAnswers[question];
+                                          String? userAnswer =
+                                              userAnswerKey?.split('-').first;
                                           bool isCorrect = _cubit
                                               .isCorrectAnswer(
                                                 question,
-                                                userAnswer,
+                                                userAnswerKey,
                                               );
 
                                           return Container(
@@ -147,21 +158,16 @@ class _SimilarWordsGameScreenState extends State<SimilarWordsGameScreen> {
                                                 const SizedBox(height: 8),
                                                 DragTarget<String>(
                                                   onWillAcceptWithDetails: (
-                                                    droppedWord,
+                                                    droppedWordKey,
                                                   ) {
-                                                    // Only accept if the answer is correct
-                                                    return _cubit
-                                                        .isCorrectAnswer(
-                                                          question,
-                                                          droppedWord.data,
-                                                        );
+                                                    return true;
                                                   },
                                                   onAcceptWithDetails: (
-                                                    droppedWord,
+                                                    droppedWordKey,
                                                   ) {
                                                     _cubit.onWordDropped(
                                                       question,
-                                                      droppedWord.data,
+                                                      droppedWordKey.data,
                                                     );
                                                   },
                                                   builder: (
@@ -169,7 +175,6 @@ class _SimilarWordsGameScreenState extends State<SimilarWordsGameScreen> {
                                                     candidateData,
                                                     rejectedData,
                                                   ) {
-                                                    // Show red highlight when wrong answer is being dragged over
                                                     final bool hasRejectedData =
                                                         rejectedData.isNotEmpty;
 
@@ -178,7 +183,8 @@ class _SimilarWordsGameScreenState extends State<SimilarWordsGameScreen> {
                                                       height: 50,
                                                       decoration: BoxDecoration(
                                                         color:
-                                                            userAnswer != null
+                                                            userAnswerKey !=
+                                                                    null
                                                                 ? (isCorrect
                                                                     ? Colors
                                                                         .green
@@ -219,13 +225,14 @@ class _SimilarWordsGameScreenState extends State<SimilarWordsGameScreen> {
                                                             ),
                                                       ),
                                                       child:
-                                                          userAnswer != null
+                                                          userAnswerKey != null
                                                               ? Row(
                                                                 children: [
                                                                   Expanded(
                                                                     child: Center(
                                                                       child: Text(
-                                                                        userAnswer,
+                                                                        userAnswer ??
+                                                                            '',
                                                                         style: AppTextStyles.keyboardKey.copyWith(
                                                                           fontWeight:
                                                                               FontWeight.bold,
@@ -303,130 +310,107 @@ class _SimilarWordsGameScreenState extends State<SimilarWordsGameScreen> {
                                       child: Wrap(
                                         spacing: 8,
                                         runSpacing: 8,
-                                        children:
-                                            state.availableWords
-                                                .where(
-                                                  (word) =>
-                                                      !state.usedWords.contains(
-                                                        word,
+                                        children: List.generate(
+                                          state.availableWords.length,
+                                          (index) {
+                                            final word =
+                                                state.availableWords[index];
+                                            final wordKey = '$word-$index';
+
+                                            if (state.usedWords.contains(
+                                              wordKey,
+                                            )) {
+                                              return const SizedBox.shrink();
+                                            }
+
+                                            return Draggable<String>(
+                                              data: wordKey,
+                                              feedback: Material(
+                                                elevation: 4,
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                                child: Container(
+                                                  padding:
+                                                      const EdgeInsets.symmetric(
+                                                        horizontal: 16,
+                                                        vertical: 8,
                                                       ),
-                                                )
-                                                .map(
-                                                  (word) => Draggable<String>(
-                                                    data: word,
-                                                    feedback: Material(
-                                                      elevation: 4,
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                            8,
-                                                          ),
-                                                      child: Container(
-                                                        padding:
-                                                            const EdgeInsets.symmetric(
-                                                              horizontal: 16,
-                                                              vertical: 8,
-                                                            ),
-                                                        decoration: BoxDecoration(
-                                                          color:
-                                                              Colors
-                                                                  .blue
-                                                                  .shade400,
-                                                          borderRadius:
-                                                              BorderRadius.circular(
-                                                                8,
-                                                              ),
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.blue.shade400,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          8,
                                                         ),
-                                                        child: Text(
-                                                          word,
-                                                          style: AppTextStyles
-                                                              .keyboardKey
-                                                              .copyWith(
-                                                                color:
-                                                                    Colors
-                                                                        .white,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w500,
-                                                              ),
+                                                  ),
+                                                  child: Text(
+                                                    word,
+                                                    style: AppTextStyles
+                                                        .keyboardKey
+                                                        .copyWith(
+                                                          color: Colors.white,
+                                                          fontWeight:
+                                                              FontWeight.w500,
                                                         ),
-                                                      ),
+                                                  ),
+                                                ),
+                                              ),
+                                              childWhenDragging: Container(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                      horizontal: 16,
+                                                      vertical: 8,
                                                     ),
-                                                    childWhenDragging: Container(
-                                                      padding:
-                                                          const EdgeInsets.symmetric(
-                                                            horizontal: 16,
-                                                            vertical: 8,
-                                                          ),
-                                                      decoration: BoxDecoration(
+                                                decoration: BoxDecoration(
+                                                  color: Colors.grey.shade300,
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
+                                                  border: Border.all(
+                                                    color: Colors.grey.shade400,
+                                                  ),
+                                                ),
+                                                child: Text(
+                                                  word,
+                                                  style: AppTextStyles
+                                                      .keyboardKey
+                                                      .copyWith(
                                                         color:
                                                             Colors
                                                                 .grey
-                                                                .shade300,
-                                                        borderRadius:
-                                                            BorderRadius.circular(
-                                                              8,
-                                                            ),
-                                                        border: Border.all(
-                                                          color:
-                                                              Colors
-                                                                  .grey
-                                                                  .shade400,
-                                                        ),
+                                                                .shade600,
+                                                        fontWeight:
+                                                            FontWeight.w500,
                                                       ),
-                                                      child: Text(
-                                                        word,
-                                                        style: AppTextStyles
-                                                            .keyboardKey
-                                                            .copyWith(
-                                                              color:
-                                                                  Colors
-                                                                      .grey
-                                                                      .shade600,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w500,
-                                                            ),
-                                                      ),
+                                                ),
+                                              ),
+                                              child: Container(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                      horizontal: 16,
+                                                      vertical: 8,
                                                     ),
-                                                    child: Container(
-                                                      padding:
-                                                          const EdgeInsets.symmetric(
-                                                            horizontal: 16,
-                                                            vertical: 8,
-                                                          ),
-                                                      decoration: BoxDecoration(
-                                                        color:
-                                                            Colors
-                                                                .orange
-                                                                .shade200,
-                                                        borderRadius:
-                                                            BorderRadius.circular(
-                                                              8,
-                                                            ),
-                                                        border: Border.all(
-                                                          color:
-                                                              Colors
-                                                                  .orange
-                                                                  .shade300,
-                                                        ),
-                                                      ),
-                                                      child: Text(
-                                                        word,
-                                                        style: AppTextStyles
-                                                            .keyboardKey
-                                                            .copyWith(
-                                                              color:
-                                                                  Colors
-                                                                      .black87,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w500,
-                                                            ),
-                                                      ),
-                                                    ),
+                                                decoration: BoxDecoration(
+                                                  color: Colors.orange.shade200,
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
+                                                  border: Border.all(
+                                                    color:
+                                                        Colors.orange.shade300,
                                                   ),
-                                                )
-                                                .toList(),
+                                                ),
+                                                child: Text(
+                                                  word,
+                                                  style: AppTextStyles
+                                                      .keyboardKey
+                                                      .copyWith(
+                                                        color: Colors.black87,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                      ),
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -438,50 +422,6 @@ class _SimilarWordsGameScreenState extends State<SimilarWordsGameScreen> {
                       ),
 
                       const SizedBox(height: 20),
-
-                      if (state.userAnswers.values.every(
-                        (answer) => answer != null,
-                      ))
-                        ElevatedButton.icon(
-                          onPressed: () {
-                            int score = state.score;
-                            showDialog(
-                              context: context,
-                              builder:
-                                  (context) => AlertDialog(
-                                    title: const Text('Game Complete!'),
-                                    content: Text(
-                                      'You got $score out of ${state.questionAnswers.length} correct!\n\n'
-                                      '${score == state.questionAnswers.length ? 'Perfect score! 🎉' : 'Keep practicing to improve your score!'}',
-                                    ),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () {
-                                          Navigator.of(context).pop();
-                                          _cubit.resetGame();
-                                        },
-                                        child: const Text('Play Again'),
-                                      ),
-                                      TextButton(
-                                        onPressed:
-                                            () => Navigator.of(context).pop(),
-                                        child: const Text('OK'),
-                                      ),
-                                    ],
-                                  ),
-                            );
-                          },
-                          icon: const Icon(Icons.check_circle),
-                          label: const Text('Check Answers'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.green,
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 24,
-                              vertical: 12,
-                            ),
-                          ),
-                        ),
                     ],
                   ),
                 ),

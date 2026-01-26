@@ -17,6 +17,7 @@ class FindWordGameState extends Equatable {
   final Map<String, List<Position>> wordPositions;
   final Map<String, Color> wordColors;
   final String newFoundWord;
+  final int initialScore;
   final int points;
   final int hints;
   final int levelPoints;
@@ -26,6 +27,7 @@ class FindWordGameState extends Equatable {
   final String userId;
   final String? hintError;
   final Position? hintPosition;
+  final bool isReplay;
 
   const FindWordGameState({
     required this.cubitState,
@@ -41,6 +43,7 @@ class FindWordGameState extends Equatable {
     this.wordPositions = const {},
     this.wordColors = const {},
     this.newFoundWord = '',
+    this.initialScore = 0,
     this.points = 0,
     this.hints = 0,
     this.bonus = 0,
@@ -50,6 +53,7 @@ class FindWordGameState extends Equatable {
     this.userId = '',
     this.hintError,
     this.hintPosition,
+    this.isReplay = false,
   });
 
   FindWordGameState copyWith({
@@ -66,6 +70,7 @@ class FindWordGameState extends Equatable {
     Map<String, List<Position>>? wordPositions,
     Map<String, Color>? wordColors,
     String? newFoundWord,
+    int? initialScore,
     int? points,
     int? hints,
     int? levelPoints,
@@ -75,6 +80,7 @@ class FindWordGameState extends Equatable {
     String? userId,
     String? hintError,
     Position? hintPosition,
+    bool? isReplay,
   }) {
     return FindWordGameState(
       cubitState: cubitState ?? this.cubitState,
@@ -89,6 +95,7 @@ class FindWordGameState extends Equatable {
       wordPositions: wordPositions ?? this.wordPositions,
       wordColors: wordColors ?? this.wordColors,
       newFoundWord: newFoundWord ?? this.newFoundWord,
+      initialScore: initialScore ?? this.initialScore,
       points: points ?? this.points,
       bonus: bonus ?? this.bonus,
       userId: userId ?? this.userId,
@@ -99,6 +106,7 @@ class FindWordGameState extends Equatable {
       hintError: hintError ?? this.hintError,
       hintPosition: hintPosition ?? this.hintPosition,
       levelPoints: levelPoints ?? this.levelPoints,
+      isReplay: isReplay ?? this.isReplay,
     );
   }
 
@@ -115,6 +123,7 @@ class FindWordGameState extends Equatable {
     wordPositions,
     wordColors,
     newFoundWord,
+    initialScore,
     points,
     userId,
     hints,
@@ -125,6 +134,7 @@ class FindWordGameState extends Equatable {
     levelPoints,
     seconds,
     progressValue,
+    isReplay,
   ];
 }
 

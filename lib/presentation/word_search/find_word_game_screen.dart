@@ -58,7 +58,7 @@ class _FindWordGameScreenState extends State<FindWordGameScreen> {
               SnackBar(
                 content: Text(state.hintError ?? ''),
                 duration: const Duration(seconds: 1),
-                backgroundColor: state.wordColors[state.newFoundWord],
+                backgroundColor: Colors.red,
               ),
             );
           }
@@ -67,9 +67,18 @@ class _FindWordGameScreenState extends State<FindWordGameScreen> {
             context.go(
               Routes.levelCompleteScreen.toPath,
               extra: Points(
-                levelPoints: state.levelPoints,
-                totalPoints: state.points,
+                initialTotalPoints: state.initialScore,
+                runPoints: state.levelPoints,
                 bonusPoints: state.bonus,
+                addedPoints:
+                    state.isReplay
+                        ? (state.levelPoints + state.bonus >
+                                (state.level?.points ?? 0)
+                            ? (state.levelPoints +
+                                state.bonus -
+                                (state.level?.points ?? 0))
+                            : 0)
+                        : (state.levelPoints + state.bonus),
               ),
             );
           }
