@@ -9,7 +9,6 @@ import 'package:local_game/presentation/similar_words/similar_words_game_cubit.d
 import 'package:local_game/presentation/similar_words/similar_words_game_state.dart';
 import 'package:local_game/presentation/widget/game_top_bar.dart';
 import 'package:local_game/presentation/widget/neubrutalism_container.dart';
-import 'package:local_game/presentation/widget/neubrutalism_toast.dart';
 
 class SimilarWordsGameScreen extends StatefulWidget {
   final int levelId;
@@ -44,9 +43,18 @@ class _SimilarWordsGameScreenState extends State<SimilarWordsGameScreen> {
             context.go(
               Routes.levelCompleteScreen.toPath,
               extra: Points(
-                totalPoints: state.score,
-                levelPoints: state.levelPoints,
+                initialTotalPoints: state.initialScore,
+                runPoints: state.levelPoints,
                 bonusPoints: state.bonus,
+                addedPoints:
+                    state.isReplay
+                        ? (state.levelPoints + state.bonus >
+                                (state.level?.points ?? 0)
+                            ? (state.levelPoints +
+                                state.bonus -
+                                (state.level?.points ?? 0))
+                            : 0)
+                        : (state.levelPoints + state.bonus),
               ),
             );
           }
@@ -83,7 +91,7 @@ class _SimilarWordsGameScreenState extends State<SimilarWordsGameScreen> {
                         ),
                         child: Row(
                           children: [
-                            Icon(
+                            const Icon(
                               Icons.timer_outlined,
                               size: 20,
                               color: darkBorderColor,
@@ -150,12 +158,14 @@ class _SimilarWordsGameScreenState extends State<SimilarWordsGameScreen> {
                                               .questionAnswers
                                               .keys
                                               .elementAt(index);
-                                          String? userAnswer =
+                                          String? userAnswerKey =
                                               state.userAnswers[question];
+                                          String? userAnswer =
+                                              userAnswerKey?.split('-').first;
                                           bool isCorrect = _cubit
                                               .isCorrectAnswer(
                                                 question,
-                                                userAnswer,
+                                                userAnswerKey,
                                               );
 
                                           return Padding(
@@ -178,9 +188,9 @@ class _SimilarWordsGameScreenState extends State<SimilarWordsGameScreen> {
                                                 _buildDropTarget(
                                                   question,
                                                   userAnswer,
+                                                  userAnswerKey,
                                                   isCorrect,
                                                   darkBorderColor,
-                                                  accentOrange,
                                                 ),
                                               ],
                                             ),
@@ -221,56 +231,56 @@ class _SimilarWordsGameScreenState extends State<SimilarWordsGameScreen> {
                                           spacing: 12,
                                           runSpacing: 12,
                                           alignment: WrapAlignment.center,
-                                          children:
-                                              state.availableWords
-                                                  .where(
-                                                    (word) =>
-                                                        !state.usedWords
-                                                            .contains(word),
-                                                  )
-                                                  .map(
-                                                    (word) => Draggable<String>(
-                                                      data: word,
-                                                      feedback: Material(
-                                                        color:
-                                                            Colors.transparent,
-                                                        child: NeubrutalismContainer(
-                                                          borderRadius: 12,
-                                                          backgroundColor:
-                                                              Colors.blue,
-                                                          padding:
-                                                              const EdgeInsets.symmetric(
-                                                                horizontal: 16,
-                                                                vertical: 8,
-                                                              ),
-                                                          child: Text(
-                                                            word,
-                                                            style:
-                                                                const TextStyle(
-                                                                  color:
-                                                                      Colors
-                                                                          .white,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w900,
-                                                                ),
-                                                          ),
+                                          children: List.generate(
+                                            state.availableWords.length,
+                                            (index) {
+                                              final word =
+                                                  state.availableWords[index];
+                                              final wordKey = '$word-$index';
+
+                                              if (state.usedWords.contains(
+                                                wordKey,
+                                              )) {
+                                                return const SizedBox.shrink();
+                                              }
+
+                                              return Draggable<String>(
+                                                data: wordKey,
+                                                feedback: Material(
+                                                  color: Colors.transparent,
+                                                  child: NeubrutalismContainer(
+                                                    borderRadius: 12,
+                                                    backgroundColor:
+                                                        Colors.blue,
+                                                    padding:
+                                                        const EdgeInsets.symmetric(
+                                                          horizontal: 16,
+                                                          vertical: 8,
                                                         ),
-                                                      ),
-                                                      childWhenDragging: Opacity(
-                                                        opacity: 0.3,
-                                                        child: _buildWordChip(
-                                                          word,
-                                                          darkBorderColor,
-                                                        ),
-                                                      ),
-                                                      child: _buildWordChip(
-                                                        word,
-                                                        darkBorderColor,
+                                                    child: Text(
+                                                      word,
+                                                      style: const TextStyle(
+                                                        color: Colors.white,
+                                                        fontWeight:
+                                                            FontWeight.w900,
                                                       ),
                                                     ),
-                                                  )
-                                                  .toList(),
+                                                  ),
+                                                ),
+                                                childWhenDragging: Opacity(
+                                                  opacity: 0.3,
+                                                  child: _buildWordChip(
+                                                    word,
+                                                    darkBorderColor,
+                                                  ),
+                                                ),
+                                                child: _buildWordChip(
+                                                  word,
+                                                  darkBorderColor,
+                                                ),
+                                              );
+                                            },
+                                          ),
                                         ),
                                       ),
                                     ),
@@ -281,44 +291,6 @@ class _SimilarWordsGameScreenState extends State<SimilarWordsGameScreen> {
                           ],
                         ),
                       ),
-
-                      const SizedBox(height: 24),
-
-                      if (state.userAnswers.values.every(
-                        (answer) => answer != null,
-                      ))
-                        GestureDetector(
-                          onTap: () {
-                            int score = state.score;
-                            NeubrutalismToast.show(
-                              context,
-                              message: 'COMPLETED! SCORE: $score',
-                              backgroundColor: Colors.green,
-                              icon: Icons.emoji_events,
-                            );
-                          },
-                          child: NeubrutalismContainer(
-                            backgroundColor: Colors.green,
-                            borderRadius: 50,
-                            height: 60,
-                            width: double.infinity,
-                            child: const Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.check_circle, color: Colors.white),
-                                SizedBox(width: 8),
-                                Text(
-                                  'CHECK ANSWERS',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w900,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
                     ],
                   ),
                 ),
@@ -331,13 +303,10 @@ class _SimilarWordsGameScreenState extends State<SimilarWordsGameScreen> {
   }
 
   Widget _buildWordChip(String word, Color darkBorderColor) {
-    return Container(
+    return NeubrutalismContainer(
+      borderRadius: 12,
+      backgroundColor: Colors.white,
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: darkBorderColor, width: 2),
-      ),
       child: Text(
         word,
         style: TextStyle(
@@ -352,16 +321,16 @@ class _SimilarWordsGameScreenState extends State<SimilarWordsGameScreen> {
   Widget _buildDropTarget(
     String question,
     String? userAnswer,
+    String? userAnswerKey,
     bool isCorrect,
     Color darkBorderColor,
-    Color accentOrange,
   ) {
     return DragTarget<String>(
-      onWillAcceptWithDetails: (droppedWord) {
-        return _cubit.isCorrectAnswer(question, droppedWord.data);
+      onWillAcceptWithDetails: (droppedWordKey) {
+        return true;
       },
-      onAcceptWithDetails: (droppedWord) {
-        _cubit.onWordDropped(question, droppedWord.data);
+      onAcceptWithDetails: (droppedWordKey) {
+        _cubit.onWordDropped(question, droppedWordKey.data);
       },
       builder: (context, candidateData, rejectedData) {
         final bool isBeingHovered = candidateData.isNotEmpty;
@@ -371,7 +340,7 @@ class _SimilarWordsGameScreenState extends State<SimilarWordsGameScreen> {
         Color targetBorder = darkBorderColor.withOpacity(0.2);
         double borderWidth = 1.5;
 
-        if (userAnswer != null) {
+        if (userAnswerKey != null) {
           targetBg =
               isCorrect
                   ? Colors.green.withOpacity(0.1)

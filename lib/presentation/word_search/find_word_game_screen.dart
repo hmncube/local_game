@@ -71,9 +71,18 @@ class _FindWordGameScreenState extends State<FindWordGameScreen> {
             context.go(
               Routes.levelCompleteScreen.toPath,
               extra: Points(
-                levelPoints: state.levelPoints,
-                totalPoints: state.points,
+                initialTotalPoints: state.initialScore,
+                runPoints: state.levelPoints,
                 bonusPoints: state.bonus,
+                addedPoints:
+                    state.isReplay
+                        ? (state.levelPoints + state.bonus >
+                                (state.level?.points ?? 0)
+                            ? (state.levelPoints +
+                                state.bonus -
+                                (state.level?.points ?? 0))
+                            : 0)
+                        : (state.levelPoints + state.bonus),
               ),
             );
           }
@@ -113,7 +122,7 @@ class _FindWordGameScreenState extends State<FindWordGameScreen> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(
+                                const Icon(
                                   Icons.timer,
                                   size: 18,
                                   color: darkBorderColor,

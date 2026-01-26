@@ -26,22 +26,26 @@ class SimilarWordsGameCubit extends BaseCubitWrapper<SimilarWordsGameState> {
   Future<void> initializeGame({required int levelId}) async {
     emit(state.copyWith(cubitState: CubitLoading()));
     final level = await _levelDao.getLevelById(levelId);
-    final words =
+    final questions = level?.wordsEn ?? [];
+    final answers =
         level?.languageId == 1
             ? level?.wordsEn ?? []
             : level?.languageId == 2
             ? level?.wordsSn ?? []
             : level?.wordsNd ?? [];
-final questions = level?.wordsEn ?? [];
+
     Map<String, String> questionAnswers = {};
-    List<String> availableWords = List.empty(growable: true);
-    for (int i = 0; i < words.length; i += 2) {
-      questionAnswers[questions[i]] = words[i];
-      availableWords.add(words[i]);
+    List<String> availableWords = [];
+    for (int i = 0; i < questions.length; i++) {
+      if (i < answers.length) {
+        questionAnswers[questions[i]] = answers[i];
+        availableWords.add(answers[i]);
+      }
     }
 
-    // get random words
-    final random = await _levelDao.getLevelById(levelId - 1);
+    // get random words (distractors)
+    final distractorLevelId = levelId > 1 ? levelId - 1 : levelId + 1;
+    final random = await _levelDao.getLevelById(distractorLevelId);
     final randomWords =
         level?.languageId == 1
             ? random?.wordsEn ?? []
@@ -49,10 +53,12 @@ final questions = level?.wordsEn ?? [];
             ? random?.wordsSn ?? []
             : random?.wordsNd ?? [];
 
-    final set = Set.from(availableWords);
-    set.addAll(randomWords);
+    // Combine available words and distractors without using Set.from to preserve duplicates
+    availableWords.addAll(randomWords);
 
-    availableWords = List.from(set);
+    // Remove duplicates if any (only if they are exact same string from distractors)
+    // but keep those intended for multiple questions if they exist.
+    // For now, let's just use the list as is to ensure all answers are present.
 
     Map<String, String?> userAnswers = {};
     for (String question in questionAnswers.keys) {
@@ -69,9 +75,11 @@ final questions = level?.wordsEn ?? [];
         userAnswers: userAnswers,
         questionAnswers: questionAnswers,
         hints: user?.hints,
+        initialScore: user?.totalScore ?? 0,
         score: user?.totalScore,
-        userId: user?.id,
+        userId: user?.id ?? '',
         level: level,
+        isReplay: level?.status == AppValues.levelDone,
       ),
     );
   }
@@ -84,15 +92,26 @@ final questions = level?.wordsEn ?? [];
     });
   }
 
-  Future<void> onWordDropped(String questionWord, String droppedWord) async {
-    final userAnswers = _updateUserAnswers(questionWord, droppedWord);
-    final usedWords = _updateUsedWords(questionWord, droppedWord);
-    final isGameComplete = _isGameComplete(userAnswers);
+  Future<void> onWordDropped(String questionWord, String wordKey) async {
+    final userAnswers = _updateUserAnswers(questionWord, wordKey);
+    final usedWords = _updateUsedWords(questionWord, wordKey);
+
+    // Check if the game is complete (all answers present AND all correct)
+    bool allCorrect = true;
+    for (var entry in userAnswers.entries) {
+      if (!isCorrectAnswer(entry.key, entry.value)) {
+        allCorrect = false;
+        break;
+      }
+    }
+    final isGameComplete =
+        allCorrect && userAnswers.length == state.questionAnswers.length;
 
     if (isGameComplete) {
       await _completeLevel();
     }
 
+    final droppedWord = wordKey.split('-').first;
     final points = await _updatePoints(droppedWord);
 
     emit(
@@ -105,7 +124,6 @@ final questions = level?.wordsEn ?? [];
         isGameComplete: isGameComplete,
       ),
     );
-    startGame();
   }
 
   Future<({int totalScore, int levelScore, int bonus})> _updatePoints(
@@ -117,7 +135,9 @@ final questions = level?.wordsEn ?? [];
     final totalScore = state.score + earnedPoints;
     final levelScore = state.levelPoints + earnedPoints;
 
-    await _userDao.updateTotalScore(state.userId, totalScore);
+    if (!state.isReplay) {
+      await _userDao.updateTotalScore(state.userId, totalScore);
+    }
 
     return (totalScore: totalScore, levelScore: levelScore, bonus: bonus);
   }
@@ -131,33 +151,62 @@ final questions = level?.wordsEn ?? [];
     return userAnswers;
   }
 
-  Set<String> _updateUsedWords(String questionWord, String droppedWord) {
+  Set<String> _updateUsedWords(String questionWord, String wordKey) {
     final usedWords = Set<String>.from(state.usedWords);
 
-    final previousAnswer = state.userAnswers[questionWord];
-    if (previousAnswer != null) {
-      usedWords.remove(previousAnswer);
+    final previousWordKey = state.userAnswers[questionWord];
+    if (previousWordKey != null) {
+      usedWords.remove(previousWordKey);
     }
 
-    usedWords.add(droppedWord);
+    usedWords.add(wordKey);
     return usedWords;
-  }
-
-  bool _isGameComplete(Map<String, String?> userAnswers) {
-    return userAnswers.values.every((value) => value != null);
   }
 
   Future<void> _completeLevel() async {
     _timer?.cancel();
-    final completedLevel = state.level?.copyWith(
-      points: state.levelPoints,
-      finishedAt: DateTime.now().millisecondsSinceEpoch,
-      status: AppValues.levelDone,
-    );
-    await _levelDao.updateLevel(completedLevel);
+    final currentBest = state.level?.points ?? 0;
+    final currentTotalScore = state.levelPoints + state.bonus;
+
+    if (state.isReplay) {
+      if (currentTotalScore > currentBest) {
+        final difference = currentTotalScore - currentBest;
+        final user = await _userDao.getUser();
+        if (user != null) {
+          await _userDao.updateTotalScore(
+            state.userId,
+            user.totalScore + difference,
+          );
+        }
+
+        final completedLevel = state.level?.copyWith(
+          points: currentTotalScore,
+          finishedAt: DateTime.now().millisecondsSinceEpoch,
+        );
+        await _levelDao.updateLevel(completedLevel);
+      }
+    } else {
+      if (state.bonus > 0) {
+        final user = await _userDao.getUser();
+        if (user != null) {
+          await _userDao.updateTotalScore(
+            state.userId,
+            user.totalScore + state.bonus,
+          );
+        }
+      }
+
+      final completedLevel = state.level?.copyWith(
+        points: currentTotalScore,
+        finishedAt: DateTime.now().millisecondsSinceEpoch,
+        status: AppValues.levelDone,
+      );
+      await _levelDao.updateLevel(completedLevel);
+    }
   }
 
-  bool isCorrectAnswer(String question, String? answer) {
+  bool isCorrectAnswer(String question, String? answerKey) {
+    final answer = answerKey?.split('-').first;
     return state.questionAnswers[question] == answer;
   }
 
@@ -176,6 +225,8 @@ final questions = level?.wordsEn ?? [];
       ),
     );
   }
+
+  // Removed onWordUsed as it's now handled in onWordDropped
 
   @override
   void initialize() {}

@@ -5,6 +5,7 @@ import 'package:local_game/data/model/level_model.dart';
 class WordLinkState extends Equatable {
   final BaseCubitState cubitState;
   final LevelModel? level;
+  final int initialScore;
   final int totalPoints;
   final int hintsCount;
   final int levelPoints;
@@ -16,6 +17,7 @@ class WordLinkState extends Equatable {
   final bool isWordCorrect;
   final bool isLevelComplete;
   final bool wasWordEnteredBefore;
+  final bool isReplay;
   final String hint;
   final String userId;
   final List<String> letters;
@@ -28,6 +30,7 @@ class WordLinkState extends Equatable {
     this.level,
     this.levelPoints = 0,
     this.hintsCount = 0,
+    this.initialScore = 0,
     this.totalPoints = 0,
     this.hintWordIndex = 0,
     this.bonus = 0,
@@ -43,11 +46,13 @@ class WordLinkState extends Equatable {
     this.currentWord = const [],
     this.isWordWrong = false,
     this.isWordCorrect = false,
+    this.isReplay = false,
   });
 
   WordLinkState copyWith({
     BaseCubitState? cubitState,
     int? hintsCount,
+    int? initialScore,
     int? totalPoints,
     int? levelPoints,
     int? seconds,
@@ -65,6 +70,7 @@ class WordLinkState extends Equatable {
     bool? isWordWrong,
     bool? isWordCorrect,
     bool? wasWordEnteredBefore,
+    bool? isReplay,
   }) {
     return WordLinkState(
       cubitState: cubitState ?? this.cubitState,
@@ -74,6 +80,7 @@ class WordLinkState extends Equatable {
       seconds: seconds ?? this.seconds,
       bonus: bonus ?? this.bonus,
       hintsCount: hintsCount ?? this.hintsCount,
+      initialScore: initialScore ?? this.initialScore,
       totalPoints: totalPoints ?? this.totalPoints,
       levelPoints: levelPoints ?? this.levelPoints,
       currentWord: currentWord ?? this.currentWord,
@@ -86,6 +93,7 @@ class WordLinkState extends Equatable {
       hintWordIndex: hintWordIndex ?? this.hintWordIndex,
       userId: userId ?? this.userId,
       progressValue: progressValue ?? this.progressValue,
+      isReplay: isReplay ?? this.isReplay,
     );
   }
 
@@ -95,6 +103,7 @@ class WordLinkState extends Equatable {
     level,
     letters,
     words,
+    initialScore,
     totalPoints,
     hintsCount,
     hint,
@@ -110,5 +119,6 @@ class WordLinkState extends Equatable {
     userId,
     levelPoints,
     progressValue,
+    isReplay,
   ];
 }
