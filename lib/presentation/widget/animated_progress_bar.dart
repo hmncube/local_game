@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:local_game/app/themes/app_theme.dart';
-import 'package:local_game/core/constants/app_assets.dart';
 
 class AnimatedProgressBar extends StatefulWidget {
   const AnimatedProgressBar({super.key});
@@ -23,12 +20,10 @@ class _AnimatedProgressBarState extends State<AnimatedProgressBar>
       vsync: this,
     )..repeat();
 
-    _animation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: Curves.easeInOut,
-      ),
-    );
+    _animation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
   }
 
   @override
@@ -39,84 +34,61 @@ class _AnimatedProgressBarState extends State<AnimatedProgressBar>
 
   @override
   Widget build(BuildContext context) {
+    const darkBorderColor = Color(0xFF2B2118);
+    const accentOrange = Color(0xFFE88328);
+
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 40),
-      child: SizedBox(
-        height: 60,
-        child: Stack(
-          children: [
-            // Container with animated green progress
-            Positioned.fill(
-              child: Padding(
-                padding: const EdgeInsets.all(6.0), // Space for SVG border
-                child: AnimatedBuilder(
+      padding: const EdgeInsets.symmetric(horizontal: 48),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            height: 48,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: darkBorderColor, width: 3),
+              boxShadow: const [
+                BoxShadow(color: darkBorderColor, offset: Offset(4, 4)),
+              ],
+            ),
+            child: Stack(
+              children: [
+                // Animated progress fill
+                AnimatedBuilder(
                   animation: _animation,
                   builder: (context, child) {
-                    return ClipRRect(
-                      borderRadius: BorderRadius.circular(27),
-                      child: Stack(
-                        children: [
-                          // Animated green fill
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: FractionallySizedBox(
-                              widthFactor: 0.7 * _animation.value + 0.15,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    colors: [
-                                      AppTheme.accentGreen.withOpacity(0.6),
-                                      AppTheme.accentGreen,
-                                      AppTheme.accentGreen.withOpacity(0.8),
-                                    ],
-                                    stops: const [0.0, 0.5, 1.0],
-                                  ),
-                                ),
-                              ),
-                            ),
+                    return FractionallySizedBox(
+                      widthFactor: _animation.value,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: accentOrange,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: Colors.transparent,
+                            width: 0,
                           ),
-                          // Shimmer effect
-                          ShaderMask(
-                            shaderCallback: (bounds) {
-                              return LinearGradient(
-                                begin: Alignment.centerLeft,
-                                end: Alignment.centerRight,
-                                stops: [
-                                  _animation.value - 0.3,
-                                  _animation.value,
-                                  _animation.value + 0.3,
-                                ],
-                                colors: const [
-                                  Colors.transparent,
-                                  Colors.white38,
-                                  Colors.transparent,
-                                ],
-                              ).createShader(bounds);
-                            },
-                            blendMode: BlendMode.srcATop,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: Colors.greenAccent,
-                                borderRadius: BorderRadius.circular(27),
-                              ),
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
                     );
                   },
                 ),
-              ),
+                // "LOADING..." Text
+                Center(
+                  child: Text(
+                    'LOADING...',
+                    style: TextStyle(
+                      color: darkBorderColor,
+                      fontWeight: FontWeight.w900,
+                      fontSize: 14,
+                      letterSpacing: 2,
+                    ),
+                  ),
+                ),
+              ],
             ),
-            // SVG border overlay
-            Positioned.fill(
-              child: SvgPicture.asset(
-                AppAssets.progressBarSvg,
-                fit: BoxFit.fill,
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

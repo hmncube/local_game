@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:local_game/core/base/cubit/cubit_status.dart';
 import 'package:local_game/core/di/di.dart';
 import 'package:local_game/core/routes.dart';
 import 'package:local_game/presentation/models/points.dart';
@@ -13,6 +14,8 @@ import 'package:local_game/presentation/word_search/find_word_game_state.dart';
 
 import 'package:local_game/presentation/word_search/widgets/game_grid.dart';
 import 'package:local_game/presentation/word_search/widgets/words_to_find.dart';
+
+import 'package:local_game/presentation/widget/loading_screen.dart';
 
 class FindWordGameScreen extends StatefulWidget {
   final int levelId;
@@ -88,6 +91,10 @@ class _FindWordGameScreenState extends State<FindWordGameScreen> {
           }
         },
         builder: (context, state) {
+          if (state.cubitState is CubitLoading) {
+            return const LoadingScreen();
+          }
+
           return PopScope(
             canPop: false,
             onPopInvokedWithResult: (didPop, result) {

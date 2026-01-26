@@ -3,11 +3,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:local_game/core/di/di.dart';
 import 'package:local_game/core/extensions/time_extension.dart';
+import 'package:local_game/core/base/cubit/cubit_status.dart';
 import 'package:local_game/core/routes.dart';
 import 'package:local_game/presentation/models/points.dart';
 import 'package:local_game/presentation/similar_words/similar_words_game_cubit.dart';
 import 'package:local_game/presentation/similar_words/similar_words_game_state.dart';
 import 'package:local_game/presentation/widget/game_top_bar.dart';
+import 'package:local_game/presentation/widget/loading_screen.dart';
 import 'package:local_game/presentation/widget/neubrutalism_container.dart';
 
 class SimilarWordsGameScreen extends StatefulWidget {
@@ -60,6 +62,10 @@ class _SimilarWordsGameScreenState extends State<SimilarWordsGameScreen> {
           }
         },
         builder: (context, state) {
+          if (state.cubitState is CubitLoading) {
+            return const LoadingScreen();
+          }
+
           return PopScope(
             canPop: false,
             onPopInvokedWithResult: (didPop, result) {

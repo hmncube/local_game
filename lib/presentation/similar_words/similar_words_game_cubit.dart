@@ -80,6 +80,7 @@ class SimilarWordsGameCubit extends BaseCubitWrapper<SimilarWordsGameState> {
         userId: user?.id ?? '',
         level: level,
         isReplay: level?.status == AppValues.levelDone,
+        cubitState: CubitSuccess(),
       ),
     );
   }
