@@ -1,0 +1,87 @@
+name: API Health Check
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Restore previous state
+        uses: actions/cache@v4
+        with:
+          path: state
+          key: health-state
+
+      - name: Default state
+        run: |
+          mkdir -p state
+          if [ ! -f state/status ]; then
+            echo "UP" > state/status
+          fi
+
+      - name: Call health endpoint and measure latency
+        id: health
+        run: |
+          START=$(date +%s%3N)
+
+          if curl -f --max-time 10 https://yourapi.com/health > /dev/null; then
+            RESULT="UP"
+          else
+            RESULT="DOWN"
+          fi
+
+          END=$(date +%s%3N)
+          LATENCY=$((END - START))
+
+          echo "result=$RESULT" >> $GITHUB_OUTPUT
+          echo "latency=$LATENCY" >> $GITHUB_OUTPUT
+
+      - name: Decide alerts
+        id: decision
+        run: |
+          PREV=$(cat state/status)
+          CURR="${{ steps.health.outputs.result }}"
+          LATENCY="${{ steps.health.outputs.latency }}"
+
+          ALERT="NONE"
+          MESSAGE=""
+
+          # Down alert (only once)
+          if [ "$PREV" = "UP" ] && [ "$CURR" = "DOWN" ]; then
+            ALERT="DOWN"
+            MESSAGE="🚨 API DOWN\nHealth check failed."
+          fi
+
+          # Recovery alert
+          if [ "$PREV" = "DOWN" ] && [ "$CURR" = "UP" ]; then
+            ALERT="RECOVERED"
+            MESSAGE="✅ API RECOVERED\nService is back online."
+          fi
+
+          # Latency alert (API still UP)
+          if [ "$CURR" = "UP" ] && [ "$LATENCY" -gt 1500 ]; then
+            ALERT="SLOW"
+            MESSAGE="⚠️ API SLOW\nLatency: ${LATENCY}ms"
+          fi
+
+          echo "$CURR" > state/status
+
+          echo "alert=$ALERT" >> $GITHUB_OUTPUT
+          echo "message=$MESSAGE" >> $GITHUB_OUTPUT
+
+      - name: Send Telegram alert
+        if: steps.decision.outputs.alert != 'NONE'
+        run: |
+          curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage \
+          -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
+          -d text="${{ steps.decision.outputs.message }}"
+
+      - name: Save state
+        uses: actions/cache@v4
+        with:
+          path: state
+          key: health-state
