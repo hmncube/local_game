@@ -28,7 +28,7 @@ jobs:
         run: |
           START=$(date +%s%3N)
 
-          if curl -f --max-time 10 https://yourapi.com/health > /dev/null; then
+          if curl -f --max-time 10 http://localhost:21011/v5/health?timestamp=1770726970865 > /dev/null; then
             RESULT="UP"
           else
             RESULT="DOWN"
