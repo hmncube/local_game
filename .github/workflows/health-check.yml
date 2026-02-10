@@ -26,9 +26,14 @@ jobs:
       - name: Call health endpoint and measure latency
         id: health
         run: |
+          TIMESTAMP=$(date +%s%3N)
           START=$(date +%s%3N)
 
-          if curl -f --max-time 10 http://localhost:21011/v5/health?timestamp=1770726970865 > /dev/null; then
+          if curl -f --max-time 10 \
+            -H "X-API-KEY: ${{ secrets.API_KEY }}" \
+            -H "X-API-SECRET: ${{ secrets.API_SECRET }}" \
+            "https://mock-api.roostoo.com/v5/health?timestamp=$TIMESTAMP" \
+            > /dev/null; then
             RESULT="UP"
           else
             RESULT="DOWN"
@@ -53,19 +58,19 @@ jobs:
           # Down alert (only once)
           if [ "$PREV" = "UP" ] && [ "$CURR" = "DOWN" ]; then
             ALERT="DOWN"
-            MESSAGE="🚨 API DOWN\nHealth check failed."
+            MESSAGE="🚨 API DOWN : Health check failed."
           fi
 
           # Recovery alert
           if [ "$PREV" = "DOWN" ] && [ "$CURR" = "UP" ]; then
             ALERT="RECOVERED"
-            MESSAGE="✅ API RECOVERED\nService is back online."
+            MESSAGE="✅ API RECOVERED : Service is back online."
           fi
 
           # Latency alert (API still UP)
           if [ "$CURR" = "UP" ] && [ "$LATENCY" -gt 1500 ]; then
             ALERT="SLOW"
-            MESSAGE="⚠️ API SLOW\nLatency: ${LATENCY}ms"
+            MESSAGE="⚠️ API SLOW : Latency: ${LATENCY}ms"
           fi
 
           echo "$CURR" > state/status
