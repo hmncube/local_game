@@ -20,15 +20,30 @@ class SimilarWordsGameScreen extends StatefulWidget {
   State<SimilarWordsGameScreen> createState() => _SimilarWordsGameScreenState();
 }
 
-class _SimilarWordsGameScreenState extends State<SimilarWordsGameScreen> {
+class _SimilarWordsGameScreenState extends State<SimilarWordsGameScreen>
+    with WidgetsBindingObserver {
   late final SimilarWordsGameCubit _cubit;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _cubit = getIt<SimilarWordsGameCubit>();
     _cubit.initializeGame(levelId: widget.levelId);
     _cubit.startGame();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused) {
+      _cubit.saveProgress();
+    }
   }
 
   @override
@@ -57,6 +72,8 @@ class _SimilarWordsGameScreenState extends State<SimilarWordsGameScreen> {
                                 (state.level?.points ?? 0))
                             : 0)
                         : (state.levelPoints + state.bonus),
+                nextLevelId: widget.levelId + 1,
+                gameRoute: Routes.similarWords.toPath,
               ),
             );
           }
@@ -70,6 +87,7 @@ class _SimilarWordsGameScreenState extends State<SimilarWordsGameScreen> {
             canPop: false,
             onPopInvokedWithResult: (didPop, result) {
               if (!didPop) {
+                _cubit.saveProgress();
                 context.go(Routes.mapScreen.toPath);
               }
             },

@@ -7,6 +7,8 @@ import 'package:local_game/core/game_system/points_management.dart';
 import 'package:local_game/core/sound/sound_manager.dart';
 import 'package:local_game/data/dao/level_dao.dart';
 import 'package:local_game/data/dao/user_dao.dart';
+import 'package:local_game/data/dao/save_state_dao.dart';
+import 'package:local_game/data/model/game_save_state.dart';
 import 'package:local_game/presentation/word_link/word_link_state.dart';
 
 import '../../core/base/cubit/cubit_status.dart';
@@ -16,9 +18,14 @@ class WordLinkCubit extends BaseCubitWrapper<WordLinkState> {
   final LevelDao _levelDao;
   final UserDao _userDao;
   final SoundManager _soundManager;
+  final SaveStateDao _saveStateDao;
 
-  WordLinkCubit(this._levelDao, this._userDao, this._soundManager)
-    : super(WordLinkState(cubitState: CubitInitial()));
+  WordLinkCubit(
+    this._levelDao,
+    this._userDao,
+    this._soundManager,
+    this._saveStateDao,
+  ) : super(WordLinkState(cubitState: CubitInitial()));
 
   @override
   void dispose() {}
@@ -31,6 +38,31 @@ class WordLinkCubit extends BaseCubitWrapper<WordLinkState> {
 
     final levelId = level ?? 1;
     final levelModel = await _levelDao.getLevelById(levelId);
+
+    final savedState = await _saveStateDao.loadWordLinkState(levelId);
+    if (savedState != null && levelModel?.status != AppValues.levelDone) {
+      final user = await _userDao.getUser();
+      emit(
+        state.copyWith(
+          cubitState: CubitSuccess(),
+          letters: savedState.letters,
+          words: savedState.words,
+          filledWords: savedState.filledWords,
+          seconds: savedState.seconds,
+          totalPoints: savedState.totalPoints,
+          levelPoints: savedState.levelPoints,
+          bonus: savedState.bonus,
+          hintsCount: user?.hints,
+          initialScore: savedState.totalPoints - savedState.levelPoints,
+          userId: user?.id ?? '',
+          level: levelModel,
+          isReplay: levelModel?.status == AppValues.levelDone,
+          progressValue: savedState.seconds / AppValues.timerTime,
+        ),
+      );
+      startGame(resume: true);
+      return;
+    }
 
     final user = await _userDao.getUser();
     if (levelModel != null) {
@@ -47,7 +79,8 @@ class WordLinkCubit extends BaseCubitWrapper<WordLinkState> {
         emit(
           state.copyWith(
             cubitState: CubitSuccess(),
-            words: words..sort((a, b) => a.length.compareTo(b.length)),
+            words: List<String>.from(words)
+              ..sort((a, b) => a.length.compareTo(b.length)),
             hintsCount: user?.hints,
             userId: user?.id ?? '',
             initialScore: user?.totalScore ?? 0,
@@ -78,9 +111,11 @@ class WordLinkCubit extends BaseCubitWrapper<WordLinkState> {
   }
 
   Timer? _timer;
-  void startGame() {
+  void startGame({bool resume = false}) {
     _timer?.cancel();
-    emit(state.copyWith(seconds: AppValues.timerTime));
+    if (!resume) {
+      emit(state.copyWith(seconds: AppValues.timerTime));
+    }
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       emit(
         state.copyWith(
@@ -92,6 +127,23 @@ class WordLinkCubit extends BaseCubitWrapper<WordLinkState> {
         _timer?.cancel();
       }
     });
+  }
+
+  Future<void> saveProgress() async {
+    if (state.isLevelComplete || state.level == null || state.isReplay) return;
+
+    final saveState = WordLinkSaveState(
+      levelId: state.level!.id,
+      letters: state.letters,
+      words: state.words,
+      filledWords: state.filledWords,
+      seconds: state.seconds,
+      totalPoints: state.totalPoints,
+      levelPoints: state.levelPoints,
+      bonus: state.bonus,
+      hintsCount: state.hintsCount,
+    );
+    await _saveStateDao.saveWordLinkState(saveState);
   }
 
   List<String> dashWords(List<String> words) {
@@ -146,6 +198,9 @@ class WordLinkCubit extends BaseCubitWrapper<WordLinkState> {
           hintWordIndex: -1,
         ),
       );
+      if (!isLevelComplete) {
+        await saveProgress();
+      }
     } else {
       _soundManager.playWrongAnswerSound();
       emit(state.copyWith(currentWord: [state.hint], isWordWrong: true));
@@ -204,6 +259,7 @@ class WordLinkCubit extends BaseCubitWrapper<WordLinkState> {
       );
       await _levelDao.updateLevel(completedLevel);
     }
+    await _saveStateDao.clearState(state.level!.id, 3);
   }
 
   int findLongestWord(List<String> words) {
@@ -265,6 +321,9 @@ class WordLinkCubit extends BaseCubitWrapper<WordLinkState> {
         isLevelComplete: isLevelComplete,
       ),
     );
+    if (!isLevelComplete) {
+      await saveProgress();
+    }
   }
 
   Map<String, int> getMaxLetterCount(List<String> words) {

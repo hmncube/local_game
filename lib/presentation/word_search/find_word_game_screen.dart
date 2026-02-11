@@ -5,7 +5,6 @@ import 'package:local_game/core/base/cubit/cubit_status.dart';
 import 'package:local_game/core/di/di.dart';
 import 'package:local_game/core/routes.dart';
 import 'package:local_game/presentation/models/points.dart';
-import 'package:local_game/presentation/widget/animated_timer_bar.dart';
 import 'package:local_game/presentation/widget/game_top_bar.dart';
 import 'package:local_game/presentation/widget/neubrutalism_container.dart';
 import 'package:local_game/presentation/widget/neubrutalism_toast.dart';
@@ -25,20 +24,30 @@ class FindWordGameScreen extends StatefulWidget {
   State<FindWordGameScreen> createState() => _FindWordGameScreenState();
 }
 
-class _FindWordGameScreenState extends State<FindWordGameScreen> {
+class _FindWordGameScreenState extends State<FindWordGameScreen>
+    with WidgetsBindingObserver {
   late final FindWordGameCubit _cubit;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _cubit = getIt<FindWordGameCubit>();
     _cubit.initializeGame(level: widget.levelId);
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _cubit.close();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused) {
+      _cubit.saveProgress();
+    }
   }
 
   @override
@@ -86,6 +95,8 @@ class _FindWordGameScreenState extends State<FindWordGameScreen> {
                                 (state.level?.points ?? 0))
                             : 0)
                         : (state.levelPoints + state.bonus),
+                nextLevelId: widget.levelId + 1,
+                gameRoute: Routes.wordSearch.toPath,
               ),
             );
           }
@@ -99,6 +110,7 @@ class _FindWordGameScreenState extends State<FindWordGameScreen> {
             canPop: false,
             onPopInvokedWithResult: (didPop, result) {
               if (!didPop) {
+                _cubit.saveProgress();
                 context.go(Routes.mapScreen.toPath);
               }
             },

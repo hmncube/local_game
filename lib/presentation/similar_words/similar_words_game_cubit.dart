@@ -7,15 +7,18 @@ import 'package:local_game/core/constants/app_values.dart';
 import 'package:local_game/core/game_system/points_management.dart';
 import 'package:local_game/data/dao/level_dao.dart';
 import 'package:local_game/data/dao/user_dao.dart';
+import 'package:local_game/data/dao/save_state_dao.dart';
+import 'package:local_game/data/model/game_save_state.dart';
 import 'package:local_game/presentation/similar_words/similar_words_game_state.dart';
 
 @injectable
 class SimilarWordsGameCubit extends BaseCubitWrapper<SimilarWordsGameState> {
   final LevelDao _levelDao;
   final UserDao _userDao;
+  final SaveStateDao _saveStateDao;
   Timer? _timer;
 
-  SimilarWordsGameCubit(this._levelDao, this._userDao)
+  SimilarWordsGameCubit(this._levelDao, this._userDao, this._saveStateDao)
     : super(SimilarWordsGameState(cubitState: CubitInitial()));
 
   @override
@@ -26,6 +29,33 @@ class SimilarWordsGameCubit extends BaseCubitWrapper<SimilarWordsGameState> {
   Future<void> initializeGame({required int levelId}) async {
     emit(state.copyWith(cubitState: CubitLoading()));
     final level = await _levelDao.getLevelById(levelId);
+
+    final savedState = await _saveStateDao.loadSimilarWordsState(levelId);
+    if (savedState != null && level?.status != AppValues.levelDone) {
+      final user = await _userDao.getUser();
+
+      emit(
+        state.copyWith(
+          cubitState: CubitSuccess(),
+          availableWords: savedState.availableWords,
+          userAnswers: savedState.userAnswers,
+          questionAnswers: savedState.questionAnswers,
+          usedWords: savedState.usedWords,
+          seconds: savedState.seconds,
+          score: savedState.score,
+          levelPoints: savedState.levelPoints,
+          bonus: savedState.bonus,
+          hints: user?.hints,
+          initialScore: savedState.score - savedState.levelPoints,
+          userId: user?.id ?? '',
+          level: level,
+          isReplay: level?.status == AppValues.levelDone,
+        ),
+      );
+      startGame(resume: true);
+      return;
+    }
+
     final questions = level?.wordsEn ?? [];
     final answers =
         level?.languageId == 1
@@ -85,12 +115,31 @@ class SimilarWordsGameCubit extends BaseCubitWrapper<SimilarWordsGameState> {
     );
   }
 
-  void startGame() {
+  void startGame({bool resume = false}) {
     _timer?.cancel();
-    emit(state.copyWith(seconds: 0));
+    if (!resume) {
+      emit(state.copyWith(seconds: 0));
+    }
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       emit(state.copyWith(seconds: state.seconds + 1));
     });
+  }
+
+  Future<void> saveProgress() async {
+    if (state.isGameComplete || state.level == null || state.isReplay) return;
+
+    final saveState = SimilarWordsSaveState(
+      levelId: state.level!.id,
+      availableWords: state.availableWords,
+      userAnswers: state.userAnswers,
+      usedWords: state.usedWords,
+      questionAnswers: state.questionAnswers,
+      seconds: state.seconds,
+      score: state.score,
+      levelPoints: state.levelPoints,
+      bonus: state.bonus,
+    );
+    await _saveStateDao.saveSimilarWordsState(saveState);
   }
 
   Future<void> onWordDropped(String questionWord, String wordKey) async {
@@ -125,6 +174,9 @@ class SimilarWordsGameCubit extends BaseCubitWrapper<SimilarWordsGameState> {
         isGameComplete: isGameComplete,
       ),
     );
+    if (!isGameComplete) {
+      await saveProgress();
+    }
   }
 
   Future<({int totalScore, int levelScore, int bonus})> _updatePoints(
@@ -204,6 +256,7 @@ class SimilarWordsGameCubit extends BaseCubitWrapper<SimilarWordsGameState> {
       );
       await _levelDao.updateLevel(completedLevel);
     }
+    await _saveStateDao.clearState(state.level!.id, 2);
   }
 
   bool isCorrectAnswer(String question, String? answerKey) {
@@ -216,7 +269,7 @@ class SimilarWordsGameCubit extends BaseCubitWrapper<SimilarWordsGameState> {
     for (String question in state.questionAnswers.keys) {
       userAnswers[question] = null;
     }
-    final availableWords = state.availableWords;
+    final availableWords = List<String>.from(state.availableWords);
     availableWords.shuffle();
     emit(
       state.copyWith(
@@ -227,8 +280,6 @@ class SimilarWordsGameCubit extends BaseCubitWrapper<SimilarWordsGameState> {
     );
   }
 
-  // Removed onWordUsed as it's now handled in onWordDropped
-
   @override
-  void initialize() {}
+  Future<void> initialize() async {}
 }

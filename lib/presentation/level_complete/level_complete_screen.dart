@@ -199,24 +199,58 @@ class _LevelCompleteScreenState extends State<LevelCompleteScreen>
             ),
             Padding(
               padding: const EdgeInsets.all(24.0),
-              child: GestureDetector(
-                onTap: () => context.go(Routes.mapScreen.toPath),
-                child: NeubrutalismContainer(
-                  backgroundColor: accentOrange,
-                  borderRadius: 50,
-                  height: 80,
-                  width: double.infinity,
-                  child: const Center(
-                    child: Text(
-                      'Pfuurira Mberi',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w900,
-                        color: Colors.white,
+              child: Column(
+                children: [
+                 /* GestureDetector(
+                    onTap: () {
+                      if (widget.points.gameRoute != null &&
+                          widget.points.nextLevelId != null) {
+                        context.go(
+                          widget.points.gameRoute!,
+                          extra: widget.points.nextLevelId,
+                        );
+                      } else {
+                        context.go(Routes.mapScreen.toPath);
+                      }
+                    },
+                    child: NeubrutalismContainer(
+                      backgroundColor: accentOrange,
+                      borderRadius: 50,
+                      height: 70,
+                      width: double.infinity,
+                      child: const Center(
+                        child: Text(
+                          'Next Level',
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.w900,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),*/
+                  const SizedBox(height: 16),
+                  GestureDetector(
+                    onTap: () => context.go(Routes.mapScreen.toPath),
+                    child: NeubrutalismContainer(
+                      backgroundColor: Colors.white,
+                      borderRadius: 50,
+                      height: 70,
+                      width: double.infinity,
+                      child: const Center(
+                        child: Text(
+                          'Map',
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.w900,
+                            color: darkBorderColor,
+                          ),
+                        ),
                       ),
                     ),
                   ),
-                ),
+                ],
               ),
             ),
           ],
@@ -231,10 +265,11 @@ class _LevelCompleteScreenState extends State<LevelCompleteScreen>
       backgroundColor: Colors.white,
       padding: const EdgeInsets.all(20),
       width: double.infinity,
+      height: 340, // Constant size to prevent growing
       child: Column(
         children: [
           Text(
-            'Total Points',
+            'New Total Points',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -250,36 +285,47 @@ class _LevelCompleteScreenState extends State<LevelCompleteScreen>
               color: darkBorderColor,
             ),
           ),
-          if (_showLevelPoints || _showBonusPoints) ...[
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 16),
-              child: Divider(height: 1),
-            ),
-            if (_showLevelPoints)
-              _buildPointRow('Zviratidzwa', _displayLevel, Colors.blue),
-            if (_showBonusPoints) ...[
-              const SizedBox(height: 12),
-              _buildPointRow('Mamwe Zvibodzwa', _displayBonus, Colors.green),
-            ],
-            if (_pointsController.status == AnimationStatus.completed) ...[
-              const SizedBox(height: 24),
-              const Divider(),
-              const SizedBox(height: 8),
-              Text(
-                widget.points.addedPoints > 0
-                    ? 'Wawedzerwa +${widget.points.addedPoints}!'
-                    : 'Hapana Zvawedzerwa',
-                style: AppTextStyles.body.copyWith(
-                  color:
-                      widget.points.addedPoints > 0
-                          ? Colors.orange
-                          : Colors.grey,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
+          const SizedBox(height: 16),
+          const Divider(height: 1),
+          const SizedBox(height: 16),
+          // Level points row - always present but hidden until animation starts
+          Opacity(
+            opacity: _showLevelPoints ? 1.0 : 0.0,
+            child: _buildPointRow('Points', _displayLevel, Colors.blue),
+          ),
+          const SizedBox(height: 12),
+          // Bonus points row - always present but hidden until animation starts
+          Opacity(
+            opacity: _showBonusPoints ? 1.0 : 0.0,
+            child: _buildPointRow('Bonus', _displayBonus, Colors.green),
+          ),
+          const Spacer(),
+          // Added points message - always present to keep space
+          Opacity(
+            opacity:
+                _pointsController.status == AnimationStatus.completed
+                    ? 1.0
+                    : 0.0,
+            child: Column(
+              children: [
+                const Divider(),
+                const SizedBox(height: 8),
+                Text(
+                  widget.points.addedPoints > 0
+                      ? 'You got +${widget.points.addedPoints} points!'
+                      : 'Np points where added',
+                  style: AppTextStyles.body.copyWith(
+                    color:
+                        widget.points.addedPoints > 0
+                            ? Colors.orange
+                            : Colors.grey,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
                 ),
-              ),
-            ],
-          ],
+              ],
+            ),
+          ),
         ],
       ),
     );

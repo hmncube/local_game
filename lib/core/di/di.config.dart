@@ -15,6 +15,7 @@ import 'package:sqflite/sqflite.dart' as _i779;
 
 import '../../data/dao/level_dao.dart' as _i0;
 import '../../data/dao/player_icon_dao.dart' as _i959;
+import '../../data/dao/save_state_dao.dart' as _i750;
 import '../../data/dao/user_dao.dart' as _i390;
 import '../../data/dao/word_dao.dart' as _i861;
 import '../../data/database_provider.dart' as _i90;
@@ -47,6 +48,7 @@ Future<_i174.GetIt> init(
     () => registerModule.databaseProvider,
   );
   gh.lazySingleton<_i1063.LocalProvider>(() => _i1063.LocalProvider());
+  gh.lazySingleton<_i750.SaveStateDao>(() => _i750.SaveStateDao());
   gh.lazySingleton<_i64.SoundManager>(
     () => _i64.SoundManager(gh<_i1063.LocalProvider>()),
   );
@@ -68,20 +70,29 @@ Future<_i174.GetIt> init(
     () => _i0.LevelDao(gh<_i90.DatabaseProvider>(), gh<_i861.WordDao>()),
   );
   gh.factory<_i359.FindWordGameCubit>(
-    () => _i359.FindWordGameCubit(gh<_i390.UserDao>(), gh<_i0.LevelDao>()),
+    () => _i359.FindWordGameCubit(
+      gh<_i390.UserDao>(),
+      gh<_i0.LevelDao>(),
+      gh<_i750.SaveStateDao>(),
+    ),
   );
   gh.factory<_i901.WordLinkCubit>(
     () => _i901.WordLinkCubit(
       gh<_i0.LevelDao>(),
       gh<_i390.UserDao>(),
       gh<_i64.SoundManager>(),
+      gh<_i750.SaveStateDao>(),
     ),
   );
   gh.factory<_i621.MapCubit>(
     () => _i621.MapCubit(gh<_i0.LevelDao>(), gh<_i390.UserDao>()),
   );
   gh.factory<_i387.SimilarWordsGameCubit>(
-    () => _i387.SimilarWordsGameCubit(gh<_i0.LevelDao>(), gh<_i390.UserDao>()),
+    () => _i387.SimilarWordsGameCubit(
+      gh<_i0.LevelDao>(),
+      gh<_i390.UserDao>(),
+      gh<_i750.SaveStateDao>(),
+    ),
   );
   return getIt;
 }

@@ -8,14 +8,17 @@ import 'package:local_game/core/constants/app_values.dart';
 import 'package:local_game/core/game_system/points_management.dart';
 import 'package:local_game/data/dao/level_dao.dart';
 import 'package:local_game/data/dao/user_dao.dart';
+import 'package:local_game/data/dao/save_state_dao.dart';
+import 'package:local_game/data/model/game_save_state.dart';
 import 'package:local_game/presentation/word_search/find_word_game_state.dart';
 
 @injectable
 class FindWordGameCubit extends BaseCubitWrapper<FindWordGameState> {
   final UserDao _userDao;
   final LevelDao _levelDao;
+  final SaveStateDao _saveStateDao;
 
-  FindWordGameCubit(this._userDao, this._levelDao)
+  FindWordGameCubit(this._userDao, this._levelDao, this._saveStateDao)
     : super(FindWordGameState(cubitState: CubitInitial()));
 
   final List<Color> _availableColors = [
@@ -42,17 +45,49 @@ class FindWordGameCubit extends BaseCubitWrapper<FindWordGameState> {
   void initializeGame({required int level, int? gridSize}) async {
     emit(state.copyWith(cubitState: CubitLoading()));
 
+    final levelModel = (await _levelDao.getLevelById(level));
+    final savedState = await _saveStateDao.loadWordSearchState(level);
+
+    if (savedState != null &&
+        levelModel?.status != AppValues.levelDone &&
+        (gridSize == null || gridSize == savedState.gridSize)) {
+      final user = await _userDao.getUser();
+
+      emit(
+        state.copyWith(
+          cubitState: CubitSuccess(),
+          level: levelModel,
+          gridSize: savedState.gridSize,
+          grid: savedState.grid,
+          wordsToFind: savedState.wordsToFind,
+          foundWords: savedState.foundWords,
+          wordPositions: savedState.wordPositions,
+          wordColors: savedState.wordColors.map(
+            (key, value) => MapEntry(key, Color(value)),
+          ),
+          points: savedState.points,
+          levelPoints: savedState.levelPoints,
+          seconds: savedState.seconds,
+          initialScore: savedState.points - savedState.levelPoints,
+          hints: user?.hints,
+          userId: user?.id ?? '',
+          isReplay: levelModel?.status == AppValues.levelDone,
+        ),
+      );
+      startGame(resume: true);
+      return;
+    }
+
     final newGridSize = gridSize ?? state.gridSize;
     var grid = List.generate(newGridSize, (_) => List.filled(newGridSize, ''));
-    final levelModel = (await _levelDao.getLevelById(level));
 
-    final words =
-        levelModel?.languageId == 1
+    final words = levelModel?.wordsSn;
+/*        levelModel?.languageId == 1
             ? levelModel?.wordsEn
             : levelModel?.languageId == 2
             ? levelModel?.wordsSn
             : levelModel?.wordsNd;
-
+*/
     final wordsToFind = words?.map((w) => w.toUpperCase()).toList() ?? [];
     final wordPositions = <String, List<Position>>{};
 
@@ -87,20 +122,43 @@ class FindWordGameCubit extends BaseCubitWrapper<FindWordGameState> {
   }
 
   Timer? _timer;
-  void startGame() {
+  void startGame({bool resume = false}) {
     _timer?.cancel();
-    emit(state.copyWith(seconds: AppValues.timerTime));
+    if (!resume) {
+      emit(state.copyWith(seconds: AppValues.timerTime));
+    }
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      final newSeconds = state.seconds - 1;
       emit(
         state.copyWith(
-          seconds: state.seconds - 1,
-          progressValue: (state.seconds - 1) / AppValues.timerTime,
+          seconds: newSeconds,
+          progressValue: newSeconds / AppValues.timerTime,
         ),
       );
-      if (state.seconds <= 0) {
+      if (newSeconds <= 0) {
         _timer?.cancel();
       }
     });
+  }
+
+  Future<void> saveProgress() async {
+    if (state.isAllComplete || state.level == null || state.isReplay) return;
+
+    final saveState = WordSearchSaveState(
+      levelId: state.level!.id,
+      grid: state.grid,
+      wordsToFind: state.wordsToFind,
+      foundWords: state.foundWords,
+      wordPositions: state.wordPositions,
+      wordColors: state.wordColors.map(
+        (key, value) => MapEntry(key, value.value),
+      ),
+      seconds: state.seconds,
+      points: state.points,
+      levelPoints: state.levelPoints,
+      gridSize: state.gridSize,
+    );
+    await _saveStateDao.saveWordSearchState(saveState);
   }
 
   void _placeWords(
@@ -240,6 +298,9 @@ class FindWordGameCubit extends BaseCubitWrapper<FindWordGameState> {
         isComplete: isComplete,
         bonus: bonus,
       );
+      if (!isComplete) {
+        await saveProgress();
+      }
     } else {
       _emitStateWithoutMatch();
     }
@@ -323,6 +384,7 @@ class FindWordGameCubit extends BaseCubitWrapper<FindWordGameState> {
       );
       await _levelDao.updateLevel(completedLevel);
     }
+    await _saveStateDao.clearState(state.level!.id, 1);
   }
 
   Future<void> _updateTotalScore(int points) async {
@@ -425,6 +487,7 @@ class FindWordGameCubit extends BaseCubitWrapper<FindWordGameState> {
     final hints = state.hints - 1;
     emit(state.copyWith(hintPosition: firstPosition, hints: hints));
     updateHintDb(hints);
+    saveProgress();
   }
 
   void updateHintDb(int hints) {

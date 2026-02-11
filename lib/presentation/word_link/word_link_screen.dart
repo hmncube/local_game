@@ -4,7 +4,6 @@ import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:local_game/app/themes/app_text_styles.dart';
 import 'package:local_game/core/base/cubit/cubit_status.dart';
-import 'package:local_game/core/base/state/common_base_state_wrapper.dart';
 import 'package:local_game/core/constants/app_assets.dart';
 import 'package:local_game/core/di/di.dart';
 import 'package:local_game/core/routes.dart';
@@ -29,7 +28,7 @@ class WordLinkScreen extends StatefulWidget {
 }
 
 class _WordLinkScreenState extends State<WordLinkScreen>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   late AnimationController _controller;
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
@@ -38,6 +37,7 @@ class _WordLinkScreenState extends State<WordLinkScreen>
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _cubit = getIt.get<WordLinkCubit>()..init(level: widget.level);
     _controller = AnimationController(
       vsync: this,
@@ -57,9 +57,17 @@ class _WordLinkScreenState extends State<WordLinkScreen>
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _controller.dispose();
     _cubit.close();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused) {
+      _cubit.saveProgress();
+    }
   }
 
   void _showCorrectOverlay() {
@@ -109,6 +117,8 @@ class _WordLinkScreenState extends State<WordLinkScreen>
                               (state.level?.points ?? 0))
                           : 0)
                       : (state.levelPoints + state.bonus),
+              nextLevelId: widget.level + 1,
+              gameRoute: Routes.gameScreen.toPath,
             ),
           );
         }
@@ -122,6 +132,7 @@ class _WordLinkScreenState extends State<WordLinkScreen>
           canPop: false,
           onPopInvokedWithResult: (didPop, result) {
             if (!didPop) {
+              _cubit.saveProgress();
               context.go(Routes.mapScreen.toPath);
             }
           },
