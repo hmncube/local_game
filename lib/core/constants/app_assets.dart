@@ -24,7 +24,7 @@ mixin AppAssets {
   static const progressBarSvg = 'assets/svg/progrees-bar.svg';
   static const inputSvg = 'assets/svg/input.svg';
   static const pencilSvg = 'assets/svg/pencil.svg';
-  static const langSvg = 'assets/svg/lang.svg';
+
   static const circleSvg = 'assets/svg/circle.svg';
 
   static const starSvg = 'assets/svg/star.svg';

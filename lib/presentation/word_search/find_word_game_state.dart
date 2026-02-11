@@ -25,6 +25,7 @@ class FindWordGameState extends Equatable {
   final int bonus;
   final double progressValue;
   final String userId;
+  final String currentWord;
   final String? hintError;
   final Position? hintPosition;
   final bool isReplay;
@@ -32,7 +33,7 @@ class FindWordGameState extends Equatable {
   const FindWordGameState({
     required this.cubitState,
     this.level,
-    this.gridSize = 10,
+    this.gridSize = 8,
     this.grid = const [],
     this.wordsToFind = const [],
     this.foundWords = const [],
@@ -51,6 +52,7 @@ class FindWordGameState extends Equatable {
     this.seconds = 0,
     this.progressValue = 0.0,
     this.userId = '',
+    this.currentWord = '',
     this.hintError,
     this.hintPosition,
     this.isReplay = false,
@@ -78,6 +80,7 @@ class FindWordGameState extends Equatable {
     int? seconds,
     double? progressValue,
     String? userId,
+    String? currentWord,
     String? hintError,
     Position? hintPosition,
     bool? isReplay,
@@ -99,6 +102,7 @@ class FindWordGameState extends Equatable {
       points: points ?? this.points,
       bonus: bonus ?? this.bonus,
       userId: userId ?? this.userId,
+      currentWord: currentWord ?? this.currentWord,
       seconds: seconds ?? this.seconds,
       progressValue: progressValue ?? this.progressValue,
       isAllComplete: isAllComplete ?? this.isAllComplete,
@@ -126,6 +130,7 @@ class FindWordGameState extends Equatable {
     initialScore,
     points,
     userId,
+    currentWord,
     hints,
     bonus,
     hintPosition,

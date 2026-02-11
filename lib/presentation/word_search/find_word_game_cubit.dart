@@ -75,6 +75,7 @@ class FindWordGameCubit extends BaseCubitWrapper<FindWordGameState> {
         wordPositions: wordPositions,
         wordColors: {},
         newFoundWord: '',
+        currentWord: '',
         initialScore: user?.totalScore ?? 0,
         points: user?.totalScore,
         hints: user?.hints,
@@ -180,11 +181,13 @@ class FindWordGameCubit extends BaseCubitWrapper<FindWordGameState> {
 
   void onCellTap(int row, int col) {
     if (!state.isDragging) {
+      final pos = Position(row, col);
       emit(
         state.copyWith(
-          startPosition: Position(row, col),
-          selectedPositions: [Position(row, col)],
+          startPosition: pos,
+          selectedPositions: [pos],
           isDragging: true,
+          currentWord: state.grid[pos.row][pos.col],
         ),
       );
     }
@@ -196,7 +199,15 @@ class FindWordGameCubit extends BaseCubitWrapper<FindWordGameState> {
       state.startPosition,
       Position(row, col),
     );
-    emit(state.copyWith(selectedPositions: selectedPositions));
+    final currentWord = selectedPositions
+        .map((pos) => state.grid[pos.row][pos.col])
+        .join('');
+    emit(
+      state.copyWith(
+        selectedPositions: selectedPositions,
+        currentWord: currentWord,
+      ),
+    );
   }
 
   Future<void> onDragEnd() async {
@@ -338,6 +349,7 @@ class FindWordGameCubit extends BaseCubitWrapper<FindWordGameState> {
         isAllComplete: isComplete,
         wordColors: updatedWordColors,
         newFoundWord: matchedWord,
+        currentWord: '',
         bonus: bonus,
         points: state.points + points,
         levelPoints: state.levelPoints + points,
@@ -351,6 +363,7 @@ class FindWordGameCubit extends BaseCubitWrapper<FindWordGameState> {
         selectedPositions: [],
         startPosition: const Position.invalid(),
         isDragging: false,
+        currentWord: '',
       ),
     );
   }

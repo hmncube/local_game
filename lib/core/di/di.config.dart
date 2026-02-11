@@ -20,7 +20,6 @@ import '../../data/dao/word_dao.dart' as _i861;
 import '../../data/database_provider.dart' as _i90;
 import '../../data/local_provider.dart' as _i1063;
 import '../../presentation/map/map_cubit.dart' as _i621;
-import '../../presentation/onboarding/onboarding_cubit.dart' as _i69;
 import '../../presentation/settings/settings_cubit.dart' as _i487;
 import '../../presentation/similar_words/similar_words_game_cubit.dart'
     as _i387;
@@ -54,12 +53,6 @@ Future<_i174.GetIt> init(
   gh.factory<_i959.PlayerIconDao>(
     () => _i959.PlayerIconDao(gh<_i779.Database>()),
   );
-  gh.factory<_i447.SplashCubit>(
-    () => _i447.SplashCubit(
-      gh<_i1063.LocalProvider>(),
-      gh<_i90.DatabaseProvider>(),
-    ),
-  );
   gh.factory<_i487.SettingsCubit>(
     () => _i487.SettingsCubit(
       gh<_i1063.LocalProvider>(),
@@ -68,12 +61,8 @@ Future<_i174.GetIt> init(
   );
   gh.factory<_i390.UserDao>(() => _i390.UserDao(gh<_i90.DatabaseProvider>()));
   gh.factory<_i861.WordDao>(() => _i861.WordDao(gh<_i90.DatabaseProvider>()));
-  gh.factory<_i69.OnboardingCubit>(
-    () => _i69.OnboardingCubit(
-      gh<_i959.PlayerIconDao>(),
-      gh<_i390.UserDao>(),
-      gh<_i1063.LocalProvider>(),
-    ),
+  gh.factory<_i447.SplashCubit>(
+    () => _i447.SplashCubit(gh<_i390.UserDao>(), gh<_i90.DatabaseProvider>()),
   );
   gh.factory<_i0.LevelDao>(
     () => _i0.LevelDao(gh<_i90.DatabaseProvider>(), gh<_i861.WordDao>()),

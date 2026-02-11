@@ -6,7 +6,7 @@ import 'package:local_game/presentation/models/points.dart';
 import 'package:local_game/presentation/word_link/word_link_screen.dart';
 import 'package:local_game/presentation/level_complete/level_complete_screen.dart';
 import 'package:local_game/presentation/map/map_screen.dart';
-import 'package:local_game/presentation/onboarding/onboarding_screen.dart';
+
 import 'package:local_game/presentation/similar_words/similar_words_game_screen.dart';
 import 'package:local_game/presentation/splash/splash_screen.dart';
 import 'package:local_game/presentation/word_search/find_word_game_screen.dart';
@@ -37,17 +37,7 @@ class AppRoutes {
               child: const MapScreen(),
             ),
       ),
-      GoRoute(
-        path: Routes.onboarding.toPath,
-        name: Routes.onboarding.toNamed,
-        builder: (context, state) => const OnboardingScreen(),
-        pageBuilder:
-            (context, state) => buildPageWithDefaultTransition(
-              context: context,
-              state: state,
-              child: const OnboardingScreen(),
-            ),
-      ),
+
       GoRoute(
         path: Routes.gameScreen.toPath,
         name: Routes.gameScreen.toNamed,

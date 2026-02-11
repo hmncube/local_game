@@ -116,39 +116,22 @@ class _FindWordGameScreenState extends State<FindWordGameScreen> {
                       ),
                       const SizedBox(height: 24),
 
-                      // Timer Section
+                      // Current Word HUD
                       NeubrutalismContainer(
+                        height: 64,
                         borderRadius: 20,
                         backgroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 12,
-                        ),
-                        child: Column(
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Icon(
-                                  Icons.timer,
-                                  size: 18,
-                                  color: darkBorderColor,
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  'BONUS TIMER',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w900,
-                                    color: darkBorderColor.withOpacity(0.7),
-                                    letterSpacing: 1.2,
-                                  ),
-                                ),
-                              ],
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Center(
+                          child: Text(
+                            state.currentWord,
+                            style: const TextStyle(
+                              fontSize: 32,
+                              fontWeight: FontWeight.w900,
+                              color: accentOrange,
+                              letterSpacing: 4,
                             ),
-                            const SizedBox(height: 8),
-                            AnimatedTimerBar(value: state.progressValue),
-                          ],
+                          ),
                         ),
                       ),
 
@@ -170,6 +153,35 @@ class _FindWordGameScreenState extends State<FindWordGameScreen> {
                   ),
                 ),
               ),
+              floatingActionButton:
+                  state.seconds > 0
+                      ? FloatingActionButton.extended(
+                        onPressed: null,
+                        backgroundColor: Colors.white,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                          side: const BorderSide(
+                            color: darkBorderColor,
+                            width: 3,
+                          ),
+                        ),
+                        label: Row(
+                          children: [
+                            const Icon(Icons.timer, color: darkBorderColor),
+                            const SizedBox(width: 8),
+                            Text(
+                              '${state.seconds}s',
+                              style: const TextStyle(
+                                color: darkBorderColor,
+                                fontWeight: FontWeight.w900,
+                                fontSize: 18,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                      : null,
             ),
           );
         },

@@ -1,6 +1,6 @@
 enum Routes {
   splashScreen,
-  onboarding,
+
   mapScreen,
   gameScreen,
   wordSearch,
